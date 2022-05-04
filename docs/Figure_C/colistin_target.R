@@ -4,7 +4,7 @@ p_load(pheatmap, data.table, ggplot2)
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 
-interest <- fread("Results/interest.tsv", sep = "\t")
+interest <- fread("interest.tsv", sep = "\t")
 
 generate_breaks = function(x, n, center = F){
 	if(center){

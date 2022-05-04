@@ -1,19 +1,19 @@
 require('pacman');
 
 p_load(
-	data.table, 
-	scales, 
-	edgeR, 
-	statmod, 
-	poolr, 
-	pheatmap, 
-	svglite, 
-	ggplot2, 
-	ggrepel, 
-	Rtsne, 
-	pracma, 
-	colourpicker, 
-	RColorBrewer, 
+	data.table,
+	scales,
+	edgeR,
+	statmod,
+	poolr,
+	pheatmap,
+	svglite,
+	ggplot2,
+	ggrepel,
+	Rtsne,
+	pracma,
+	colourpicker,
+	RColorBrewer,
 	vegan)
 
 curated_names <- fread(
@@ -47,7 +47,7 @@ aba_design <- fread(
 	na.strings = c("NA"))
 
 aba_genome <- aba_bed[
-	aba_key[, .(spacer, type, locus_tag, y_pred, target, offset)], 
+	aba_key[, .(spacer, type, locus_tag, y_pred, target, offset)],
 	on = .(locus_tag)]
 
 # define the experimental design space to only take into consideration "tubes"
@@ -62,36 +62,36 @@ publication_design[, rep := paste0("(", rep, ")")]
 # keep only the counts that are in the experimental design space
 aba <- aba[condition %in% aba_design$condition]
 
-# convert single column into a table 
-aba_grid <- 
+# convert single column into a table
+aba_grid <-
 	data.table::dcast(
-		aba, 
+		aba,
 		spacer ~ factor(condition, levels = unique(condition)),
-		value.var = "count", 
+		value.var = "count",
 		fill = 0)
 
-aba_grid_matrix <- 
+aba_grid_matrix <-
 	data.matrix(aba_grid[, -c("spacer")])
 
 row.names(aba_grid_matrix) <- aba_grid$spacer
 
-aba_group <- 
+aba_group <-
 	factor(
 		aba_design[,  paste(drug, dose, timing, sep = "_")])
 
 aba_permut <-
 	model.matrix( ~ 0 + aba_group)
 
-colnames(aba_permut) <- 
+colnames(aba_permut) <-
 	levels(aba_group)
 
-aba_y <- 
+aba_y <-
 	DGEList(
 		counts = aba_grid_matrix,
 		group = aba_group,
 		genes = row.names(aba_grid_matrix))
 
-aba_keep <- 
+aba_keep <-
 	filterByExpr(
 		y = aba_y,
 		design = aba_permut,
@@ -112,9 +112,9 @@ colnames(aba_CPM) <- factor(aba_design[,  paste(drug, dose, timing, sep = "_")])
 ########################
 
 contrast_levels <- CJ(
-	level2 = colnames(aba_permut), 
+	level2 = colnames(aba_permut),
 	level1 = colnames(aba_permut))[
-		level2 != level1, 
+		level2 != level1,
 		paste(level2, level1, sep = " - ")]
 
 aba_contrast <- makeContrasts(
@@ -142,23 +142,23 @@ results_LFC <- aba_key[, .(genes = unique(spacer))]
 ########################
 
 for (i in 1:ncol(aba_contrast)) {
-	
+
 	results <- glmQLFTest(aba_fit, contrast = aba_contrast[,i])
-	
+
 	results <- topTags(results, n = Inf)
-	
+
 	results <- data.table(results$table)
-	
+
 	print(paste("Processing results for", contrast_levels[i], "..."))
-	
+
 	results_FDR <- results[, .(genes, FDR)][results_FDR, on = .(genes)]
-	
+
 	setnames(results_FDR, "FDR", contrast_levels[i])
-	
+
 	results_LFC <- results[, .(genes, logFC)][results_LFC, on = .(genes)]
-	
+
 	setnames(results_LFC, "logFC", contrast_levels[i])
-	
+
 }
 
 ########################
@@ -174,9 +174,9 @@ results_LFC <- curated_names[, .(AB19606, AB030, unique_name)][results_LFC, on =
 
 ########################
 
-melted_results_FDR <- 
+melted_results_FDR <-
 	data.table::melt(
-		results_FDR, 
+		results_FDR,
 		id.vars = c(
 			"AB19606",
 			"AB030",
@@ -186,13 +186,13 @@ melted_results_FDR <-
 			"y_pred",
 			"target",
 			"offset"),
-		variable.name = "condition", 
+		variable.name = "condition",
 		value.name = "FDR",
 		measure.vars = contrast_levels)
 
-melted_results_LFC <- 
+melted_results_LFC <-
 	data.table::melt(
-		results_LFC, 
+		results_LFC,
 		id.vars = c(
 			"AB19606",
 			"AB030",
@@ -202,15 +202,15 @@ melted_results_LFC <-
 			"y_pred",
 			"target",
 			"offset"),
-		variable.name = "condition", 
+		variable.name = "condition",
 		value.name = "LFC",
 		measure.vars = contrast_levels)
 
 ########################
 
-melted_results <- 
+melted_results <-
 	melted_results_LFC[
-		melted_results_FDR, 
+		melted_results_FDR,
 		on = .(
 			AB19606,
 			AB030,
@@ -226,7 +226,7 @@ melted_results <- melted_results[!is.na(FDR) & !is.na(LFC)]
 
 ##########################################################################################
 
-control_melted_results_by_condition <- 
+control_melted_results_by_condition <-
 	melted_results[
 		type == "control",
 		.(med_LFC = median(LFC)),
@@ -239,14 +239,14 @@ melted_results[, LFC.adj := control_melted_results_by_condition[
 
 ##########################################################################################
 
-median_melted_results <- 
+median_melted_results <-
 	melted_results[
-		, .(medLFC = median(LFC), FDR = stouffer(FDR)$p), 
+		, .(medLFC = median(LFC), FDR = stouffer(FDR)$p),
 		by = .(AB19606, AB030, unique_name, type, condition)]
 
 ############################################################################################################
 
-conditions <- 
+conditions <-
 	c("None_0_T1 - None_0_T0",
 		"None_0_T2 - None_0_T0",
 		"Colistin_0.44_T1 - None_0_T1",
@@ -266,23 +266,23 @@ interest <- data.table(condition = conditions)
 ############################################################################################################
 
 results_LFC <- dcast(
-	melted_results[condition %in% interest$condition], 
-	AB19606 + AB030 + unique_name + type + spacer + y_pred + target + offset ~ condition, 
+	melted_results[condition %in% interest$condition],
+	AB19606 + AB030 + unique_name + type + spacer + y_pred + target + offset ~ condition,
 	value.var = "LFC")
 
 results_FDR <- dcast(
-	melted_results[condition %in% interest$condition], 
-	AB19606 + AB030 + unique_name + type + spacer + y_pred + target + offset ~ condition, 
+	melted_results[condition %in% interest$condition],
+	AB19606 + AB030 + unique_name + type + spacer + y_pred + target + offset ~ condition,
 	value.var = "FDR")
 
 median_results_LFC <- dcast(
-	median_melted_results[condition %in% interest$condition], 
-	AB19606 + AB030 + unique_name + type ~ condition, 
+	median_melted_results[condition %in% interest$condition],
+	AB19606 + AB030 + unique_name + type ~ condition,
 	value.var = "medLFC")
 
 median_results_FDR <- dcast(
-	median_melted_results[condition %in% interest$condition], 
-	AB19606 + AB030 + unique_name + type ~ condition, 
+	median_melted_results[condition %in% interest$condition],
+	AB19606 + AB030 + unique_name + type ~ condition,
 	value.var = "FDR")
 
 fwrite(results_LFC, "Results/results_LFC.tsv.gz", sep = "\t")
@@ -369,4 +369,4 @@ fwrite(melted_results, "Results/melted_results.tsv.gz", sep = "\t")
 
 fwrite(median_melted_results, "Results/median_melted_results.tsv.gz", sep = "\t")
 
-fwrite(interest, "Results/interest.tsv", sep = "\t")
+fwrite(interest, "interest.tsv", sep = "\t")

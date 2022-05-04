@@ -81,7 +81,7 @@ conflict_prefer("filter", "dplyr")
 melted_results <- fread(
 	"../../Results/melted_results.tsv.gz", sep = "\t")
 interest <- fread(
-	"../../Results/interest.tsv", sep = "\t")
+	"../../interest.tsv", sep = "\t")
 curated_names <- fread(
 	"../../curated_names.tsv", sep = "\t")
 ```

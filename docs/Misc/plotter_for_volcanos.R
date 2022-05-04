@@ -3,7 +3,7 @@ p_load(ggplot2, data.table, pheatmap, ggrepel, hrbrthemes, viridis)
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 
-interest <- fread("Results/interest.tsv", sep = "\t")
+interest <- fread("interest.tsv", sep = "\t")
 
 #T1
 

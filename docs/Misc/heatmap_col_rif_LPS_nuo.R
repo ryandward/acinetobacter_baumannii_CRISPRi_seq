@@ -6,7 +6,7 @@ p_load(pheatmap, data.table, ggplot2)
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 
-interest <- fread("Results/interest.tsv", sep = "\t")
+interest <- fread("interest.tsv", sep = "\t")
 
 scale_rows = function(x){
 	m = apply(x, 1, mean, na.rm = T)
