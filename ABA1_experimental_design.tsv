@@ -1,0 +1,46 @@
+condition	shift	timing	experiment	rep	verbose	drug	dose
+ABA1-1	LB	T0	tube	1	No drug	None	0
+ABA1-2	LB	T1	tube	1	No drug	None	0
+ABA1-3	LB	T2	tube	1	No drug	None	0
+ABA1-4	LB	T1	tube	2	No drug	None	0
+ABA1-5	LB	T2	tube	2	No drug	None	0
+ABA1-10	C3	T1	tube	1	Colistin 0.44	Colistin	0.44
+ABA1-11	C3	T2	tube	1	Colistin 0.44	Colistin	0.44
+ABA1-12	C3	T1	tube	2	Colistin 0.44	Colistin	0.44
+ABA1-13	C3	T2	tube	2	Colistin 0.44	Colistin	0.44
+ABA1-14	I2	T1	tube	1	Imipenem 0.09	Imipenem	0.09
+ABA1-15	I2	T2	tube	1	Imipenem 0.09	Imipenem	0.09
+ABA1-16	I2	T1	tube	2	Imipenem 0.09	Imipenem	0.09
+ABA1-17	I2	T2	tube	2	Imipenem 0.09	Imipenem	0.09
+ABA1-18	I3	T1	tube	1	Imipenem 0.06	Imipenem	0.06
+ABA1-19	I3	T2	tube	1	Imipenem 0.06	Imipenem	0.06
+ABA1-20	I3	T1	tube	2	Imipenem 0.06	Imipenem	0.06
+ABA1-21	I3	T2	tube	2	Imipenem 0.06	Imipenem	0.06
+ABA1-22	M2	T1	tube	1	Meropenem 0.17	Meropenem	0.17
+ABA1-23	M2	T2	tube	1	Meropenem 0.17	Meropenem	0.17
+ABA1-24	M2	T1	tube	2	Meropenem 0.17	Meropenem	0.17
+ABA1-25	M2	T2	tube	2	Meropenem 0.17	Meropenem	0.17
+ABA1-26	M3	T1	tube	1	Meropenem 0.11	Meropenem	0.11
+ABA1-27	M3	T2	tube	1	Meropenem 0.11	Meropenem	0.11
+ABA1-28	M3	T1	tube	2	Meropenem 0.11	Meropenem	0.11
+ABA1-29	M3	T2	tube	2	Meropenem 0.11	Meropenem	0.11
+ABA1-30	R	T1	tube	1	Rifampicin 0.34	Rifampicin	0.34
+ABA1-31	R	T2	tube	1	Rifampicin 0.34	Rifampicin	0.34
+ABA1-32	R	T1	tube	2	Rifampicin 0.34	Rifampicin	0.34
+ABA1-33	R	T2	tube	2	Rifampicin 0.34	Rifampicin	0.34
+ABA1-34A	LB	T0	flask	1		None	
+ABA1-34B	LB	T0	flask	2		None	
+ABA1-35	LB	T2	flask	1		None	
+ABA1-36	LB	T2	flask	2		None	
+ABA1-37	Col	T1	flask	1		Colistin	
+ABA1-38	Col	T1	flask	2		Colistin	
+ABA1-39	Col	T2	flask	1		Colistin	
+ABA1-40	Col	T2	flask	2		Colistin	
+ABA1-41	I5	T2	flask	1		Imipenem	
+ABA1-42	I5	T2	flask	2		Imipenem	
+ABA1-43	I6	T2	flask	1		Imipenem	
+ABA1-44	I6	T2	flask	2		Imipenem	
+ABA1-45	M7	T2	flask	1		Meropenem	
+ABA1-46	M7	T2	flask	2		Meropenem	
+ABA1-47	M8	T2	flask	1		Meropenem	
+ABA1-48	M8	T2	flask	2		Meropenem	
