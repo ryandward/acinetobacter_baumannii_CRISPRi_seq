@@ -1,0 +1,457 @@
+---
+title: "Drug Targets by Pathway"
+keep_md: no
+---
+```{r Read files and prepare framework for analyis}
+library(pacman)
+
+p_load(data.table, edgeR, pheatmap, viridis, tidyverse, hrbrthemes)
+
+# reads
+aba.counts <- fread(
+	"../../all_counts_seal.tsv.gz",
+	header = FALSE,
+	col.names = c("spacer", "count", "condition"))
+
+# guide design key
+aba.key <- fread("../../aba_key.tsv")
+
+# experimental design
+aba.design <- fread("../../ABA1_experimental_design.tsv")
+
+# hand-curated names with references available
+curated_names <- fread("../../curated_names.tsv")
+
+# Pathway definitions
+# Cell wall biogenesis/degradation, and Cell Wall/PG
+CL2682 <- fread("../../CL2687.tsv") 
+
+# Ribosome, why is rplY and rpmB not being painted in plots?
+map03010 <- fread("../../map03010.tsv") 
+
+# Lipopolysaccharide in AB030 KEGG, map 00540
+LPS <- fread("../../LPS.tsv") 
+
+# Quinone, and NADH:quinone oxidoreductase/Mrp antiporter, membrane subunit
+CL3048 <- fread("../../CL3048.tsv") 
+
+# Aminoacyl-tRNA synthetase, GO
+GO0004812 <- fread("../../GO0004812.tsv") 
+```
+
+```{r Functions for use in results parsing}
+
+extract_edgeR = function(y.fit, y.contrasts, y.permutations) {
+	
+	contrasts.edgeR <- makeContrasts(
+		contrasts = y.contrasts,
+		levels = y.permutations)
+
+	results <- glmQLFTest(y.fit, contrast = contrasts.edgeR)
+	
+	results <- topTags(results, n = Inf)
+	
+	results <- data.table(results$table)
+	
+	return(results)
+}
+
+clean_edgeR = function(results) {
+	
+	col_rep <- "\\.\\.\\." #i.e. "..." -> " - " 
+	
+	setnames(
+		results, 
+		names(results[, .SD, .SDcols = patterns(col_rep)]), 
+		gsub(col_rep, " - ",  names(results[, .SD, .SDcols = patterns(col_rep)])))
+	
+	col_rep <- "logFC\\." #i.e. "logFC." -> ""
+	
+	setnames(
+		results, 
+		names(results[, .SD, .SDcols = patterns(col_rep)]), 
+		gsub(col_rep, "",  names(results[, .SD, .SDcols = patterns(col_rep)])))
+	
+	return(results)
+}
+
+melt_and_stack = function(results) {
+	
+	results <- aba.genome[
+		results, on = .(spacer == genes)]
+
+	melted_results <- data.table::melt(
+		results,
+		id.vars = c(
+			"AB19606",
+			"AB030",
+			"unique_name",
+			"spacer",
+			"type",
+			"y_pred",
+			"target",
+			"offset",
+			"FDR",
+			"Pathway"),
+		variable.name = "condition", 
+		value.name = "LFC",
+		measure.vars = aba.contrasts)
+	
+	melted_results <- melted_results[!is.na(FDR) & !is.na(LFC)]
+	
+	control_melted_results_by_condition <- 
+		melted_results[
+			type == "control",
+			.(med_LFC = median(LFC)),
+			keyby = .(condition)]
+	
+	setkey(melted_results, condition)
+	
+	melted_results[
+		, LFC.adj := control_melted_results_by_condition[
+			melted_results, LFC - med_LFC, by = .EACHI]$V1]
+	
+	return(melted_results)
+}
+
+```
+
+```{r Functions for use in heatmaps}
+generate_breaks = function(x, n, center = F) {
+	
+	if (center) {
+		m = max(abs(c(min(x, na.rm = T), max(x, na.rm = T))))
+		res = seq(-m, m, length.out = n + 1)}
+	
+	else {
+		res = seq(min(x, na.rm = T), max(x, na.rm = T), length.out = n + 1)}
+	
+	return(res)
+}
+
+```
+
+
+```{r Combine, format, and filter data}
+aba.genome <- aba.key[
+	, .(spacer, type, locus_tag, y_pred, target, offset), by = .(locus_tag)]
+
+aba.genome <- curated_names[
+	, .(AB19606, AB030, unique_name)][aba.genome, on = .(AB19606 == locus_tag)]
+
+# classify genes as belonging to one pathway
+aba.genome[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
+aba.genome[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
+aba.genome[AB030 %in% LPS$AB030, Pathway := "LPS"]
+aba.genome[unique_name %like% "lpt", Pathway := "LPS"]
+aba.genome[unique_name == "gtrOC1", Pathway := "LPS"]
+aba.genome[AB030 %in% CL3048$AB030, Pathway := "Quinone/NADH"]
+aba.genome[AB030 %in% GO0004812$AB030, Pathway := "tRNA Ligase"]
+aba.genome[is.na(Pathway), Pathway := "Other"]
+aba.genome[AB19606 == "", AB19606 := NA]
+
+# define the experimental design space to only take into consideration "tubes"
+aba.design <- aba.design[experiment == "tube"]
+
+# keep only the counts that are in the experimental design space
+aba.counts <- aba.counts[condition %in% aba.design$condition]
+
+# convert single column into a table 
+aba.grid <- data.table::dcast(
+	aba.counts, 
+	spacer ~ factor(condition, levels = unique(condition)),
+	value.var = "count", 
+	fill = 0)
+
+aba.grid.mat <- 
+	data.matrix(aba.grid[, -c("spacer")])
+
+row.names(aba.grid.mat) <- aba.grid$spacer
+
+aba.group <- factor(aba.design[, paste(drug, dose, timing, sep = "_")])
+
+aba.permutations <-	model.matrix( ~ 0 + aba.group)
+
+colnames(aba.permutations) <- levels(aba.group)
+```
+
+```{r Prepare data for edgeR}
+aba.y <- DGEList(
+	counts = aba.grid.mat,
+	group = aba.group,
+	genes = row.names(aba.grid.mat))
+
+aba.keep <- filterByExpr(
+	y = aba.y,
+	design = aba.permutations,
+	group = aba.group)
+
+aba.y <- aba.y[aba.keep, , keep.lib.sizes = TRUE]
+
+aba.y <- calcNormFactors(aba.y)
+
+aba.y <- estimateDisp(aba.y, aba.permutations)
+
+aba.fit <- glmQLFit(aba.y, aba.permutations, robust = TRUE)
+
+```
+
+```{r Perform edgeR for Colistin Samples}
+aba.contrasts <- c(
+	"None_0_T1 - None_0_T0",
+	"Colistin_0.44_T1 - None_0_T0",
+	"Colistin_0.44_T1 - None_0_T1",
+	"None_0_T2 - None_0_T0",
+	"Colistin_0.44_T2 - None_0_T0",
+	"Colistin_0.44_T2 - None_0_T2") 
+
+results <- extract_edgeR(
+	y.fit = aba.fit, 
+	y.contrasts = aba.contrasts, 
+	y.permutations = aba.permutations)
+
+results <- clean_edgeR(results)
+
+melted_results <- melt_and_stack(results)
+```
+
+
+```{r LPS activity in colistin, fig.width=10, fig.height=10}
+median_LFC <- dcast(
+	melted_results[Pathway == "LPS" & type == "perfect"], 
+	unique_name + Pathway ~ condition, 
+	value.var = "LFC.adj", 
+	fun.aggregate = median)
+
+print(colnames(median_LFC))
+
+to_plot_title <- "Median L2FC in Perfect-Match LPS Guides"
+
+# convert to matrix
+LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
+
+# name rows in matrix
+rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+
+# format genes (rows): Pathway + italic(Gene Name)
+genes.formatted <- lapply(
+	median_LFC[, .I],
+	function(x) { 
+		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
+
+# format conditions (columns)
+conditions.formatted <- c(
+	bquote(Induction ~ (t[1] - t[0])),
+	bquote(Colistin ~ (t[1] - t[0])),
+	bquote(Colistin - Induction ~ (t[1] - t[1])),
+	bquote(Induction ~ (t[2] - t[0])),
+	bquote(Colistin ~ (t[2] - t[0])),
+	bquote(Colistin - Induction ~ (t[2] - t[2])))
+
+plot_matrix <- LFC_grid
+
+breaks <- generate_breaks(plot_matrix, n = 256, center = T)
+
+plot_colors <- colorRampPalette(
+	c("#ba000d", "white", "#007ac1"),
+	interpolate = "linear")(256)
+
+to_plot <- pheatmap(
+	plot_matrix,
+	col = plot_colors,
+	breaks = breaks,
+	border_color = NA,
+	main = to_plot_title,
+	cluster_cols = F,
+	angle_col = 45,
+	clustering_method = "ward.D2",
+	clustering_distance_rows = "canberra",
+	labels_row = as.expression(genes.formatted),
+	labels_col = as.expression(conditions.formatted),
+	gaps_col = 3,
+	cutree_rows = 4,
+	cellheight = 24,
+	cellwidth = 48,
+	fontsize = 12,
+	silent = T)
+	
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+	
+print(to_plot)
+```
+
+```{r Perform edgeR for Imipenem (high) Samples}
+aba.contrasts <- c(
+	"None_0_T1 - None_0_T0",
+	"Imipenem_0.09_T1 - None_0_T0",
+	"Imipenem_0.09_T1 - None_0_T1",
+	"None_0_T2 - None_0_T0",
+	"Imipenem_0.09_T2 - None_0_T0",
+	"Imipenem_0.09_T2 - None_0_T2") 
+
+results <- extract_edgeR(
+	y.fit = aba.fit, 
+	y.contrasts = aba.contrasts, 
+	y.permutations = aba.permutations)
+
+results <- clean_edgeR(results)
+
+melted_results <- melt_and_stack(results)
+```
+
+```{r Cell Wall activity in Imipenem, fig.width=10, fig.height=8}
+median_LFC <- dcast(
+	melted_results[Pathway == "Cell Wall/PG" & type == "perfect"], 
+	unique_name + Pathway ~ condition, 
+	value.var = "LFC.adj", 
+	fun.aggregate = median)
+
+print(colnames(median_LFC))
+
+to_plot_title <- "Median L2FC in Perfect-Match Cell Wall/PG Guides"
+
+# convert to matrix
+LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
+
+# name rows in matrix
+rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+
+# format genes (rows): Pathway + italic(Gene Name)
+genes.formatted <- lapply(
+	median_LFC[, .I],
+	function(x) { 
+		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
+
+# format conditions (columns)
+conditions.formatted <- c(
+	bquote(Induction ~ (t[1] - t[0])),
+	bquote(Imipenem ~ (high) ~ (t[1] - t[0])),
+	bquote(Imipenem ~ (high) - Induction ~ (t[1] - t[1])),
+	bquote(Induction ~ (t[2] - t[0])),
+	bquote(Imipenem ~ (high) ~ (t[2] - t[0])),
+	bquote(Imipenem ~ (high) - Induction ~ (t[2] - t[2])))
+
+plot_matrix <- LFC_grid
+
+breaks <- generate_breaks(plot_matrix, n = 256, center = T)
+
+plot_colors <- colorRampPalette(
+	c("#ba000d", "white", "#007ac1"),
+	interpolate = "linear")(256)
+
+to_plot <- pheatmap(
+	plot_matrix,
+	col = plot_colors,
+	breaks = breaks,
+	border_color = NA,
+	main = to_plot_title,
+	cluster_cols = F,
+	angle_col = 45,
+	clustering_method = "ward.D2",
+	clustering_distance_rows = "canberra",
+	labels_row = as.expression(genes.formatted),
+	labels_col = as.expression(conditions.formatted),
+	gaps_col = 3,
+	cutree_rows = 4,
+	cellheight = 24,
+	cellwidth = 48,
+	fontsize = 12,
+	silent = T)
+	
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+	
+print(to_plot)
+```
+
+```{r Perform edgeR for Meropenem (high) Samples}
+aba.contrasts <- c(
+	"None_0_T1 - None_0_T0",
+	"Meropenem_0.17_T1 - None_0_T0",
+	"Meropenem_0.17_T1 - None_0_T1",
+	"None_0_T2 - None_0_T0",
+	"Meropenem_0.17_T2 - None_0_T0",
+	"Meropenem_0.17_T2 - None_0_T2") 
+
+results <- extract_edgeR(
+	y.fit = aba.fit, 
+	y.contrasts = aba.contrasts, 
+	y.permutations = aba.permutations)
+
+results <- clean_edgeR(results)
+
+melted_results <- melt_and_stack(results)
+```
+
+```{r Cell Wall activity in Meropenem, fig.width=10, fig.height=8}
+median_LFC <- dcast(
+	melted_results[Pathway == "Cell Wall/PG" & type == "perfect"], 
+	unique_name + Pathway ~ condition, 
+	value.var = "LFC.adj", 
+	fun.aggregate = median)
+
+print(colnames(median_LFC))
+
+to_plot_title <- "Median L2FC in Perfect-Match Cell Wall/PG Guides"
+
+# convert to matrix
+LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
+
+# name rows in matrix
+rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+
+# format genes (rows): Pathway + italic(Gene Name)
+genes.formatted <- lapply(
+	median_LFC[, .I],
+	function(x) { 
+		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
+
+# format conditions (columns)
+conditions.formatted <- c(
+	bquote(Induction ~ (t[1] - t[0])),
+	bquote(Meropenem ~ (high) ~ (t[1] - t[0])),
+	bquote(Meropenem ~ (high) - Induction ~ (t[1] - t[1])),
+	bquote(Induction ~ (t[2] - t[0])),
+	bquote(Meropenem ~ (high) ~ (t[2] - t[0])),
+	bquote(Meropenem ~ (high) - Induction ~ (t[2] - t[2])))
+
+plot_matrix <- LFC_grid
+
+breaks <- generate_breaks(plot_matrix, n = 256, center = T)
+
+plot_colors <- colorRampPalette(
+	c("#ba000d", "white", "#007ac1"),
+	interpolate = "linear")(256)
+
+to_plot <- pheatmap(
+	plot_matrix,
+	col = plot_colors,
+	breaks = breaks,
+	border_color = NA,
+	main = to_plot_title,
+	cluster_cols = F,
+	angle_col = 45,
+	clustering_method = "ward.D2",
+	clustering_distance_rows = "canberra",
+	labels_row = as.expression(genes.formatted),
+	labels_col = as.expression(conditions.formatted),
+	gaps_col = 3,
+	cutree_rows = 4,
+	cellheight = 24,
+	cellwidth = 48,
+	fontsize = 12,
+	silent = T)
+	
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+	
+print(to_plot)
+```
+

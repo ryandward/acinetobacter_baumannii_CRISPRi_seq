@@ -1,0 +1,247 @@
+---
+title: "Validation and Reproducibility Between Replicates"
+fig_width: 10
+fig_height: 4
+keep_md: no
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r Shape Data}
+library(pacman)
+
+p_load(data.table, edgeR, ggplot2, hrbrthemes, viridis, tidyverse)
+
+curated_names <- fread(
+	"../../curated_names.tsv")
+
+aba_bed <- fread(
+	"../../CP046654.1.bed",
+	col.names = c(
+		"chromosome",
+		"left",
+		"right",
+		"locus_tag",
+		"gene_name",
+		"strand",
+		"coding",
+		"completeness"))
+
+aba <- fread(
+	"../../all_counts_seal.tsv.gz",
+	header = FALSE,
+	col.names = c(
+		"spacer",
+		"count",
+		"condition"))
+
+aba_key <- fread(
+	"../../aba_key.tsv")
+
+aba_design <- fread(
+	"../../ABA1_experimental_design.tsv",
+	na.strings = c("NA"))
+
+aba_genome <- aba_bed[
+	aba_key[, .(spacer, type, locus_tag, y_pred, target, offset)], 
+	on = .(locus_tag)]
+
+# define the experimental design space to only take into consideration "tubes"
+aba_design <- aba_design[experiment == "tube"]
+
+publication_design <- copy(aba_design)
+
+publication_design[, timing := gsub("T", "t", timing)]
+
+publication_design[, rep := paste0("(", rep, ")")]
+
+# keep only the counts that are in the experimental design space
+aba <- aba[condition %in% aba_design$condition]
+
+# convert single column into a table 
+aba_grid <- 
+	data.table::dcast(
+		aba, 
+		spacer ~ factor(condition, levels = unique(condition)),
+		value.var = "count", 
+		fill = 0)
+
+aba_grid_matrix <- 
+	data.matrix(aba_grid[, -c("spacer")])
+
+row.names(aba_grid_matrix) <- aba_grid$spacer
+```
+
+```{r MDS CPM for all times}
+d <- dist(t(cpm(aba_grid_matrix)))
+
+d_fit <- cmdscale(d,eig = TRUE, k = 2) # k is the number of dim
+
+d_scale <- data.table(d_fit$points, keep.rownames = "condition")
+
+d_scale <- publication_design[d_scale, on = .(condition)]
+
+d_scale[, Timing := timing]
+
+d_scale[, Chemical := paste(drug, dose, "ug/mL")]
+
+setnames(d_scale, c("V1", "V2"), c("Dimension 1", "Dimension 2"))
+
+this_title <- "Multidimensional Scaling: Counts per Million"
+
+plot_object <- ggplot(
+	data = d_scale,
+	aes(
+		x = `Dimension 1`, 
+		y = `Dimension 2`,
+		fill = Chemical,
+		shape = Timing)) +
+	geom_point(size = 6) +
+	theme_ipsum() +
+	ggtitle(this_title) +
+	scale_fill_viridis(discrete = TRUE, alpha = 0.35 ) +
+	scale_shape_manual(name = "Timing", values = c(21, 22, 23)) +
+	guides(
+		fill = guide_legend(
+			override.aes = list(shape = 21),
+			order = 1))
+
+print(plot_object)
+
+```
+
+```{r MDS CPM for T1}
+
+samples_T1 <-
+	dcast(melt(aba_grid, id.vars = "spacer")[variable %in% aba_design[timing == "T1", condition]], spacer ~ variable, value.var = "value")
+
+samples_T1_matrix <- data.matrix(samples_T1[, -1])
+
+rownames(samples_T1_matrix) <- samples_T1$spacer
+
+d <- dist(t(cpm(samples_T1_matrix)))
+
+d_fit <- cmdscale(d,eig = TRUE, k = 2) # k is the number of dim
+
+d_scale <- data.table(d_fit$points, keep.rownames = "condition")
+
+d_scale <- publication_design[d_scale, on = .(condition)]
+
+d_scale[, Timing := timing]
+
+d_scale[, Chemical := paste(drug, dose, "ug/mL")]
+
+setnames(d_scale, c("V1", "V2"), c("Dimension 1", "Dimension 2"))
+
+this_title <- "Multidimensional Scaling at t[1]: Counts per Million"
+
+plot_object <- ggplot(
+	data = d_scale,
+	aes(
+		x = `Dimension 1`, 
+		y = `Dimension 2`,
+		fill = Chemical,
+		shape = Timing)) +
+	geom_point(size = 6) +
+	theme_ipsum() +
+	ggtitle(this_title) +
+	scale_fill_viridis(discrete = TRUE, alpha = 0.35 ) +
+	scale_shape_manual(name = "Timing", values = c(22)) +
+	guides(
+		fill = guide_legend(
+			override.aes = list(shape = 22),
+			order = 1))
+
+print(plot_object)
+```
+
+```{r MDS CPM for T2}
+
+samples_T1 <-
+	dcast(melt(aba_grid, id.vars = "spacer")[variable %in% aba_design[timing == "T2", condition]], spacer ~ variable, value.var = "value")
+
+samples_T1_matrix <- data.matrix(samples_T1[, -1])
+
+rownames(samples_T1_matrix) <- samples_T1$spacer
+
+d <- dist(t(cpm(samples_T1_matrix)))
+
+d_fit <- cmdscale(d,eig = TRUE, k = 2) # k is the number of dim
+
+d_scale <- data.table(d_fit$points, keep.rownames = "condition")
+
+d_scale <- publication_design[d_scale, on = .(condition)]
+
+d_scale[, Timing := timing]
+
+d_scale[, Chemical := paste(drug, dose, "ug/mL")]
+
+setnames(d_scale, c("V1", "V2"), c("Dimension 1", "Dimension 2"))
+
+this_title <- "Multidimensional Scaling at t[2]: Counts per Million"
+
+plot_object <- ggplot(
+	data = d_scale,
+	aes(
+		x = `Dimension 1`, 
+		y = `Dimension 2`,
+		fill = Chemical,
+		shape = Timing)) +
+	geom_point(size = 6) +
+	theme_ipsum() +
+	ggtitle(this_title) +
+	scale_fill_viridis(discrete = TRUE, alpha = 0.35 ) +
+	scale_shape_manual(name = "Timing", values = c(23)) +
+	guides(
+		fill = guide_legend(
+			override.aes = list(shape = 23),
+			order = 1))
+
+print(plot_object)
+```
+
+```{r message=FALSE, warning=FALSE, fig.width=7, fig.height=7}
+
+aba.cpm <-
+	aba_grid_matrix %>% 
+	cpm %>% 
+	as_tibble(rownames = "spacer") %>% 
+	pivot_longer(!spacer, names_to = "condition", values_to = "CPM") %>%
+	full_join(aba_design) %>%
+	mutate(rep = paste("Replicate", rep)) %>%
+	group_by(verbose, timing) %>% 
+	nest %>%
+	mutate(
+		data = map(
+			data, ~.x %>% pivot_wider(id_cols = spacer, names_from = rep, values_from = CPM))) %>%
+	filter(timing != "T0") %>%
+	mutate(
+		correlation = paste0("(Cor=", round(
+			map_dbl(
+				data, 
+				~cor(.$`Replicate 1`, .$`Replicate 2`)), 3), ")")) %>%
+	unite("Sample Name", c("verbose", "timing", "correlation"), sep = " ")
+	
+
+aba.cpm <- aba.cpm %>%
+	mutate(
+		plot = map2(
+			data,
+			`Sample Name`,
+			~ggplot(
+				.x,
+				aes(x = `Replicate 1`, y = `Replicate 2`)) +
+				geom_point() +
+				geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
+				theme_ipsum() +
+				theme(legend.position = "bottom") +
+				ggtitle(paste("CPM:", .y)) +
+				scale_x_continuous(
+					trans = "log10", 
+					limits = c(1, pmax(max(.$`Replicate 1`), max(.$`Replicate 2`)))) +
+				scale_y_continuous(
+					trans = "log10", 
+					limits = c(1, pmax(max(.$`Replicate 1`), max(.$`Replicate 2`))))))
+
+print(aba.cpm$plot)
+```

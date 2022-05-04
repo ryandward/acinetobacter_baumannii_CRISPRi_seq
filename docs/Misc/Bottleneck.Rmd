@@ -1,0 +1,328 @@
+---
+title: "Bottleneck Counter Effects"
+keep_md: no
+author: "Ryan Ward"
+date: '2022-04-29'
+output: html_document
+---
+```{r Read files and prepare framework for analyis}
+library(pacman)
+
+p_load(data.table, viridis, tidyverse, hrbrthemes, statmod, tidyverse, scales, rmarkdown)
+
+# reads
+aba.counts <- fread(
+	"../../all_counts_seal.tsv.gz",
+	header = FALSE,
+	col.names = c("spacer", "count", "condition"))
+
+glimpse(aba.counts)
+
+# guide design key
+aba.key <- fread("../../aba_key.tsv")
+
+glimpse(aba.key)
+
+# experimental design
+aba.design <- fread("../../ABA1_experimental_design.tsv")
+
+glimpse(aba.design)
+
+
+# hand-curated names with references available
+curated_names <- fread("../../curated_names.tsv")
+
+glimpse(curated_names)
+
+```
+
+```{r Combine, message=FALSE}
+aba.genome <- aba.key %>% 
+	group_by(locus_tag) %>% 
+	select(
+		locus_tag,
+		spacer, 
+		type, 
+		y_pred, 
+		target, 
+		offset) %>% 
+	inner_join(
+		curated_names, 
+		by = c("locus_tag" = "AB19606")) %>% 
+	rename(AB19606 = locus_tag)
+
+# define the experimental design space to only take into consideration "tubes"
+aba.design <- aba.design %>%
+	filter(experiment == "tube")
+
+# keep only the counts that are in the experimental design space
+aba.counts <- aba.counts %>% semi_join(aba.design)
+```
+
+```{r}
+# fill with zeroes?
+# this doesn't seem to have an effect
+
+# convert single column into a table 
+# aba.counts <- aba.counts %>% 
+# 	pivot_wider(
+# 		id_cols = spacer, 
+# 		names_from = condition, 
+# 		values_from = count, 
+# 		values_fill = 0) %>%
+# 	pivot_longer(
+# 		!spacer, 
+# 		names_to = "condition", 
+# 		values_to = "count")
+```
+
+Build up components of bottleneck calculation
+```{r message=FALSE}
+# https://www.nature.com/articles/nmeth.3253
+aba.design <- aba.design %>% 
+	mutate (generations = case_when(
+		timing == "T0" ~ 0,
+		timing == "T1" ~ 9, 
+		timing == "T2" ~ 18))
+
+aba.counts.verbose <- aba.counts %>%
+	inner_join(aba.design) %>% 
+	inner_join(aba.key) %>%
+	unite("Condition", drug, dose, timing, sep = " ") %>% 
+	unite("Sample",    Condition, rep, sep = " ", remove = FALSE) %>% 
+	rename(Type = type) %>%
+	select(spacer, count, Type, Condition, Sample, generations)
+
+aba.botneck.t0 <- aba.counts.verbose %>% 
+	filter(generations == 0) %>%
+	group_by(Type) %>%
+	mutate(
+		fi0 = count/sum(count),
+		count0 = count) %>%
+	select(Type, spacer, fi0, count0) %>%
+	nest %>%
+	rename(data0 = data) %>%
+	mutate(s0 = map_dbl(data0, ~sum(.$count0)))
+
+aba.botneck <- aba.counts.verbose %>%
+	filter(generations != 0) %>%
+	group_by(Type, Condition, Sample, generations) %>%
+	mutate(
+		fis = count/sum(count)) %>%
+	nest %>%
+		mutate(
+		ss = map_dbl(data, ~sum(.$count))) %>% 
+	full_join(aba.botneck.t0) %>% 
+	mutate(data = map2(data, data0, inner_join))
+
+aba.botneck <- aba.botneck %>% 
+	mutate(
+		data = map(
+			data, ~.x %>% 
+				mutate(
+					ratio = ( (fis - fi0)^2) / ( fi0 * (1 - fi0)^2 ) )	) )
+
+aba.botneck <- aba.botneck %>% 
+	mutate(
+		f_hat = map_dbl(
+			data, 
+			~sum(.$ratio)) * (1 / map_dbl(data, ~n_distinct(.$spacer))),
+		Nb = generations/(f_hat - 1/s0 - 1/ss))
+
+aba.botneck.stats <- aba.botneck %>%
+	group_by(Condition, Type) %>% 
+	summarise(
+		Nb.med = median(Nb), 
+		Nb.range = max(Nb) - min(Nb),
+		Nb.mean = mean(Nb),
+		Nb.sd = sd(Nb))
+```
+Create specific ordered factors for Condition and Sample
+```{r Reorder}
+aba.botneck <- aba.botneck %>% 
+	mutate(
+		Sample = factor(
+			Sample, 
+			levels = c(
+			"None 0 T1 1",
+			"None 0 T1 2",
+			"Colistin 0.44 T1 1",
+			"Colistin 0.44 T1 2",
+			"Rifampicin 0.34 T1 1",
+			"Rifampicin 0.34 T1 2",
+			"Imipenem 0.06 T1 1",
+			"Imipenem 0.06 T1 2",
+			"Imipenem 0.09 T1 1",
+			"Imipenem 0.09 T1 2",
+			"Meropenem 0.11 T1 1",
+			"Meropenem 0.11 T1 2",
+			"Meropenem 0.17 T1 1",
+			"Meropenem 0.17 T1 2",
+			"None 0 T2 1",
+			"None 0 T2 2",
+			"Colistin 0.44 T2 1",
+			"Colistin 0.44 T2 2",
+			"Rifampicin 0.34 T2 1",
+			"Rifampicin 0.34 T2 2",
+			"Imipenem 0.06 T2 1",
+			"Imipenem 0.06 T2 2",
+			"Imipenem 0.09 T2 1",
+			"Imipenem 0.09 T2 2",
+			"Meropenem 0.11 T2 1",
+			"Meropenem 0.11 T2 2",
+			"Meropenem 0.17 T2 1",
+			"Meropenem 0.17 T2 2")))
+
+aba.botneck <- aba.botneck %>% 
+	mutate(
+		Condition = factor(
+			Condition, 
+			levels = c(
+			"None 0 T1",
+			"Colistin 0.44 T1",
+			"Rifampicin 0.34 T1",
+			"Imipenem 0.06 T1",
+			"Imipenem 0.09 T1",
+			"Meropenem 0.11 T1",
+			"Meropenem 0.17 T1",
+			"None 0 T2",
+			"Colistin 0.44 T2",
+			"Rifampicin 0.34 T2",
+			"Imipenem 0.06 T2",
+			"Imipenem 0.09 T2",
+			"Meropenem 0.11 T2",
+			"Meropenem 0.17 T2")))
+
+aba.botneck.stats <- aba.botneck.stats %>% 
+	mutate(
+		Condition = factor(
+			Condition, 
+			levels = levels(aba.botneck$Condition)))
+```
+
+Create specific ordered factors for Type
+
+```{r}
+aba.botneck <- aba.botneck %>% 
+	mutate(
+		Type = factor(
+			Type, 
+			levels = c(
+				"control",
+				"mismatch",
+				"perfect")))
+
+aba.botneck.stats <- aba.botneck.stats %>% 
+	mutate(
+		Type = factor(
+			Type, 
+			levels = levels(aba.botneck$Type)))
+
+```
+
+Bottleneck metric on integer scale.
+
+```{r, fig.width=10, fig.height=5}
+aba.botneck.plot <- aba.botneck %>%
+	ggplot(aes(
+		x = Sample, 
+		y = Nb, 
+		fill = Type)) +
+	geom_bar(
+		stat = "identity", 
+		position = position_dodge(),
+		colour = "black") +
+	theme_ipsum() + 
+	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis') +
+	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+	ggtitle("Population Complexity: Bottleneck Metric") +
+	scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+	theme(axis.title.x = element_blank())
+
+print(aba.botneck.plot)
+
+aba.botneck.plot <- aba.botneck %>%
+	ggplot(aes(
+		x = Sample, 
+		y = Nb, 
+		fill = Type)) +
+	geom_bar(
+		stat = "identity", 
+		position = position_dodge(),
+		colour = "black") +
+	theme_ipsum() + 
+	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis') +
+	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+	ggtitle("Population Complexity: Bottleneck Metric") +
+	scale_y_continuous(
+					trans = "log10",
+					breaks = c(0, 10^seq(0,7)),
+					labels = label_number(scale_cut = cut_short_scale())) +
+	theme(axis.title.x = element_blank())
+
+print(aba.botneck.plot)
+
+aba.botneck.stats.plot <- aba.botneck.stats %>%
+	ggplot(aes(
+		x = Condition, 
+		y = Nb.mean, 
+		fill = Type)) +
+	geom_bar(
+		stat = "identity", 
+		position = position_dodge(),
+		colour = "black") +
+	geom_errorbar(aes(
+		x = Condition,
+		y = Nb.mean,
+		ymin = Nb.mean - Nb.sd,
+		ymax = Nb.mean + Nb.sd),
+		width = 0.2,
+		position = position_dodge(0.95, preserve = "single")) +
+	theme_ipsum() + 
+	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis', alpha = 0.5) +
+	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+	ggtitle("Population Complexity: Bottleneck Metric") +
+	scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+	theme(axis.title.x = element_blank())
+
+print(aba.botneck.stats.plot)
+
+aba.botneck.stats.plot <- aba.botneck.stats %>%
+	ggplot(aes(
+		x = Condition, 
+		y = Nb.mean, 
+		fill = Type)) +
+	geom_bar(
+		stat = "identity", 
+		position = position_dodge(),
+		colour = "black") +
+	geom_errorbar(aes(
+		x = Condition,
+		y = Nb.mean,
+		ymin = Nb.mean - Nb.sd,
+		ymax = Nb.mean + Nb.sd),
+		width = 0.2,
+		position = position_dodge(0.95, preserve = "single")) +
+	theme_ipsum() + 
+	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis', alpha = 0.5) +
+	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+	ggtitle("Population Complexity: Bottleneck Metric") +
+	scale_y_continuous(
+					trans = "log10",
+					breaks = c(0, 10^seq(0,7)),
+					labels = label_number(scale_cut = cut_short_scale())) +
+	theme(axis.title.x = element_blank())
+
+print(aba.botneck.stats.plot)
+```
+
+Bottleneck numbers (Nb) by condition and Type
+```{r message=FALSE, warning=FALSE}
+aba.botneck %>% 
+	select(Nb) %>%
+	arrange(Condition, Type) %>%
+	pivot_wider(
+		names_from = Type, 
+		values_from = Nb) %>% 
+	paged_table
+```

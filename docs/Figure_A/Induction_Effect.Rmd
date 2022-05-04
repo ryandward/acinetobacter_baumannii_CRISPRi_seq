@@ -1,0 +1,542 @@
+---
+title: "Induction Effect"
+fig_width: 10
+fig_height: 4
+keep_md: no
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r Shape Data}
+library(pacman)
+
+p_load(tidyverse, data.table, edgeR, ggplot2, hrbrthemes, viridis, scales, rmarkdown)
+
+curated_names <- fread(
+	"../../curated_names.tsv")
+
+aba.bed <- fread(
+	"../../CP046654.1.bed",
+	col.names = c(
+		"chromosome",
+		"left",
+		"right",
+		"locus_tag",
+		"gene_name",
+		"strand",
+		"coding",
+		"completeness"))
+
+aba.counts <- fread(
+	"../../all_counts_seal.tsv.gz",
+	header = FALSE,
+	col.names = c(
+		"spacer",
+		"count",
+		"condition"))
+
+aba.key <- fread(
+	"../../aba_key.tsv")
+
+aba.design <- fread(
+	"../../ABA1_experimental_design.tsv",
+	na.strings = c("NA"))
+
+aba.genome <- aba.key %>% 
+	group_by(locus_tag) %>% 
+	select(
+		locus_tag,
+		spacer, 
+		type, 
+		y_pred, 
+		target, 
+		offset) %>% 
+	inner_join(
+		curated_names, 
+		by = c("locus_tag" = "AB19606")) %>% 
+	rename(AB19606 = locus_tag)
+
+# define the experimental design space to only take into consideration "tubes"
+aba.design <- aba.design %>%
+	filter(experiment == "tube")
+
+# keep only the counts that are in the experimental design space
+aba.counts <- aba.counts %>% semi_join(aba.design)
+```
+
+Helper function to convert from dataframe to data.matrix
+```{r}
+data.matrix.withnames <- function(x) {
+    m <- data.matrix(x[,-1], rownames.force = TRUE)
+    rownames(m) <- as.data.frame(x)[,1]
+    return(m)
+}
+```
+
+Build up components of bottleneck calculation
+```{r message=FALSE}
+# https://www.nature.com/articles/nmeth.3253
+aba.design <- aba.design %>% 
+	mutate(generations = case_when(
+		timing == "T0" ~ 0,
+		timing == "T1" ~ 9, 
+		timing == "T2" ~ 18))
+
+aba.counts.verbose <- aba.counts %>%
+	inner_join(aba.design) %>% 
+	inner_join(aba.key) %>%
+	unite("Condition", drug, dose, timing, sep = "_") %>% 
+	unite("Sample",    Condition, rep, sep = "_", remove = FALSE) %>% 
+	select(type, spacer, count, Condition, Sample, generations) %>%
+	group_by(type) %>%
+	nest %>% 
+	mutate(
+		data = map(
+			data, ~pivot_wider(
+				.x, 
+				id_cols = spacer, 
+				names_from = Sample, 
+				values_from = count, 
+				values_fill = 0)),
+		data_matrix = map(
+			data, ~data.matrix.withnames(.x)))
+
+aba.group <- aba.design %>%
+	as_tibble %>%
+	unite("Condition", drug, dose, timing, sep = "_") %>% 
+	pull(Condition) %>% 
+	factor
+
+aba.permut <- model.matrix( ~ 0 + aba.group)
+
+colnames(aba.permut) <- levels(aba.group)
+```
+
+```{r edgeR stuff into the tibbles}
+aba.edgeR <- aba.counts.verbose %>% 
+	mutate(
+		y = map(
+			data_matrix, 
+			~DGEList(counts = ., group = aba.group, genes = row.names(.))),
+		keep = map(
+			y,
+			~filterByExpr(y = ., design = aba.permut, group = aba.group)),
+		y = map2(
+			y, 
+			keep, 
+			~.x[.y, , keep.lib.sizes = FALSE]),
+		y = map(
+			y,
+			~calcNormFactors(.)),
+		y = map(
+			y,
+			~estimateDisp(., aba.permut)),
+		fit = map(
+			y, 
+			~glmQLFit(., aba.permut, robust = TRUE)))
+```
+Under this paradigm, the fitted values should be equal due to model fitting between replicates.
+
+Thus, we can throw away one replicate and just keep rep. 1 to exhibit the fitted CPM.
+```{r Estimate CPM}
+
+aba.cpm <- aba.edgeR %>%
+	mutate(
+		cpm.fit = map2(
+			fit, 
+			y, 
+			~cpm(y = .x$fitted.values, lib.size = exp(getOffset(.y)))),
+		cpm.fit = map(
+			cpm.fit, 
+			~as_tibble(., rownames = "spacer")),
+		cpm.fit = map(
+			cpm.fit,
+			~pivot_longer(.x, !spacer, names_to = "Sample", values_to = "Fitted CPM")),
+		cpm.fit = map(
+			cpm.fit,
+			~filter(.x, Sample %in% c(
+				"None_0_T0_1",
+				"None_0_T1_1",
+				"None_0_T2_1"))),
+		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = gsub("_[0-9]$", "", Sample))),
+		cpm.fit = map(cpm.fit, ~.x %>% select(Condition, spacer, `Fitted CPM`)),
+		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = case_when(
+			Condition == "None_0_T0" ~ "Uninduced",
+			Condition == "None_0_T1" ~ "Induced at t1",
+			Condition == "None_0_T2" ~ "Induced at t2"))),
+		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = factor(
+			Condition,
+			levels = c(
+				"Uninduced",
+				"Induced at t1",
+				"Induced at t2")))),
+		Type = case_when(
+			type == "control" ~ "Non-targeting Guides",
+			type == "mismatch" ~ "Mismatched Guides",
+			type == "perfect" ~ "Perfect Guides"),
+		Type = factor(
+			Type,
+			levels = c(
+				"Non-targeting Guides",
+				"Mismatched Guides",
+				"Perfect Guides")))
+```
+
+Do stats to normalize by z-score and change to distribution of controls. https://stats.stackexchange.com/questions/46429/transform-data-to-desired-mean-and-standard-deviation
+
+```{r normalize}
+# aba.cpm <- aba.cpm %>%
+# 	mutate(
+# 		summary = map(
+# 		  cpm.fit, 
+# 		  ~.x %>% group_by(Condition) %>% 
+# 		      summarise(
+# 		          mean = mean(`Fitted CPM`) %>% round(3),
+# 		          med = median(`Fitted CPM`) %>% round(3),
+# 		          min = min(`Fitted CPM`) %>% round(3),
+# 		          max = max(`Fitted CPM`) %>% round(3),
+# 		          sd = sd(`Fitted CPM`) %>% round(3))),
+# 		cpm.fit = map2(
+# 			cpm.fit,
+# 			summary,
+# 			~inner_join(.x, .y) %>% mutate(z = (`Fitted CPM` - mean) / sd )))
+# 
+# aba.cpm <- aba.cpm %>%
+# 	mutate(
+# 		cpm.fit = map(
+# 			cpm.fit, 
+# 			~inner_join(
+# 				.x, 
+# 				aba.cpm %>% ungroup %>% filter(type == "control") %>% select(summary) %>% unnest(c(summary)), 
+# 				by = "Condition")))
+# 
+# aba.cpm <- aba.cpm %>% mutate(cpm.fit = map(cpm.fit, ~.x %>% mutate(`Normalized Fitted CPM` = z * sd.y + mean.y)))
+```
+
+
+```{r fig.height=5, fig.width=10}
+
+cpm.max <- aba.cpm %>% 
+	ungroup %>% 
+	select(cpm.fit) %>% 
+	unnest(cols = "cpm.fit") %>% 
+	select(`Fitted CPM`) %>% max
+
+aba.cpm.t <- aba.cpm %>%
+	mutate(
+		plot = map2(
+			cpm.fit,
+			Type,
+			~ggplot(
+				.x,
+				aes(x = `Fitted CPM`, fill = `Condition`)) +
+				geom_density() +
+				ggtitle(.y) +
+				theme_ipsum() +
+	scale_fill_viridis(
+		discrete = TRUE, 
+		alpha = 0.3, 
+		direction = -1, 
+		option = "cividis") +
+	scale_x_continuous(
+		trans = scales::pseudo_log_trans(base = 10),
+		breaks = c(0, 10^(1:6)),
+		labels = label_number(scale_cut = cut_short_scale()),
+		limits = c(0, cpm.max))))
+
+print(aba.cpm.t$plot)
+```
+
+```{r fig.height=5, fig.width=10}
+
+cpm.max <- aba.cpm %>% 
+	ungroup %>% 
+	select(cpm.fit) %>% 
+	unnest(cols = "cpm.fit") %>% 
+	select(`Fitted CPM`) %>% max
+
+aba.cpm.t <- aba.cpm %>%
+    unnest(cols = c(cpm.fit)) %>%
+    group_by(Condition) %>% 
+	select(`Type`, `Condition`, spacer, `Fitted CPM`) %>% 
+	group_by(Condition) %>% 
+	nest %>%
+	mutate(
+		plot = map2(
+			data,
+			`Condition`,
+			~ggplot(
+				.x,
+				aes(x = `Fitted CPM`, fill = `Type`)) +
+				geom_density() +
+				ggtitle(.y) +
+				theme_ipsum() +
+	scale_fill_viridis(
+		discrete = TRUE, 
+		alpha = 0.3, 
+		direction = -1, 
+		option = "magma") +
+	scale_x_continuous(
+		trans = scales::pseudo_log_trans(base = 10),
+		breaks = c(0, 10^(1:6)),
+		labels = label_number(scale_cut = cut_short_scale()),
+		limits = c(0, cpm.max))))
+
+print(aba.cpm.t$plot)
+```
+
+Conditions that we're interested in measuring the differences between
+
+```{r}
+conditions.full <- c(
+	"None_0_T1 - None_0_T0",
+	"None_0_T2 - None_0_T0",
+	"Colistin_0.44_T1 - None_0_T0",
+	"Colistin_0.44_T2 - None_0_T0",
+	"Rifampicin_0.34_T1 - None_0_T0",
+	"Rifampicin_0.34_T2 - None_0_T0",
+	"Imipenem_0.06_T1 - None_0_T0",
+	"Imipenem_0.06_T2 - None_0_T0",
+	"Imipenem_0.09_T1 - None_0_T0",
+	"Meropenem_0.11_T1 - None_0_T0",
+	"Meropenem_0.11_T2 - None_0_T0",
+	"Meropenem_0.17_T1 - None_0_T0",
+	"Meropenem_0.17_T2 - None_0_T0")
+
+conditions.induction <- c(
+	"Colistin_0.44_T1 - None_0_T1",
+	"Colistin_0.44_T2 - None_0_T2",
+	"Rifampicin_0.34_T1 - None_0_T1",
+	"Rifampicin_0.34_T2 - None_0_T2",
+	"Imipenem_0.06_T1 - None_0_T1",
+	"Imipenem_0.06_T2 - None_0_T2",
+	"Imipenem_0.09_T1 - None_0_T1",
+	"Imipenem_0.09_T2 - None_0_T2",
+	"Meropenem_0.11_T1 - None_0_T1",
+	"Meropenem_0.11_T2 - None_0_T2",
+	"Meropenem_0.17_T1 - None_0_T1",
+	"Meropenem_0.17_T2 - None_0_T2")
+
+conditions.all <- c(conditions.full, conditions.induction)
+
+aba.contrasts <-  makeContrasts(
+	contrasts = conditions.all,
+	levels = aba.permut)
+```
+
+Perform contrasts and find LFC and FDR
+
+```{r}
+aba.edgeR <- aba.edgeR %>%
+	mutate(
+		results = map(
+			fit,
+			~glmQLFTest(., contrast = aba.contrasts)),
+		results = map(
+			results,
+			~topTags(., n = Inf)),
+		results = map(
+			results, ~as_tibble(.) %>% pull(table)),
+		results = map(
+			results, ~rename(., spacer = genes)),
+		results = map(
+			results, 
+			~pivot_longer(
+				., 
+				!c(spacer, F, PValue, FDR, logCPM), 
+				names_to = "contrast", 
+				values_to = "logFC")),
+		results = map(
+			results,
+			~inner_join(
+				.,
+				aba.key %>% select(y_pred, original, locus_tag, offset, spacer))),
+		results = map(
+			results, 
+			~.x %>% mutate(contrast = gsub("\\.\\.\\.", " - ", contrast))),
+		results = map(
+			results, 
+			~.x %>% mutate(contrast = gsub("logFC\\.", "", contrast))),
+		summary = map(
+			results, 
+			~.x %>% group_by(contrast) %>% 
+				summarise(
+					mean = mean(logFC) %>% round(3),
+					med = median(logFC) %>% round(3),
+					min = min(logFC) %>% round(3),
+					max = max(logFC) %>% round(3),
+					sd = sd(logFC) %>% round(3) )),
+		summary.paged = map(
+			summary, 
+			~paged_table(.)))
+
+print(aba.edgeR$type)
+print(aba.edgeR$summary.paged)
+```
+
+Transpose results: Ungroup from type, then regroup results by contrast group 
+```{r}
+# aba.edgeR.t <- aba.edgeR %>% 
+# 	select(type, results) %>% 
+# 	unnest(results) %>% 
+# 	group_by(contrast) %>% 
+# 	nest %>%
+# 	mutate(
+# 		plot = map2(
+# 			data,
+# 			`contrast`,
+# 			~ggplot(
+# 				.x,
+# 				aes(x = `logFC`, fill = `type`)) +
+# 				geom_density() +
+# 				ggtitle(.y) +
+# 				theme_ipsum() +
+# 	scale_fill_viridis(
+# 		discrete = TRUE, 
+# 		alpha = 0.3, 
+# 		direction = -1, 
+# 		option = "magma")))
+# 
+# print(aba.edgeR.t$plot)
+```
+
+```{r}
+# aba.edgeR.prior <- fread("../../Results/melted_results.tsv.gz") %>% 
+# 	filter(condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>% 
+# 	select(type, condition, LFC, LFC.adj) %>% 
+# 	group_by(condition) %>% 
+# 	nest %>% 
+# 	mutate(
+# 		plot = map2(
+# 			data,
+# 			`condition`,
+# 			~ggplot(
+# 				.x,
+# 				aes(x = `LFC.adj`, fill = `type`)) +
+# 				geom_density() +
+# 				ggtitle(.y) +
+# 				theme_ipsum() +
+# 				scale_fill_viridis(
+# 					discrete = TRUE,
+# 					alpha = 0.3,
+# 					direction = -1,
+# 					option = "magma") +
+# 				xlim(
+# 					fread("../../Results/melted_results.tsv.gz") %>%
+# 						filter(condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
+# 						select(type, condition, LFC, LFC.adj) %>% select(LFC.adj) %>% range)))
+# 
+# print(aba.edgeR.prior$plot)
+```
+
+Show replicates and log2 fold change with respect to T0.
+
+```{r, fig.width=7, fig.height=7}
+aba.counts.stats <- aba.counts.verbose %>% 
+	select(-data_matrix) %>% 
+	unnest(data) %>% 
+	pivot_longer(
+		!c(type, spacer), 
+		names_to = "condition", 
+		values_to = "count")
+
+aba.counts.stats <- aba.counts.stats %>% 
+	inner_join(
+		aba.counts.stats %>%
+			filter(condition == "None_0_T0_1") %>%
+			ungroup %>%
+			rename(base_count = count) %>%
+			select(spacer, base_count)) %>% 
+	mutate(logFC = log2(count/base_count)) %>%
+	rename(sample = condition)
+
+aba.counts.stats <- aba.counts.stats %>% 
+	inner_join(
+		aba.counts.stats %>% 
+			group_by(sample) %>% 
+			filter(type == "control") %>% 
+			summarise(logFC.med.ctrl = median(logFC))) %>%
+	mutate(logFC.adj = logFC - logFC.med.ctrl) %>%
+	separate(
+		sample, c("drug", "dose", "timing", "rep"), "_") %>%
+	mutate(rep = paste("Rep", rep)) %>%
+	mutate(dose.with_units = paste0(dose,"ng/μL")) %>%
+	unite(
+		"Condition", drug, dose.with_units, timing, remove = F) %>% 
+	group_by(Condition)
+
+logFC.range <- aba.counts.stats %>% filter(!is.infinite(logFC.adj)) %>% pull(logFC.adj) %>% range
+
+aba.counts.stats.reps <- aba.counts.stats %>% 
+	mutate(Type = factor(type)) %>%
+	arrange(desc(Type)) %>%
+	nest %>% 
+	mutate(data = map(
+		data,
+		~.x %>% pivot_wider(
+			id_cols = c(Type, spacer), 
+			names_from = rep, 
+			values_from = logFC.adj))) %>%
+	filter(Condition != "None_0ng/μL_T0") %>% 
+	mutate(
+		data.finite = map(
+			data, ~.x %>% filter(is.finite(`Rep 1`) & is.finite(`Rep 2`))), 
+		correlation = map_dbl(data.finite, ~cor(.x$`Rep 1`, .x$`Rep 2`)),
+		Title = paste0(
+			"LogFC: ", gsub("_", " ", Condition), 
+			"(Cor=", round(correlation, 3), ")"))
+	
+
+aba.counts.stats.reps <- aba.counts.stats.reps %>%
+	mutate(plot = map2(
+		data,
+		`Title`,
+		~ggplot(
+			.x,
+			aes(x = `Rep 1`, y = `Rep 2`)) +
+			geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
+			geom_point(aes(color = Type), shape = 20) +
+			ggtitle(.y) +
+			theme_ipsum() +
+			xlim(logFC.range) +
+			ylim(logFC.range) +
+			# scale_alpha_manual(values = c(0.5, 0.15, 0.25)) +
+			scale_color_viridis(
+				discrete = TRUE,
+				alpha = c(0.15, 0.25, 0.35),
+				direction = -1,
+				option = "viridis") +
+			theme(
+				legend.position = "bottom",
+				legend.key = element_rect(fill = "#ECECEC")) +
+			guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))))) 
+
+aba.counts.stats.reps %>% pull(plot) %>% print
+```
+
+Violin Plots
+
+```{r}
+aba.counts.violin <- aba.counts.stats %>% 
+	mutate(rep = paste("Rep", rep)) %>%
+	mutate(dose.with_units = paste0(dose,"ng/μL")) %>%
+	unite(
+		"Condition", drug, dose.with_units, timing, remove = F, sep = " ") %>% 
+	filter((Condition %like% "None") & timing != "T0") %>% 
+		mutate(
+			Condition = gsub("^", "Induction + ", Condition),
+			Condition = gsub(" \\+ None 0ng/μL", "", Condition),
+			Condition = gsub("(T[1,2])", "at \\1", Condition),
+			Condition = factor(Condition, levels = unique(Condition)),
+			Condition = factor(Condition, levels = rev(levels(Condition))),
+			Type = factor(type),
+			Type = factor(Type, levels = rev(levels(Type)))) %>%
+	ggplot(aes(x = Condition, y = `logFC.adj`, fill = Type)) + 
+	geom_violin(alpha = 0.5, width = 0.65) + theme_ipsum() + 
+	scale_fill_viridis(discrete = T, direction = 1, option = "viridis") + 
+		coord_flip() +
+	  guides(fill = guide_legend(reverse = TRUE)) +
+	ggtitle("Distribution of Guide Depletion")
+
+print(aba.counts.violin)
+```

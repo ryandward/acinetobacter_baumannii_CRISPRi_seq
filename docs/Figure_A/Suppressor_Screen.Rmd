@@ -1,0 +1,266 @@
+---
+title: "Suppressor Growth Statistics"
+fig_width: 12
+fig_height: 4
+keep_md: no
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Read raw data
+
+```{r}
+
+library(pacman)
+
+p_load_current_gh("hrbrmstr/hrbrthemes")
+
+p_load(data.table, growthcurver, ggplot2, viridis)
+
+
+suppressor_layout <- fread("../../Suppressor/layout.tsv", header = T)
+suppressor_OD600  <- fread("../../Suppressor/OD600.tsv")
+suppressor_RFP    <- fread("../../Suppressor/RFP.tsv")
+
+suppressor_layout <- melt(
+	suppressor_layout, 
+	id.vars = "row", 
+	value.name = "strain", 
+	variable.name = "column")
+```
+
+# Perform data wrangling to get data from plate reader format to a useful entry for Growthcurver.
+
+First, OD600 data.
+
+```{r OD600 wrangle}
+
+suppressor_layout[, well := paste0(row, column)]
+
+setnames(suppressor_OD600, t(suppressor_OD600)[, 1])
+
+setnames(
+	suppressor_OD600,
+	"Cycle Nr.",
+	"Well")
+
+suppressor_OD600 <-
+	suppressor_OD600[grep("[A-z][0-9]{1,2}", Well)]
+
+suppressor_OD600 <- 
+	melt(
+		suppressor_OD600, 
+		id.vars = "Well", 
+		variable.name = "Cycle", 
+		value.name = "OD600", 
+		na.rm = TRUE)
+
+suppressor_OD600[, Cycle := as.integer(Cycle)]
+
+```
+
+Next, RFP data.
+
+```{r RFP wrangle}
+
+setnames(suppressor_RFP, t(suppressor_RFP)[, 1])
+
+setnames(
+	suppressor_RFP,
+	"Cycle Nr.",
+	"Well")
+
+suppressor_RFP <-
+	suppressor_RFP[grep("[A-z][0-9]{1,2}", Well)]
+
+suppressor_RFP <- 
+	melt(
+		suppressor_RFP, 
+		id.vars = "Well", 
+		variable.name = "Cycle", 
+		value.name = "RFP", 
+		na.rm = TRUE)
+
+suppressor_RFP[, Cycle := as.integer(Cycle)]
+```
+
+Merge together
+
+```{r Merge}
+
+suppressors <- 
+	suppressor_OD600[suppressor_RFP, on = .(Well, Cycle)]
+
+suppressors[, Time := (Cycle - 1) * 60 * 30]
+
+suppressors[, Hour := Time / 60 / 60]
+
+suppressors <- 
+	suppressor_layout[, .(Well = well, Strain = strain)][suppressors, on = .(Well)]
+
+```
+
+# Analyze well stats and QC with Growthcurver.
+
+```{r Analyze}
+
+empty_OD600 <- suppressors[, .(min_OD600 = min(OD600)), by = .(Strain)][Strain == "empty", min_OD600]
+
+suppressor_stats <- unique(suppressors[, .(Well, Strain)])
+
+suppressor_stats <- 
+	suppressors[
+		, SummarizeGrowth(
+			Hour, 
+			OD600,
+			blank = empty_OD600)$vals, 
+		by = .(Well, Strain)]
+
+qc_fail <- suppressor_stats[note == "cannot fit data", .(Well, Strain)]
+
+suppressors <- suppressors[!Well %in% qc_fail$Well]
+
+suppressor_stats <- suppressor_stats[!Well %in% qc_fail$Well]
+
+print(paste(qc_fail$Well, qc_fail$Strain, "did not pass quality check."))
+```
+
+# Use Growthcurver to extract data fit to model from those wells that passed quality check.
+
+```{r Fit and wrangle data}
+
+fit_suppressors <- suppressors[
+	!Well %in% qc_fail$Well,{
+		fit <- SummarizeGrowth(Hour, OD600)
+		OD600_fit <- fit$model$m$predict()
+		Hour <- fit$data$t
+		.(Hour, OD600_fit)},
+	by = .(Well, Strain)]
+
+fit_suppressors[
+	is.na(OD600_fit), 
+	OD600_fit := 0]
+```
+
+# Identify supprsesor wells ("s") groups where the maximum(RFP) value is greater than the mean of the group (Strain) it belongs to.
+
+These belong to a second group of brightly fluorescing red strains that are actually part of a bimodal distribution.
+
+```{r find bimodal groups}
+
+suppressors <- suppressors[fit_suppressors, on = .(Hour, Well, Strain)]
+
+find_bimodal <- suppressors[, .(maxRFP = max(RFP)), by = .(Well, Strain)]
+
+find_bimodal[Strain %like% "s$", second_type := maxRFP > mean(maxRFP), by = .(Strain)]
+
+suppressors[, second_type := find_bimodal[.SD, on = .(Well)]$second_type]
+
+suppressors[second_type == TRUE, `New Strain` := paste0(Strain, "R")]
+
+suppressors[is.na(`New Strain`), `New Strain` := Strain]
+
+suppressors[, Reps := suppressors[, .N, by = .(Strain, Well)][, .N, by = .(Strain)][.SD, N, on = .(Strain)]]
+
+suppressors[, RFP_norm := RFP - suppressors[Strain == "empty", .(RFP_empty = median(RFP)), by = .(Hour)][.SD, RFP_empty, on = .(Hour)]]
+```
+
+# Generate Growth Plots
+
+```{r OD600 by time}
+library(pacman)
+p_load(data.table, ggplot2, hrbrthemes)
+
+this.plot <- 
+    ggplot(
+      suppressors[
+      	Strain != "empty", 
+      	.(OD600, `New Strain` = paste(`New Strain`, Reps, "reps")), 
+        by = .(Hour)],
+      aes(x = Hour, y = OD600, color = `New Strain`, fill = `New Strain`)) +
+    stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.99) +
+		scale_fill_ipsum() +
+		scale_color_ipsum() +
+		theme_ipsum() +
+    ggtitle("Suppressor Growth Stats (OD600), 99% CI")
+  
+plot(this.plot)
+
+this.plot <- 
+    ggplot(
+      suppressors[
+      	Strain != "empty", 
+      	.(OD600_fit, `New Strain` = paste(`New Strain`, Reps, "reps")), 
+        by = .(Hour)],
+      aes(x = Hour, y = OD600_fit, color = `New Strain`, fill = `New Strain`)) +
+    stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.99) +
+		scale_fill_ipsum() +
+		scale_color_ipsum() +
+		theme_ipsum() +
+    ggtitle("Suppressor Growth Stats (OD600 fit), 99% CI")
+  
+plot(this.plot)
+
+```
+
+# Generate RFP plots.
+
+```{r RFP by time}
+this.plot <- 
+    ggplot(
+      suppressors[
+      	Strain != "empty",
+        .(RFP_norm, OD600, Strain = paste(Strain, Reps, "reps")), 
+        by = .(Hour)],
+      aes(x = Hour, y = RFP_norm, color = Strain, fill = Strain)) +
+    stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.50) +
+		scale_fill_ipsum() +
+		scale_color_ipsum() +
+		theme_ipsum() +
+    ggtitle("Suppressor Growth Stats (normalized RFP), 50% CI")
+  
+  plot(this.plot)
+  
+  this.plot <- 
+    ggplot(
+      suppressors[
+      	Strain != "empty",
+        .(RFP_norm, OD600, Strain = paste(Strain, Reps, "reps")), 
+        by = .(Hour)],
+      aes(x = Hour, y = RFP_norm/OD600, color = Strain, fill = Strain)) +
+    stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.50) +
+		scale_fill_ipsum() +
+		scale_color_ipsum() +
+		theme_ipsum() +
+    ggtitle("Suppressor Growth Stats (normalized RFP / OD600), 50% CI")
+  
+  plot(this.plot)
+
+```
+
+# Barplots to demonstrate RFP knockdown.
+
+```{r RFP at t18}
+this_title <- expression(bold(paste("Normalized RFP to" ~ OD[600] ~ "at" ~ hour[18])))
+
+suppressors[Strain != "empty" & Hour == 18] %>%
+	ggplot( aes( x = Strain, y = RFP_norm / OD600, fill = Strain)) +
+	geom_boxplot( outlier.colour = NA ) +
+	scale_fill_viridis( discrete = TRUE, alpha = 0.5) +
+	geom_jitter() +
+	theme_ipsum() +
+	ggtitle(this_title) +
+	xlab("Strain")
+
+this_title <- expression(bold(paste("Normalized RFP to" ~ OD[600] ~ "at" ~ hour[18])))
+
+suppressors[Strain != "empty" & Hour == 18] %>%
+	ggplot( aes( x = `New Strain`, y = RFP_norm / OD600, fill = `New Strain`)) +
+	geom_boxplot( outlier.colour = NA ) +
+	scale_fill_viridis( discrete = TRUE, alpha = 0.5) +
+	geom_jitter() +
+	ggtitle(this_title) +
+	xlab("") +
+	theme_ipsum()
+
+```

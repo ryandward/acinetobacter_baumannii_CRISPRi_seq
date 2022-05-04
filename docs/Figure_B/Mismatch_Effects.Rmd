@@ -1,0 +1,221 @@
+---
+title: "Mismatch Effects"
+keep_md: no
+author: "Ryan Ward"
+date: '2022-04-21'
+output: html_document
+---
+```{r Read files and prepare framework for analyis}
+library(pacman)
+
+p_load(data.table, edgeR, pheatmap, viridis, tidyverse, hrbrthemes, statmod, scales)
+
+# reads
+aba.counts <- fread(
+	"../../all_counts_seal.tsv.gz",
+	header = FALSE,
+	col.names = c("spacer", "count", "condition"))
+
+# guide design key
+aba.key <- fread("../../aba_key.tsv")
+
+# experimental design
+aba.design <- fread("../../ABA1_experimental_design.tsv")
+
+# hand-curated names with references available
+curated_names <- fread("../../curated_names.tsv")
+```
+
+```{r Combine, format, and filter data}
+aba.genome <- aba.key[
+	, .(spacer, type, locus_tag, y_pred, target, offset), by = .(locus_tag)]
+
+aba.genome <- curated_names[
+	, .(AB19606, AB030, unique_name)][aba.genome, on = .(AB19606 == locus_tag)]
+
+# define the experimental design space to only take into consideration "tubes"
+aba.design <- aba.design[experiment == "tube"]
+
+# keep only the counts that are in the experimental design space
+aba.counts <- aba.counts[condition %in% aba.design$condition]
+
+# convert single column into a table 
+aba.grid <- data.table::dcast(
+	aba.counts, 
+	spacer ~ factor(condition, levels = unique(condition)),
+	value.var = "count", 
+	fill = 0)
+
+aba.grid.mat <- 
+	data.matrix(aba.grid[, -c("spacer")])
+
+row.names(aba.grid.mat) <- aba.grid$spacer
+
+aba.group <- factor(aba.design[, paste(drug, dose, timing, sep = "_")])
+
+aba.permutations <-	model.matrix( ~ 0 + aba.group)
+
+colnames(aba.permutations) <- levels(aba.group)
+```
+
+```{r Prepare data for edgeR}
+aba.y <- DGEList(
+	counts = aba.grid.mat,
+	group = aba.group,
+	genes = row.names(aba.grid.mat))
+
+aba.keep <- filterByExpr(
+	y = aba.y,
+	design = aba.permutations,
+	group = aba.group)
+
+aba.y <- aba.y[aba.keep, , keep.lib.sizes = TRUE]
+
+aba.y <- calcNormFactors(aba.y)
+
+aba.y <- estimateDisp(aba.y, aba.permutations)
+
+aba.fit <- glmQLFit(aba.y, aba.permutations, robust = TRUE)
+```
+
+
+```{r Functions for use in results parsing}
+
+extract_edgeR = function(y.fit, y.contrasts, y.permutations) {
+	
+	contrasts.edgeR <- makeContrasts(
+		contrasts = y.contrasts,
+		levels = y.permutations)
+
+	results <- glmQLFTest(y.fit, contrast = contrasts.edgeR)
+	
+	results <- topTags(results, n = Inf)
+	
+	results <- data.table(results$table)
+	
+	return(results)
+}
+
+clean_edgeR = function(results) {
+	
+	col_rep <- "\\.\\.\\." #i.e. "..." -> " - " 
+	
+	setnames(
+		results, 
+		names(results[, .SD, .SDcols = patterns(col_rep)]), 
+		gsub(col_rep, " - ",  names(results[, .SD, .SDcols = patterns(col_rep)])))
+	
+	col_rep <- "logFC\\." #i.e. "logFC." -> ""
+	
+	setnames(
+		results, 
+		names(results[, .SD, .SDcols = patterns(col_rep)]), 
+		gsub(col_rep, "",  names(results[, .SD, .SDcols = patterns(col_rep)])))
+	
+	return(results)
+}
+
+melt_and_stack = function(results, contrasts) {
+	
+	results <- aba.genome[
+		results, on = .(spacer == genes)]
+
+	melted_results <- data.table::melt(
+		results,
+		id.vars = c(
+			"AB19606",
+			"AB030",
+			"unique_name",
+			"spacer",
+			"type",
+			"y_pred",
+			"target",
+			"offset",
+			"FDR"),
+		variable.name = "condition", 
+		value.name = "LFC",
+		measure.vars = contrasts)
+	
+	melted_results <- melted_results[!is.na(FDR) & !is.na(LFC)]
+	
+	control_melted_results_by_condition <- 
+		melted_results[
+			type == "control",
+			.(med_LFC = median(LFC)),
+			keyby = .(condition)]
+	
+	setkey(melted_results, condition)
+	
+	melted_results[
+		, LFC.adj := control_melted_results_by_condition[
+			melted_results, LFC - med_LFC, by = .EACHI]$V1]
+	
+	return(melted_results)
+}
+```
+
+```{r Effect of mismatches across all conditions, fig.width=10, fig.height=10}
+
+conditions.full <- c(
+	"None_0_T1 - None_0_T0",
+	"None_0_T2 - None_0_T0",
+	"Colistin_0.44_T1 - None_0_T0",
+	"Colistin_0.44_T2 - None_0_T0",
+	"Rifampicin_0.34_T1 - None_0_T0",
+	"Rifampicin_0.34_T2 - None_0_T0",
+	"Imipenem_0.06_T1 - None_0_T0",
+	"Imipenem_0.06_T2 - None_0_T0",
+	"Imipenem_0.09_T1 - None_0_T0",
+	"Meropenem_0.11_T1 - None_0_T0",
+	"Meropenem_0.11_T2 - None_0_T0",
+	"Meropenem_0.17_T1 - None_0_T0",
+	"Meropenem_0.17_T2 - None_0_T0")
+
+# aba.contrasts <- CJ(
+# 	level2 = colnames(aba.permutations), 
+# 	level1 = colnames(aba.permutations))[
+# 		level2 != level1, 
+# 		paste(level2, level1, sep = " - ")]
+
+results.all <- extract_edgeR(
+	y.fit = aba.fit, 
+	y.contrasts = conditions.full, 
+	y.permutations = aba.permutations)
+
+results.all <- clean_edgeR(results.all)
+
+results.all <- melt_and_stack(results.all, conditions.full)
+
+results.all.perfect <- results.all[
+	aba.key[, .(spacer, target)], on = .(spacer)][type == "perfect"]
+
+results.all.perfect[, LFC.adj.perfect := LFC.adj]
+
+results.all.mismatch <- results.all[
+	aba.key[, .(spacer, target, y_pred)], on = .(spacer)][type == "mismatch"]
+
+results.all.mismatch[, LFC.adj.mismatch := LFC.adj]
+
+results.all.comparison <- results.all.mismatch[
+	results.all.perfect, 
+	on = .(target, condition)]
+
+results.all.comparison[, `Predicted Knockdown` := y_pred]
+
+results.all.comparison[!is.na(y_pred)] %>% 
+	arrange(LFC.adj.mismatch) %>%
+	ggplot(aes(
+		x = LFC.adj.perfect, 
+		y = LFC.adj.mismatch, 
+		color = `Predicted Knockdown`)) + 
+	geom_point(alpha = 0.25, pch = 20, size = 2, stroke = 0) + 
+	scale_color_viridis(
+		option = "inferno",
+		discrete = FALSE, 
+		direction = 1,
+		limits = c(0, 1),
+		oob = squish) +
+	theme_ipsum() +
+	theme(legend.position = "bottom") +
+	ggtitle("Fitness LogFC in Mismatch Guides versus Perfect Guides")
+```
