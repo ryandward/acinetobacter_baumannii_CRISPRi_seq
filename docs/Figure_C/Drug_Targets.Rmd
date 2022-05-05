@@ -225,7 +225,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median L2FC in Perfect-Match LPS Guides"
+to_plot_title <- "Median LogFC in Perfect LPS Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -311,7 +311,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median L2FC in Perfect-Match Cell Wall/PG Guides"
+to_plot_title <- "Median LogFC in Perfect Cell Wall/PG Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -397,7 +397,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median L2FC in Perfect-Match Cell Wall/PG Guides"
+to_plot_title <- "Median LogFC in Perfect Cell Wall/PG Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
