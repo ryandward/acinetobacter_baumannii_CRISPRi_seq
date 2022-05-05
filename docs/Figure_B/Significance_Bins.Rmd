@@ -1,0 +1,96 @@
+---
+title: "Bins of Significance"
+keep_md: no
+author: "Ryan Ward"
+date: '2022-05-04'
+output: html_document
+---
+```{r overlap calculations}
+library(pacman)
+
+p_load(eulerr, data.table, viridis, grid, ComplexHeatmap, tidyverse)
+
+median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
+
+
+bins <- 
+	median_melted_results[
+		, .(significant = FDR < 0.05 & medLFC < 0), 
+		by = .(condition, unique_name, type)]
+
+bins <- bins[condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")]
+
+bins <-
+	dcast(bins, unique_name + type ~ condition, value.var = "significant")
+
+bins[`None_0_T1 - None_0_T0` == FALSE & `None_0_T2 - None_0_T0` == FALSE, `Never Vulnerable` := TRUE]
+bins[is.na(`Never Vulnerable`), `Never Vulnerable` := FALSE]
+```
+```{r venn diagram, fig.width=8, fig.height=8}
+
+p.euler <- bins[type == "perfect"] %>% select (-c(unique_name, type)) %>% euler
+
+p <- plot(
+	p.euler,
+	fill = viridis(3, option = "cividis", direction = -1, alpha = 0.25), 
+	quantities = T,
+	lwd = 0.5)
+
+oldGrob <- getGrob(p, "tag.label.1")
+newGrob <- editGrob(oldGrob, label = bquote(Vulnerable~by~t[1]))
+p <- setGrob(p, "tag.label.1", newGrob)
+
+oldGrob <- getGrob(p, "tag.label.2")
+newGrob <- editGrob(oldGrob, label = bquote(Vulnerable~between~t[1]~and~t[2]))
+p <- setGrob(p, "tag.label.2", newGrob)
+
+oldGrob <- getGrob(p, "tag.label.3")
+newGrob <- editGrob(oldGrob, label = bquote(Not~vulnerable))
+p <- setGrob(p, "tag.label.3", newGrob)
+
+print(p)
+```
+
+```{r}
+vulnerability <- list(
+	"Timepoint 1" = median_melted_results %>% 
+		filter(condition %in% c("None_0_T1 - None_0_T0") & type == "perfect" & FDR < 0.05 & medLFC < 0) %>% 
+		pull(unique_name),
+	"Timepoint 2" = median_melted_results %>% 
+		filter(condition %in% c("None_0_T2 - None_0_T0") & type == "perfect" & FDR < 0.05 & medLFC < 0) %>% 
+		pull(unique_name)
+	)
+
+vulnerability.comb_mat <- make_comb_mat(
+	vulnerability,
+	universal_set = median_melted_results %>% 
+		select(unique_name) %>% 
+		unique %>% 
+		pull)
+
+UpSet(
+	vulnerability.comb_mat, 
+	top_annotation = HeatmapAnnotation(
+		"Intersection" = anno_barplot(
+			comb_size(vulnerability.comb_mat),
+			border = FALSE, 
+			height = unit(5, "cm"),
+			add_numbers = T,
+			gp = gpar(
+				fill = c(
+					c("gray", "black")[comb_degree(vulnerability.comb_mat)], 
+					"white"))), 
+		annotation_name_side = "left", 
+		annotation_name_rot = 90,
+		show_annotation_name = FALSE),
+	right_annotation = rowAnnotation(
+		"Gene Count" = anno_barplot(
+			set_size(vulnerability.comb_mat),
+			border = FALSE,
+			gp = gpar(fill = "gray"),
+			width = unit(5, "cm"),
+			add_numbers = T)),
+	row_labels = c(
+		as.expression(bquote(Vulnerable~at~t[1])), 
+		as.expression(bquote(Vulnerable~at~t[2]))))
+```
