@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+Raw_Data/*
+docs/*.png
+docs/*.md
+Archive
+Results/*.tsv
+Results/*.tsv.gz

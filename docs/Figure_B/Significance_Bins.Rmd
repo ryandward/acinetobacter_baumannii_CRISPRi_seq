@@ -12,7 +12,6 @@ p_load(eulerr, data.table, viridis, grid, ComplexHeatmap, tidyverse)
 
 median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
-
 bins <- 
 	median_melted_results[
 		, .(significant = FDR < 0.05 & medLFC < 0), 
@@ -76,10 +75,11 @@ UpSet(
 			border = FALSE, 
 			height = unit(5, "cm"),
 			add_numbers = T,
-			gp = gpar(
-				fill = c(
-					c("gray", "black")[comb_degree(vulnerability.comb_mat)], 
-					"white"))), 
+			# gp = gpar(
+			# 	fill = c(
+			# 		c("gray", "black")[comb_degree(vulnerability.comb_mat)], 
+			# 		"white"))
+			), 
 		annotation_name_side = "left", 
 		annotation_name_rot = 90,
 		show_annotation_name = FALSE),
@@ -87,7 +87,7 @@ UpSet(
 		"Gene Count" = anno_barplot(
 			set_size(vulnerability.comb_mat),
 			border = FALSE,
-			gp = gpar(fill = "gray"),
+			# gp = gpar(fill = "gray"),
 			width = unit(5, "cm"),
 			add_numbers = T)),
 	row_labels = c(

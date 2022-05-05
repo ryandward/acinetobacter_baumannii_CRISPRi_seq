@@ -2,6 +2,7 @@ library(pacman)
 p_load(ggplot2, data.table, pheatmap, ggrepel, hrbrthemes, viridis)
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
+median_melted_results <- fread("Results/median_melted_results.tsv.gz", sep = "\t")
 
 interest <- fread("interest.tsv", sep = "\t")
 
@@ -69,6 +70,45 @@ plot_object <-
 
 print(plot_object)
 
+################################################################################
+
+#T1 NADH enrichment
+
+to_plot <-
+	median_melted_results[
+		condition == "None_0_T1 - None_0_T0" & type == "perfect"]
+
+to_plot[Pathway %like% "NADH", `NADH Genes` := TRUE]
+
+
+plot_object <-
+	ggplot(data = to_plot,
+				 aes(x = medLFC,
+				 		y = -log10(FDR))) +
+	geom_point(aes(color = `NADH Genes`)) +
+	geom_hline(yintercept = 1.30103,
+						 linetype = "dashed",
+						 color = "red") +
+	geom_vline(xintercept = 0,
+						 linetype = "dotted",
+						 color = "black") +
+	geom_text_repel(
+		data = to_plot[`NADH Genes` == TRUE],
+		aes(label = gene_name_stylized),
+		size = 5,
+		box.padding = unit(0.5, "lines"),
+		point.padding = unit(0.25, "lines"),
+		min.segment.length = 0,
+		parse = TRUE,
+		max.overlaps = Inf) +
+	theme_ipsum() +
+	theme(legend.position = "bottom") +
+	scale_color_manual(values = c("#ff7f00"), na.value = "grey") +
+		# ggtitle("Effect of Library Induction at T[1]")
+	ggtitle(bquote(bold(NADH~Genes~Depleted~upon~Library~Induction~at~t[1])))
+
+
+print(plot_object)
 
 ##############################	##############################	#################
 

@@ -241,7 +241,7 @@ melted_results[, LFC.adj := control_melted_results_by_condition[
 
 median_melted_results <-
 	melted_results[
-		, .(medLFC = median(LFC), FDR = stouffer(FDR)$p),
+		, .(medLFC = median(LFC.adj), FDR = stouffer(FDR)$p),
 		by = .(AB19606, AB030, unique_name, type, condition)]
 
 ############################################################################################################

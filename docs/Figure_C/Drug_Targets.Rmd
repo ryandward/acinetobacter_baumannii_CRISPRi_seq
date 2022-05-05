@@ -196,6 +196,88 @@ aba.fit <- glmQLFit(aba.y, aba.permutations, robust = TRUE)
 
 ```
 
+```{r Perform edgeR for induced-only samples}
+aba.contrasts <- c(
+	"None_0_T1 - None_0_T0",
+	"None_0_T2 - None_0_T0",
+	"None_0_T2 - None_0_T1") 
+
+results <- extract_edgeR(
+	y.fit = aba.fit, 
+	y.contrasts = aba.contrasts, 
+	y.permutations = aba.permutations)
+
+results <- clean_edgeR(results)
+
+melted_results <- melt_and_stack(results)
+```
+
+
+
+```{r nuo activity in induced samples, fig.width=10, fig.height=10}
+median_LFC <- dcast(
+	melted_results[Pathway == "Quinone/NADH" & type == "perfect"], 
+	unique_name + Pathway ~ condition, 
+	value.var = "LFC.adj", 
+	fun.aggregate = median)
+
+print(colnames(median_LFC))
+
+to_plot_title <- "Median LogFC in Perfect Quinone/NADH Guides"
+
+# convert to matrix
+LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
+
+# name rows in matrix
+rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+
+# format genes (rows): Pathway + italic(Gene Name)
+genes.formatted <- lapply(
+	median_LFC[, .I],
+	function(x) { 
+		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
+
+# format conditions (columns)
+conditions.formatted <- c(
+	bquote(Induction ~ (t[1] - t[0])),
+	bquote(Induction ~ (t[2] - t[0])),
+	bquote(Difference ~ (t[2] - t[1])))
+
+plot_matrix <- LFC_grid
+
+breaks <- generate_breaks(plot_matrix, n = 256, center = T)
+
+plot_colors <- colorRampPalette(
+	c("#ba000d", "white", "#007ac1"),
+	interpolate = "linear")(256)
+
+to_plot <- pheatmap(
+	plot_matrix,
+	col = plot_colors,
+	breaks = breaks,
+	border_color = NA,
+	main = to_plot_title,
+	cluster_cols = F,
+	angle_col = 45,
+	clustering_method = "ward.D2",
+	clustering_distance_rows = "canberra",
+	labels_row = as.expression(genes.formatted),
+	labels_col = as.expression(conditions.formatted),
+	# gaps_col = 3,
+	# cutree_rows = 4,
+	cellheight = 24,
+	cellwidth = 48,
+	fontsize = 12,
+	silent = T)
+	
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+	
+print(to_plot)
+```
+
 ```{r Perform edgeR for Colistin Samples}
 aba.contrasts <- c(
 	"None_0_T1 - None_0_T0",
