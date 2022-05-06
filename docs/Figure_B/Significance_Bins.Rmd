@@ -8,7 +8,7 @@ output: html_document
 ```{r overlap calculations}
 library(pacman)
 
-p_load(eulerr, data.table, viridis, grid, ComplexHeatmap, tidyverse)
+p_load(eulerr, data.table, viridis, grid, ComplexHeatmap, tidyverse, ComplexUpset)
 
 median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
@@ -51,21 +51,16 @@ print(p)
 ```
 
 ```{r}
-vulnerability <- list(
-	"Timepoint 1" = median_melted_results %>% 
-		filter(condition %in% c("None_0_T1 - None_0_T0") & type == "perfect" & FDR < 0.05 & medLFC < 0) %>% 
-		pull(unique_name),
-	"Timepoint 2" = median_melted_results %>% 
-		filter(condition %in% c("None_0_T2 - None_0_T0") & type == "perfect" & FDR < 0.05 & medLFC < 0) %>% 
-		pull(unique_name)
-	)
+vulnerability.comb_mat <- 
+	median_melted_results %>% 
+    filter(type == "perfect") %>%
+    mutate(depleted = (FDR < 0.05 & medLFC < 0)) %>%  
+    pivot_wider(
+    	id_cols = unique_name, 
+    	names_from = condition, values_from = depleted) %>% 
+	select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
+	make_comb_mat() 
 
-vulnerability.comb_mat <- make_comb_mat(
-	vulnerability,
-	universal_set = median_melted_results %>% 
-		select(unique_name) %>% 
-		unique %>% 
-		pull)
 
 UpSet(
 	vulnerability.comb_mat, 
@@ -75,22 +70,75 @@ UpSet(
 			border = FALSE, 
 			height = unit(5, "cm"),
 			add_numbers = T,
-			# gp = gpar(
-			# 	fill = c(
-			# 		c("gray", "black")[comb_degree(vulnerability.comb_mat)], 
-			# 		"white"))
-			), 
-		annotation_name_side = "left", 
+			gp = gpar(fill = "grey", lty = "blank")), 
+		annotation_name_side = "right", 
 		annotation_name_rot = 90,
 		show_annotation_name = FALSE),
 	right_annotation = rowAnnotation(
 		"Gene Count" = anno_barplot(
 			set_size(vulnerability.comb_mat),
 			border = FALSE,
-			# gp = gpar(fill = "gray"),
+			gp = gpar(fill =  viridis(3, direction = -1, alpha = 0.5)[2:3], lwd = 3),
 			width = unit(5, "cm"),
 			add_numbers = T)),
+	set_order = order(set_size(vulnerability.comb_mat)),
 	row_labels = c(
 		as.expression(bquote(Vulnerable~at~t[1])), 
 		as.expression(bquote(Vulnerable~at~t[2]))))
 ```
+
+```{r}
+results.depleted <- 
+	median_melted_results %>%
+	mutate(condition = case_when(
+		condition == "None_0_T1 - None_0_T0" ~ "Induced at t1",
+		condition == "None_0_T2 - None_0_T0" ~ "Induced at t2",
+		TRUE ~ condition)) %>%
+	filter(type == "perfect") %>% 
+	mutate(depleted = (FDR < 0.05 & medLFC < 0)) %>% 
+	pivot_wider(id_cols = unique_name, names_from = condition, values_from = depleted)
+
+upset(
+	results.depleted, 
+	c("Induced at t1", "Induced at t2"),
+	name = "Gene Vulnerability",
+	queries = list(
+		upset_query(set = "Induced at t1", fill = "blue", color = "black"),
+		upset_query(set = "Induced at t2", fill = "coral3", color = "black")),
+		base_annotations = list(
+			"Intersections" = (
+				intersection_size(
+					# bar_number_threshold = 1,  # show all numbers on top of bars
+					width = 0.25) +
+					theme(
+						axis.line.y = element_line(colour = "black"),
+						axis.ticks.y = element_line(),
+						axis.line.x = element_line(colour = "black"),
+						panel.grid.major = element_blank(), 
+						panel.grid.minor = element_blank(),
+						panel.background = element_blank()) +
+					labs(y = ""))),
+	stripes = upset_stripes(
+		geom = geom_segment(size = 0)),
+	# to prevent connectors from getting the colorured
+	# use `fill` instead of `color`, together with `shape="circle filled"`
+	matrix = intersection_matrix(
+		geom = geom_point(
+			shape = "circle filled",
+			size = 5,
+			stroke = 1)),
+	set_sizes = (
+		upset_set_size(
+			geom = geom_bar(width=0.5)) +
+			theme(
+				axis.line.x = element_line(colour = "black"),
+				axis.ticks.x = element_line(),
+				panel.grid.major = element_blank(),
+				panel.grid.minor = element_blank(),
+				panel.background = element_blank()) +
+			labs(y = "Number of Genes")
+	),
+	sort_sets = "ascending",
+	sort_intersections = "ascending")
+```
+
