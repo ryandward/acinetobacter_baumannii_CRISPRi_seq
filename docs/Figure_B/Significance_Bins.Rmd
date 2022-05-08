@@ -10,6 +10,8 @@ library(pacman)
 
 p_load(eulerr, data.table, viridis, grid, ComplexHeatmap, tidyverse, ComplexUpset)
 
+interest <- fread("../../interest.tsv", sep = "\t")
+
 median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
 bins <- 
@@ -60,7 +62,6 @@ vulnerability.comb_mat <-
     	names_from = condition, values_from = depleted) %>% 
 	select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
 	make_comb_mat() 
-
 
 UpSet(
 	vulnerability.comb_mat, 
@@ -129,7 +130,7 @@ upset(
 			stroke = 1)),
 	set_sizes = (
 		upset_set_size(
-			geom = geom_bar(width=0.5)) +
+			geom = geom_bar(width = 0.5)) +
 			theme(
 				axis.line.x = element_line(colour = "black"),
 				axis.ticks.x = element_line(),
@@ -142,3 +143,38 @@ upset(
 	sort_intersections = "ascending")
 ```
 
+```{r}
+vulnerability.comb_mat <- 
+	median_melted_results %>% 
+    filter(type == "perfect") %>%
+    mutate(depleted = (FDR < 0.05 & medLFC < 0)) %>%  
+    pivot_wider(
+    	id_cols = unique_name, 
+    	names_from = condition, values_from = depleted) %>% 
+	select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
+	make_comb_mat() 
+
+UpSet(
+	vulnerability.comb_mat, 
+	top_annotation = HeatmapAnnotation(
+		"Intersection" = anno_barplot(
+			comb_size(vulnerability.comb_mat),
+			border = FALSE, 
+			height = unit(5, "cm"),
+			add_numbers = T,
+			gp = gpar(fill = "grey", lty = "blank")), 
+		annotation_name_side = "right", 
+		annotation_name_rot = 90,
+		show_annotation_name = FALSE),
+	right_annotation = rowAnnotation(
+		"Gene Count" = anno_barplot(
+			set_size(vulnerability.comb_mat),
+			border = FALSE,
+			gp = gpar(fill =  viridis(3, direction = -1, alpha = 0.5)[2:3], lwd = 3),
+			width = unit(5, "cm"),
+			add_numbers = T)),
+	set_order = order(set_size(vulnerability.comb_mat)),
+	row_labels = c(
+		as.expression(bquote(Vulnerable~at~t[1])), 
+		as.expression(bquote(Vulnerable~at~t[2]))))
+```
