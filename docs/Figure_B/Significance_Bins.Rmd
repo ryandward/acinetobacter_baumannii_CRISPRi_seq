@@ -16,7 +16,7 @@ median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
 bins <- 
 	median_melted_results[
-		, .(significant = FDR < 0.05 & medLFC < 0), 
+		, .(significant = FDR < 0.01 & medLFC < 0), 
 		by = .(condition, unique_name, type)]
 
 bins <- bins[condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")]
@@ -52,11 +52,11 @@ p <- setGrob(p, "tag.label.3", newGrob)
 print(p)
 ```
 
-```{r}
+```{r Cell Wall activity in Meropenem, fig.width=6, fig.height=4}
 vulnerability.comb_mat <- 
 	median_melted_results %>% 
     filter(type == "perfect") %>%
-    mutate(depleted = (FDR < 0.05 & medLFC < 0)) %>%  
+    mutate(depleted = (FDR < 0.01 & medLFC < 0)) %>%  
     pivot_wider(
     	id_cols = unique_name, 
     	names_from = condition, values_from = depleted) %>% 
@@ -69,111 +69,22 @@ UpSet(
 		"Intersection" = anno_barplot(
 			comb_size(vulnerability.comb_mat),
 			border = FALSE, 
-			height = unit(5, "cm"),
+			height = unit(6, "cm"),
 			add_numbers = T,
 			gp = gpar(fill = "grey", lty = "blank")), 
 		annotation_name_side = "right", 
 		annotation_name_rot = 90,
 		show_annotation_name = FALSE),
 	right_annotation = rowAnnotation(
-		"Gene Count" = anno_barplot(
+		"Genes Vulnerable Upon Induction" = anno_barplot(
 			set_size(vulnerability.comb_mat),
 			border = FALSE,
 			gp = gpar(fill =  viridis(3, direction = -1, alpha = 0.5)[2:3], lwd = 3),
-			width = unit(5, "cm"),
-			add_numbers = T)),
+			width = unit(7, "cm"),
+			add_numbers = T),
+			annotation_name_gp = gpar(fontsize = 8)),
 	set_order = order(set_size(vulnerability.comb_mat)),
-	row_labels = c(
-		as.expression(bquote(Vulnerable~at~t[1])), 
-		as.expression(bquote(Vulnerable~at~t[2]))))
-```
-
-```{r}
-results.depleted <- 
-	median_melted_results %>%
-	mutate(condition = case_when(
-		condition == "None_0_T1 - None_0_T0" ~ "Induced at t1",
-		condition == "None_0_T2 - None_0_T0" ~ "Induced at t2",
-		TRUE ~ condition)) %>%
-	filter(type == "perfect") %>% 
-	mutate(depleted = (FDR < 0.05 & medLFC < 0)) %>% 
-	pivot_wider(id_cols = unique_name, names_from = condition, values_from = depleted)
-
-upset(
-	results.depleted, 
-	c("Induced at t1", "Induced at t2"),
-	name = "Gene Vulnerability",
-	queries = list(
-		upset_query(set = "Induced at t1", fill = "blue", color = "black"),
-		upset_query(set = "Induced at t2", fill = "coral3", color = "black")),
-		base_annotations = list(
-			"Intersections" = (
-				intersection_size(
-					# bar_number_threshold = 1,  # show all numbers on top of bars
-					width = 0.25) +
-					theme(
-						axis.line.y = element_line(colour = "black"),
-						axis.ticks.y = element_line(),
-						axis.line.x = element_line(colour = "black"),
-						panel.grid.major = element_blank(), 
-						panel.grid.minor = element_blank(),
-						panel.background = element_blank()) +
-					labs(y = ""))),
-	stripes = upset_stripes(
-		geom = geom_segment(size = 0)),
-	# to prevent connectors from getting the colorured
-	# use `fill` instead of `color`, together with `shape="circle filled"`
-	matrix = intersection_matrix(
-		geom = geom_point(
-			shape = "circle filled",
-			size = 5,
-			stroke = 1)),
-	set_sizes = (
-		upset_set_size(
-			geom = geom_bar(width = 0.5)) +
-			theme(
-				axis.line.x = element_line(colour = "black"),
-				axis.ticks.x = element_line(),
-				panel.grid.major = element_blank(),
-				panel.grid.minor = element_blank(),
-				panel.background = element_blank()) +
-			labs(y = "Number of Genes")
-	),
-	sort_sets = "ascending",
-	sort_intersections = "ascending")
-```
-
-```{r}
-vulnerability.comb_mat <- 
-	median_melted_results %>% 
-    filter(type == "perfect") %>%
-    mutate(depleted = (FDR < 0.05 & medLFC < 0)) %>%  
-    pivot_wider(
-    	id_cols = unique_name, 
-    	names_from = condition, values_from = depleted) %>% 
-	select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
-	make_comb_mat() 
-
-UpSet(
-	vulnerability.comb_mat, 
-	top_annotation = HeatmapAnnotation(
-		"Intersection" = anno_barplot(
-			comb_size(vulnerability.comb_mat),
-			border = FALSE, 
-			height = unit(5, "cm"),
-			add_numbers = T,
-			gp = gpar(fill = "grey", lty = "blank")), 
-		annotation_name_side = "right", 
-		annotation_name_rot = 90,
-		show_annotation_name = FALSE),
-	right_annotation = rowAnnotation(
-		"Gene Count" = anno_barplot(
-			set_size(vulnerability.comb_mat),
-			border = FALSE,
-			gp = gpar(fill =  viridis(3, direction = -1, alpha = 0.5)[2:3], lwd = 3),
-			width = unit(5, "cm"),
-			add_numbers = T)),
-	set_order = order(set_size(vulnerability.comb_mat)),
+	row_names_gp = grid::gpar(fontsize = 10),
 	row_labels = c(
 		as.expression(bquote(Vulnerable~at~t[1])), 
 		as.expression(bquote(Vulnerable~at~t[2]))))

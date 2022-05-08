@@ -294,12 +294,14 @@ fwrite(median_results_LFC, "Results/median_results_LFC.tsv.gz", sep = "\t")
 fwrite(median_results_FDR, "Results/median_results_FDR.tsv.gz", sep = "\t")
 
 ############################################################################################################
-
 CL2682 <- fread('CL2687.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
+
 map03010 <- fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
+
 LPS <- fread('LPS.tsv') #Lipopolysaccharide in AB030 KEGG, map 00540
-CL3048 <- fread('CL3048.tsv') #Quinone, and NADH:quinone oxidoblackuctase/Mrp antiporter, membrane subunit
-# KW0030 <- fread('KW-0030.tsv') #Aminoacyl-tRNA synthetase
+
+NADH <- fread('NADH.tsv') #NADH
+
 GO0004812 <- fread('GO0004812.tsv') #Aminoacyl-tRNA synthetase, GO
 
 melted_results[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
@@ -307,10 +309,8 @@ melted_results[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
 melted_results[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 
 melted_results[AB030 %in% LPS$AB030, Pathway := "LPS"]
-melted_results[unique_name %like% "lpt", Pathway := "LPS"]
-melted_results[unique_name == "gtrOC1", Pathway := "LPS"]
 
-melted_results[AB030 %in% CL3048$AB030, Pathway := "Quinone/NADH"]
+melted_results[AB030 %in% NADH$AB030, Pathway := "NADH"]
 
 melted_results[AB030 %in% GO0004812$AB030, Pathway := "tRNA Ligase"]
 
@@ -337,14 +337,10 @@ median_melted_results[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
 median_melted_results[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 
 median_melted_results[AB030 %in% LPS$AB030, Pathway := "LPS"]
-median_melted_results[unique_name %like% "lpt", Pathway := "LPS"]
-median_melted_results[unique_name == "gtrOC1", Pathway := "LPS"]
+# median_melted_results[unique_name %like% "lpt", Pathway := "LPS"]
+# median_melted_results[unique_name == "gtrOC1", Pathway := "LPS"]
 
-median_melted_results[AB030 %in% CL3048$AB030, Pathway := "Quinone/NADH"]
-
-# median_melted_results[unique_name %like% "cyo", Pathway := "Quinone/NADH"]
-# maybe
-
+median_melted_results[AB030 %in% NADH$AB030, Pathway := "NADH"]
 
 median_melted_results[AB030 %in% GO0004812$AB030, Pathway := "tRNA Ligase"]
 

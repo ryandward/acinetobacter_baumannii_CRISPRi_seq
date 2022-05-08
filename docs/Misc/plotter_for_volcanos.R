@@ -1,5 +1,8 @@
 library(pacman)
-p_load(ggplot2, data.table, pheatmap, ggrepel, hrbrthemes, viridis)
+
+p_load(tidyverse, ggplot2, data.table, ggrepel, hrbrthemes, viridis, ggallin)
+
+#https://cran.r-project.org/web/packages/ggallin/README.html
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 median_melted_results <- fread("Results/median_melted_results.tsv.gz", sep = "\t")
@@ -15,10 +18,10 @@ to_plot <-
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(),
 						 color = "grey") +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -32,6 +35,7 @@ plot_object <-
 		point.padding = unit(0.25, "lines"),
 		parse = TRUE) +
 	theme_ipsum() +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction at T[1]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~at~t[1])))
 
@@ -47,10 +51,10 @@ to_plot <-
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(),
 						 color = "grey") +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -64,7 +68,8 @@ plot_object <-
 		point.padding = unit(0.25, "lines"),
 		parse = TRUE) +
 	theme_ipsum() +
-	# ggtitle("Effect of Library Induction at T[2]")
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
+			# ggtitle("Effect of Library Induction at T[2]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~at~t[2])))
 
 
@@ -84,9 +89,9 @@ to_plot[Pathway %like% "NADH", `NADH Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `NADH Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -103,6 +108,7 @@ plot_object <-
 		max.overlaps = Inf) +
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	scale_color_manual(values = c("#ff7f00"), na.value = "grey") +
 		# ggtitle("Effect of Library Induction at T[1]")
 	ggtitle(bquote(bold(NADH~Genes~Depleted~upon~Library~Induction~at~t[1])))
@@ -121,9 +127,9 @@ to_plot[Pathway %like% "Cell Wall", `Cell Wall Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `Cell Wall Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -141,6 +147,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#33a02c"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Imipenem at T[1]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Imipenem~at~t[1])))
 
@@ -152,9 +159,9 @@ to_plot[Pathway %like% "tRNA", `tRNA Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `tRNA Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -172,6 +179,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#6a3d9a"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Imipenem at T[1]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Imipenem~at~t[1])))
 
@@ -189,9 +197,9 @@ to_plot[Pathway %like% "NADH", `NADH Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `LPS Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -209,6 +217,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#1f78b4"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Rifampicin at T[2]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Rifampicin~at~t[2])))
 
@@ -217,9 +226,9 @@ print(plot_object)
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `NADH Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -237,6 +246,8 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#ff7f00"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
+	
 	# ggtitle("Effect of Library Induction + Rifampicin at T[2]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Rifampicin~at~t[2])))
 
@@ -254,9 +265,9 @@ to_plot[Pathway %like% "NADH", `NADH Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `LPS Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -274,6 +285,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#1f78b4"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Colistin at T[2]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Colistin~at~t[2])))
 
@@ -282,9 +294,9 @@ print(plot_object)
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `NADH Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -302,6 +314,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#ff7f00"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Colistin at T[2]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Colistin~at~t[2])))
 
@@ -319,9 +332,9 @@ to_plot[Pathway %like% "Cell Wall", `Cell Wall Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `Cell Wall Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -339,6 +352,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#33a02c"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Meropenem at T[1]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Meropenem~at~t[1])))
 
@@ -350,9 +364,9 @@ to_plot[Pathway %like% "tRNA", `tRNA Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `tRNA Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -370,6 +384,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#6a3d9a"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Meropenem at T[1]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Meropenem~at~t[1])))
 
@@ -388,9 +403,9 @@ to_plot[Pathway %like% "NADH", `NADH Genes` := TRUE]
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `LPS Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -408,6 +423,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#1f78b4"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Colistin at T[1]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Colistin~at~t[1])))
 
@@ -416,9 +432,9 @@ print(plot_object)
 plot_object <-
 	ggplot(data = to_plot,
 				 aes(x = medLFC,
-				 		y = -log10(FDR))) +
+				 		y = FDR)) +
 	geom_point(aes(color = `NADH Genes`)) +
-	geom_hline(yintercept = 1.30103,
+	geom_hline(yintercept = 0.01,
 						 linetype = "dashed",
 						 color = "red") +
 	geom_vline(xintercept = 0,
@@ -436,6 +452,7 @@ plot_object <-
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
 	scale_color_manual(values = c("#ff7f00"), na.value = "grey") +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	# ggtitle("Effect of Library Induction + Colistin at T[1]")
 	ggtitle(bquote(bold(Effect~of~Library~Induction~"+"~Colistin~at~t[1])))
 

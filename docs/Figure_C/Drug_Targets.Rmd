@@ -29,11 +29,11 @@ CL2682 <- fread("../../CL2687.tsv")
 # Ribosome, why is rplY and rpmB not being painted in plots?
 map03010 <- fread("../../map03010.tsv") 
 
-# Lipopolysaccharide in AB030 KEGG, map 00540
+# Lipopolysaccharide Genes
 LPS <- fread("../../LPS.tsv") 
 
-# Quinone, and NADH:quinone oxidoreductase/Mrp antiporter, membrane subunit
-CL3048 <- fread("../../CL3048.tsv") 
+# NADH Genes
+NADH <- fread("../../NADH.tsv") 
 
 # Aminoacyl-tRNA synthetase, GO
 GO0004812 <- fread("../../GO0004812.tsv") 
@@ -143,9 +143,7 @@ aba.genome <- curated_names[
 aba.genome[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
 aba.genome[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 aba.genome[AB030 %in% LPS$AB030, Pathway := "LPS"]
-aba.genome[unique_name %like% "lpt", Pathway := "LPS"]
-aba.genome[unique_name == "gtrOC1", Pathway := "LPS"]
-aba.genome[AB030 %in% CL3048$AB030, Pathway := "Quinone/NADH"]
+aba.genome[AB030 %in% NADH$AB030, Pathway := "NADH"]
 aba.genome[AB030 %in% GO0004812$AB030, Pathway := "tRNA Ligase"]
 aba.genome[is.na(Pathway), Pathway := "Other"]
 aba.genome[AB19606 == "", AB19606 := NA]
@@ -216,14 +214,14 @@ melted_results <- melt_and_stack(results)
 
 ```{r nuo activity in induced samples, fig.width=10, fig.height=10}
 median_LFC <- dcast(
-	melted_results[Pathway == "Quinone/NADH" & type == "perfect"], 
+	melted_results[Pathway == "NADH" & type == "perfect"], 
 	unique_name + Pathway ~ condition, 
 	value.var = "LFC.adj", 
 	fun.aggregate = median)
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median LogFC in Perfect Quinone/NADH Guides"
+to_plot_title <- "Median LogFC in Perfect NADH Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])

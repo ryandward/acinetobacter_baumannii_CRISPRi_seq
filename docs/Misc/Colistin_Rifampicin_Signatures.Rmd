@@ -84,7 +84,7 @@ p <- UpSet(
 				# fill = c(rep("light blue", 2), rep("coral", 2)),
 				fill = viridis(2, direction = -1, alpha = 0.35) %>% rep(each = 2), 
 				col = c("red", "black", "red", "black"),
-				lwd = 2,
+				lwd = 3,
 				lty = c("dotted", "solid", "dotted", "solid")),
 			width = unit(6, "cm"),
 			add_numbers = T),
