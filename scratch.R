@@ -1,3 +1,5 @@
+p_load(tidyverse, ComplexHeatmap, colorspace, viridis)
+
 conditions.full <- tibble(condition = c(
 	"None_0_T1 - None_0_T0",
 	"None_0_T2 - None_0_T0",

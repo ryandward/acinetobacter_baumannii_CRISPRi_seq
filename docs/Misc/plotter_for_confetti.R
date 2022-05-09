@@ -1,5 +1,7 @@
 library(pacman)
 
+source("meta_counter.R")
+
 p_load(ggplot2, data.table, pheatmap, ggrepel, hrbrthemes, viridis)
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
