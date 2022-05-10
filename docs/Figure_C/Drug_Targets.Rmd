@@ -351,7 +351,7 @@ to_plot <- pheatmap(
 	labels_row = as.expression(genes.formatted),
 	labels_col = as.expression(conditions.formatted),
 	gaps_col = 3,
-	cutree_rows = 4,
+	cutree_rows = 2,
 	cellheight = 24,
 	cellwidth = 48,
 	fontsize = 12,
