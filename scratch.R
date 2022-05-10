@@ -28,20 +28,20 @@ depleted.long <-
 		median_melted_results %>%
 			filter(condition %in% c(
 				"None_0_T2 - None_0_T0",
-				"Meropenem_0.11_T2 - None_0_T2",
-				"Imipenem_0.06_T2 - None_0_T2") &
+				"Meropenem_0.17_T2 - None_0_T2",
+				"Imipenem_0.09_T2 - None_0_T2") &
 					type == "perfect")) 
 
 mixed <- depleted.long %>%
 	mutate(
-		depleted = (medLFC < 0 & FDR < 0.0001), 
-		resistant = (medLFC > 0 & FDR < 0.0001)) %>% 
+		depleted = (medLFC < 0 & FDR < 0.01), 
+		resistant = (medLFC > 0 & FDR < 0.01)) %>% 
 	select(unique_name, condition, depleted, resistant) %>% 
 	pivot_longer(!c(condition, unique_name)) %>% 
-	mutate(condition = gsub(" - None_0_T2", "", condition)) %>%
-	mutate(condition = gsub(" - None_0_T0", "(induced)", condition)) %>% 
+	mutate(condition = gsub(" - None_0_T([1-9])", "-T\\1", condition)) %>%
+	mutate(condition = gsub(" - None_0_T0", "-T0", condition)) %>% 
 	mutate(condition = gsub("_", " ", condition)) %>% 
-	mutate(condition = gsub("T2", "", condition)) %>% 
+	mutate(condition = gsub("None 0", "No drug", condition)) %>%
 	unite("condition", c("condition", "name"), sep = " ") %>% 
 	pivot_wider(id_cols = unique_name, names_from = condition, values_from = value)
 
@@ -60,7 +60,7 @@ p <- UpSet(
 annotation_name_gp = gpar(fontsize = 10),		
 show_annotation_name = TRUE),
 	right_annotation = rowAnnotation(
-		"Genes Significant Beyond Induction at T2" = anno_barplot(
+		"Genes Significant Beyond Induction" = anno_barplot(
 			set_size(mixed.matrix.distinct),
 			border = FALSE,
 			gp = gpar(
@@ -93,7 +93,7 @@ p <- UpSet(
 		annotation_name_gp = gpar(fontsize = 10),		
 		show_annotation_name = TRUE),
 	right_annotation = rowAnnotation(
-		"Genes Significant Beyond Induction at T2" = anno_barplot(
+		"Genes Significant Beyond Induction" = anno_barplot(
 			set_size(mixed.matrix.intersect),
 			border = FALSE,
 			gp = gpar(

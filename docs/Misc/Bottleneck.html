@@ -180,7 +180,9 @@ pre code {
 
 <pre class="r"><code>library(pacman)
 
-p_load(data.table, viridis, tidyverse, hrbrthemes, statmod, tidyverse, scales, rmarkdown)
+p_load(data.table, viridis, tidyverse, hrbrthemes, statmod, tidyverse, rmarkdown)
+
+p_load_gh(&quot;r-lib/scales&quot;)
 
 # reads
 aba.counts &lt;- fread(

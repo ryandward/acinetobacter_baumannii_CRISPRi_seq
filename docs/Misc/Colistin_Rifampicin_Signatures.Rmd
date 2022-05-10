@@ -50,20 +50,20 @@ depleted.long <-
 
 mixed <- depleted.long %>%
 	mutate(
-		depleted = (medLFC < 0 & FDR < 0.01), 
-		resistant = (medLFC > 0 & FDR < 0.01)) %>% 
+		depleted = (medLFC < -1 & FDR < 0.01), 
+		resistant = (medLFC > 1 & FDR < 0.01)) %>% 
 	select(unique_name, condition, depleted, resistant) %>% 
 	pivot_longer(!c(condition, unique_name)) %>% 
-	mutate(condition = gsub(" - None_0_T2", "", condition)) %>% 
+	mutate(condition = gsub(" - None_0_T[0-9]", "", condition)) %>% 
 	mutate(condition = gsub("_[0-9\\.]+_", "", condition)) %>% 
-	mutate(condition = gsub("T2", "", condition)) %>% 
+	mutate(condition = gsub("T[0-9]", "", condition)) %>% 
 
 	mutate(condition = gsub("_[0-9\\.]+_", " ", condition)) %>% 
 		unite("condition", c("condition", "name"), sep = " ") %>% 
 	pivot_wider(id_cols = unique_name, names_from = condition, values_from = value)
 
 mixed.matrix <- mixed %>%
-	make_comb_mat
+	make_comb_mat(mode = "distinct")
 
 p <- UpSet(
 	mixed.matrix, 

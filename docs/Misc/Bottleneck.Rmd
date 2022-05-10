@@ -8,7 +8,9 @@ output: html_document
 ```{r Read files and prepare framework for analyis}
 library(pacman)
 
-p_load(data.table, viridis, tidyverse, hrbrthemes, statmod, tidyverse, scales, rmarkdown)
+p_load(data.table, viridis, tidyverse, hrbrthemes, statmod, tidyverse, rmarkdown)
+
+p_load_gh("r-lib/scales")
 
 # reads
 aba.counts <- fread(
