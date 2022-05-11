@@ -131,10 +131,14 @@ generate_breaks = function(x, n, center = F) {
 
 plot_colors <- c(
 	colorRampPalette(
-		c("#ba000d", "white"))(144^2) %>% `[`((1:144)^2) %>% `[`(-144), 
-	"white", 
+		c("#d50000", "white"))(144^3) %>% 
+		`[`((1:144)^3) %>% 
+		`[`(-144),
+	"white",
 	rev(colorRampPalette(
-		c("#0069c0", "white"))(144^2) %>% `[`((1:144)^2) %>% `[`(-144)))
+		c("#0091ea", "white"))(144^3) %>% 
+			`[`((1:144)^3) %>% 
+			`[`(-144)))
 
 ```
 
@@ -228,7 +232,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median LogFC in Perfect NADH Guides"
+to_plot_title <- "Median LogFC in Perfect Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -308,7 +312,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median LogFC in Perfect LPS Guides"
+to_plot_title <- "Median LogFC in Perfect Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -391,7 +395,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median LogFC in Perfect NADH Guides"
+to_plot_title <- "Median LogFC in Perfect Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -431,7 +435,7 @@ to_plot <- pheatmap(
 	labels_row = as.expression(genes.formatted),
 	labels_col = as.expression(conditions.formatted),
 	gaps_col = 3,
-	cutree_rows = 4,
+	cutree_rows = 3,
 	cellheight = 24,
 	cellwidth = 48,
 	fontsize = 12,
@@ -474,7 +478,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median LogFC in Perfect Cell Wall/PG Guides"
+to_plot_title <- "Median LogFC in Perfect Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -556,7 +560,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median LogFC in Perfect Cell Wall/PG Guides"
+to_plot_title <- "Median LogFC in Perfect Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -567,7 +571,7 @@ rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
 # format genes (rows): Pathway + italic(Gene Name)
 genes.formatted <- lapply(
 	median_LFC[, .I],
-	function(x) { 
+	function(x) {
 		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
 
 # format conditions (columns)
