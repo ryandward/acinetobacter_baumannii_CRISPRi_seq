@@ -129,11 +129,12 @@ generate_breaks = function(x, n, center = F) {
 	return(res)
 }
 
-material_gradient <- colorRampPalette(
-	c("#b71c1c", "#c62828", "#d32f2f", "#e53935", "#f44336", #reds
-		"white",
-		"#2196f3", "#1e88e5", "#1976d2", "#1565c0", "#0d47a1"), #blues
-	interpolate = "linear")
+plot_colors <- c(
+	colorRampPalette(
+		c("#ba000d", "white"))(144^2) %>% `[`((1:144)^2) %>% `[`(-144), 
+	"white", 
+	rev(colorRampPalette(
+		c("#0069c0", "white"))(144^2) %>% `[`((1:144)^2) %>% `[`(-144)))
 
 ```
 
@@ -249,9 +250,7 @@ conditions.formatted <- c(
 
 plot_matrix <- LFC_grid
 
-breaks <- generate_breaks(plot_matrix, n = 256, center = T)
-
-plot_colors <- material_gradient(256)
+breaks <- generate_breaks(plot_matrix, n = 286, center = T)
 
 to_plot <- pheatmap(
 	plot_matrix,
@@ -334,9 +333,7 @@ conditions.formatted <- c(
 
 plot_matrix <- LFC_grid
 
-breaks <- generate_breaks(plot_matrix, n = 256, center = T)
-
-plot_colors <- material_gradient(256)
+breaks <- generate_breaks(plot_matrix, n = 286, center = T)
 
 to_plot <- pheatmap(
 	plot_matrix,
@@ -351,7 +348,7 @@ to_plot <- pheatmap(
 	labels_row = as.expression(genes.formatted),
 	labels_col = as.expression(conditions.formatted),
 	gaps_col = 3,
-	cutree_rows = 2,
+	cutree_rows = 4,
 	cellheight = 24,
 	cellwidth = 48,
 	fontsize = 12,
@@ -419,9 +416,7 @@ conditions.formatted <- c(
 
 plot_matrix <- LFC_grid
 
-breaks <- generate_breaks(plot_matrix, n = 256, center = T)
-
-plot_colors <- material_gradient(256)
+breaks <- generate_breaks(plot_matrix, n = 286, center = T)
 
 to_plot <- pheatmap(
 	plot_matrix,
@@ -436,7 +431,7 @@ to_plot <- pheatmap(
 	labels_row = as.expression(genes.formatted),
 	labels_col = as.expression(conditions.formatted),
 	gaps_col = 3,
-	cutree_rows = 2,
+	cutree_rows = 4,
 	cellheight = 24,
 	cellwidth = 48,
 	fontsize = 12,
@@ -504,9 +499,7 @@ conditions.formatted <- c(
 
 plot_matrix <- LFC_grid
 
-breaks <- generate_breaks(plot_matrix, n = 256, center = T)
-
-plot_colors <- material_gradient(256)
+breaks <- generate_breaks(plot_matrix, n = 286, center = T)
 
 to_plot <- pheatmap(
 	plot_matrix,
@@ -588,9 +581,7 @@ conditions.formatted <- c(
 
 plot_matrix <- LFC_grid
 
-breaks <- generate_breaks(plot_matrix, n = 256, center = T)
-
-plot_colors <- material_gradient(256)
+breaks <- generate_breaks(plot_matrix, n = 286, center = T)
 
 to_plot <- pheatmap(
 	plot_matrix,
