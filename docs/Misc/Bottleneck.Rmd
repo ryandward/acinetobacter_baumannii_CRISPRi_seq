@@ -8,7 +8,7 @@ output: html_document
 ```{r Read files and prepare framework for analyis}
 library(pacman)
 
-p_load(data.table, viridis, tidyverse, hrbrthemes, statmod, tidyverse, rmarkdown)
+p_load(data.table, viridis, tidyverse, hrbrthemes, statmod, tidyverse, rmarkdown, R.utils)
 
 p_load_gh("r-lib/scales")
 
@@ -78,7 +78,7 @@ aba.counts <- aba.counts %>% semi_join(aba.design)
 # 		values_to = "count")
 ```
 
-Build up components of bottleneck calculation
+Build up components of bottleneck calculation, and plot how controls cluster with each other. They should not have significant clustering.
 ```{r message=FALSE}
 # https://www.nature.com/articles/nmeth.3253
 aba.design <- aba.design %>% 
@@ -94,6 +94,30 @@ aba.counts.verbose <- aba.counts %>%
 	unite("Sample",    Condition, rep, sep = " ", remove = FALSE) %>% 
 	rename(Type = type) %>%
 	select(spacer, count, Type, Condition, Sample, generations)
+
+aba.counts.control.clusters <- aba.counts.verbose %>% 
+	filter(Type == "control") %>% 
+	pivot_wider(
+		id_cols = "spacer", 
+		names_from = Sample, 
+		values_from = "count", 
+		values_fill = 0) %>% 
+	select(-spacer) %>% 
+	data.matrix %>% 
+	cor(method = "spearman") %>% 
+	dist(method = "canberra") %>% 
+	hclust(method = "ward.D2") 
+
+aba.order <- aba.counts.control.clusters$labels[aba.counts.control.clusters$order] %>% 
+	data.table(Sample = .) %>% 
+	as_tibble
+
+plot(aba.counts.control.clusters,
+		 main = "Control guides: Canberra distance, Ward clustering")
+
+```
+
+```{r}
 
 aba.botneck.t0 <- aba.counts.verbose %>% 
 	filter(generations == 0) %>%
