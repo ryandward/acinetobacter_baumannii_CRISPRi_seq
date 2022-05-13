@@ -24,7 +24,7 @@ curated_names <- fread("../../curated_names.tsv")
 
 # Pathway definitions
 # Cell wall biogenesis/degradation, and Cell Wall/PG
-CL2682 <- fread("../../CL2687.tsv") 
+CellWall <- fread("../../CL704.tsv") 
 
 # Ribosome, why is rplY and rpmB not being painted in plots?
 map03010 <- fread("../../map03010.tsv") 
@@ -151,7 +151,7 @@ aba.genome <- curated_names[
 	, .(AB19606, AB030, unique_name)][aba.genome, on = .(AB19606 == locus_tag)]
 
 # classify genes as belonging to one pathway
-aba.genome[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
+aba.genome[AB030 %in% CellWall$AB030, Pathway := "Cell Wall/PG"]
 aba.genome[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 aba.genome[AB030 %in% LPS$AB030, Pathway := "LPS"]
 aba.genome[AB030 %in% NADH$AB030, Pathway := "NADH"]
@@ -469,7 +469,7 @@ results <- clean_edgeR(results)
 melted_results <- melt_and_stack(results)
 ```
 
-```{r Cell Wall activity in Imipenem, fig.width=10, fig.height=8}
+```{r Cell Wall activity in Imipenem, fig.width=10, fig.height=12}
 median_LFC <- dcast(
 	melted_results[Pathway == "Cell Wall/PG" & type == "perfect"], 
 	unique_name + Pathway ~ condition, 
@@ -551,7 +551,7 @@ results <- clean_edgeR(results)
 melted_results <- melt_and_stack(results)
 ```
 
-```{r Cell Wall activity in Meropenem, fig.width=10, fig.height=8}
+```{r Cell Wall activity in Meropenem, fig.width=10, fig.height=12}
 median_LFC <- dcast(
 	melted_results[Pathway == "Cell Wall/PG" & type == "perfect"], 
 	unique_name + Pathway ~ condition, 

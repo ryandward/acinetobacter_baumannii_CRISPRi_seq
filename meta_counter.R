@@ -294,7 +294,7 @@ fwrite(median_results_LFC, "Results/median_results_LFC.tsv.gz", sep = "\t")
 fwrite(median_results_FDR, "Results/median_results_FDR.tsv.gz", sep = "\t")
 
 ############################################################################################################
-CL2682 <- fread('CL2687.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
+CellWall <- fread('CL704.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
 
 map03010 <- fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
 
@@ -306,7 +306,7 @@ NADH <- fread('NADH.tsv')
 
 GO0004812 <- fread('GO0004812.tsv') #Aminoacyl-tRNA synthetase, GO
 
-melted_results[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
+melted_results[AB030 %in% CellWall$AB030, Pathway := "Cell Wall/PG"]
 
 melted_results[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 
@@ -334,7 +334,7 @@ setorder(melted_results, FDR)
 ##########################################################################################
 
 
-median_melted_results[AB030 %in% CL2682$AB030, Pathway := "Cell Wall/PG"]
+median_melted_results[AB030 %in% CellWall$AB030, Pathway := "Cell Wall/PG"]
 
 median_melted_results[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 
