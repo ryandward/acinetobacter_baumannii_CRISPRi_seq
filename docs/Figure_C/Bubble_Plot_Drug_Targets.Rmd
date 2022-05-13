@@ -19,7 +19,7 @@ median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 median_melted_results[Pathway == "Other", Pathway := NA_character_]
 
 median_melted_results %>% 
-	filter(condition == "Imipenem_0.09_T1 - None_0_T1" & type == "perfect") %>% 
+	filter(condition == "Imipenem_0.09_T2 - None_0_T2" & type == "perfect") %>% 
 	arrange(AB19606) %>% 
 	mutate(`Locus Tag Position` = factor(AB19606, levels = unique(AB19606))) %>% 
 	mutate(`Locus Tag Position` = 1:n()) %>% 
@@ -41,7 +41,7 @@ median_melted_results %>%
 		colour = "black") + 
 	theme_ipsum_rc() + 
 	geom_label_repel(
-		data = . %>% filter(Pathway %like% "Cell Wall"), 
+		data = . %>% filter(Pathway %like% "Cell Wall" & FDR < 0.05), 
 		aes(label = gene_name_stylized), 
 		parse = TRUE,
 		max.overlaps = 25) + 
@@ -59,3 +59,95 @@ median_melted_results %>%
 		fill = guide_legend(override.aes = list(size = 10))) -> p
 
 print(p)
+
+```
+
+```{r fig.width=10}
+
+median_melted_results %>% 
+	filter(condition == "Colistin_0.44_T2 - None_0_T2" & type == "perfect") %>% 
+	arrange(AB19606) %>% 
+	mutate(`Locus Tag Position` = factor(AB19606, levels = unique(AB19606))) %>% 
+	mutate(`Locus Tag Position` = 1:n()) %>% 
+	arrange(type) %>% 
+	ggplot(aes(x = `Locus Tag Position`, y = medLFC)) +
+	geom_hline(yintercept = 0,
+		colour = "red",
+		lty = "dashed") +
+	geom_point(
+		data = . %>% filter(is.na(Pathway)), 
+		aes(fill = Pathway, size = -log10(FDR)),
+		shape = 21,
+		colour = "black",
+		alpha = 0.5) + 
+	geom_point(
+		data = . %>% filter(!is.na(Pathway)), 
+		aes(fill = Pathway, size = -log10(FDR)),
+		shape = 21,
+		colour = "black") + 
+	theme_ipsum_rc() + 
+	geom_label_repel(
+		data = . %>% filter(Pathway %in% c("NADH", "LPS") & FDR < 0.05), 
+		aes(label = gene_name_stylized), 
+		parse = TRUE,
+		max.overlaps = 25) + 
+	scale_fill_viridis(
+		discrete = T,
+		alpha = 0.75,
+		na.value = "grey", 
+		direction = -1) +
+	labs(
+		title = bquote(bolditalic("Acinetobacter baumannii") ~ bold("Gene Sensitivity by Pathway")), 
+		subtitle = "Fitness effects beyond induction in Colistin",
+		parse = TRUE) +
+	guides(
+		size = "none",
+		fill = guide_legend(override.aes = list(size = 10))) -> p
+
+print(p)
+```
+
+```{r fig.width=10}
+
+median_melted_results %>% 
+	filter(condition == "Rifampicin_0.34_T2 - None_0_T2" & type == "perfect") %>% 
+	arrange(AB19606) %>% 
+	mutate(`Locus Tag Position` = factor(AB19606, levels = unique(AB19606))) %>% 
+	mutate(`Locus Tag Position` = 1:n()) %>% 
+	arrange(type) %>% 
+	ggplot(aes(x = `Locus Tag Position`, y = medLFC)) +
+	geom_hline(yintercept = 0,
+		colour = "red",
+		lty = "dashed") +
+	geom_point(
+		data = . %>% filter(is.na(Pathway)), 
+		aes(fill = Pathway, size = -log10(FDR)),
+		shape = 21,
+		colour = "black",
+		alpha = 0.5) + 
+	geom_point(
+		data = . %>% filter(!is.na(Pathway)), 
+		aes(fill = Pathway, size = -log10(FDR)),
+		shape = 21,
+		colour = "black") + 
+	theme_ipsum_rc() + 
+	geom_label_repel(
+		data = . %>% filter(Pathway %in% c("NADH", "LPS") & FDR < 0.05 ), 
+		aes(label = gene_name_stylized), 
+		parse = TRUE,
+		max.overlaps = 25) + 
+	scale_fill_viridis(
+		discrete = T,
+		alpha = 0.75,
+		na.value = "grey", 
+		direction = -1) +
+	labs(
+		title = bquote(bolditalic("Acinetobacter baumannii") ~ bold("Gene Sensitivity by Pathway")), 
+		subtitle = "Fitness effects beyond induction in Rifampicin",
+		parse = TRUE) +
+	guides(
+		size = "none",
+		fill = guide_legend(override.aes = list(size = 10))) -> p
+
+print(p)
+```

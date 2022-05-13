@@ -10,6 +10,7 @@ Using a new paradigm, we estimate gene vulnerability and/or resistance using CRI
 ```{r interested conditions and genes}
 
 interested.genes <- c(
+	"psd",
 	"asd",
 	"nuoA",
 	"nuoB",
@@ -997,11 +998,11 @@ plot.graphic <- fit_predictions %>%
 print(plot.graphic)
 ```
 
-```{r plot asd vulnerability}
+```{r plot psd vulnerability}
 
-plot.genes <- c("nuoE")
+plot.genes <- c("psd")
 plot.conditions <- c("None_0_T2 - None_0_T0", "Rifampicin_0.34_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0")
-plot.title <- bquote(bold(Gene ~ bolditalic(nuoE) ~ vulnerability ~ at ~ t[2] ~ '(CI = 90%)'))
+plot.title <- bquote(bold(Gene ~ bolditalic(psd) ~ vulnerability ~ at ~ t[2] ~ '(CI = 90%)'))
 plot.graphic <- fit_predictions %>% 
 	filter(
 		Gene %in% plot.genes &
@@ -1049,7 +1050,11 @@ plot.graphic <- fit_predictions %>%
 		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
 	theme_ipsum() +
 	theme(legend.position = "bottom") +
-	ggtitle(plot.title)
+	ggtitle(plot.title) +
+  coord_cartesian(
+    ylim = c(
+        mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
+        mismatches %>% unnest(data) %>% select(LFC.adj) %>% max()))
 
 
 print(plot.graphic)
