@@ -14,9 +14,14 @@ p_load_gh("hrbrmstr/hrbrthemes")
 
 interest <- fread("../../interest.tsv", sep = "\t")
 
+aba.bed <- fread("../../CP046654.1.bed")
+
 median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
 median_melted_results[Pathway == "Other", Pathway := NA_character_]
+
+median_melted_results[Pathway == "LPS", Pathway := "LOS"]
+
 
 median_melted_results %>% 
 	filter(condition == "Imipenem_0.09_T2 - None_0_T2" & type == "perfect") %>% 
@@ -87,7 +92,7 @@ median_melted_results %>%
 		colour = "black") + 
 	theme_ipsum_rc() + 
 	geom_label_repel(
-		data = . %>% filter(Pathway %in% c("NADH", "LPS") & FDR < 0.05), 
+		data = . %>% filter(Pathway %in% c("NADH", "LOS") & FDR < 0.05), 
 		aes(label = gene_name_stylized), 
 		parse = TRUE,
 		max.overlaps = 25) + 
@@ -132,7 +137,7 @@ median_melted_results %>%
 		colour = "black") + 
 	theme_ipsum_rc() + 
 	geom_label_repel(
-		data = . %>% filter(Pathway %in% c("NADH", "LPS") & FDR < 0.05 ), 
+		data = . %>% filter(Pathway %in% c("NADH", "LOS") & FDR < 0.05 ), 
 		aes(label = gene_name_stylized), 
 		parse = TRUE,
 		max.overlaps = 25) + 
@@ -148,6 +153,65 @@ median_melted_results %>%
 	guides(
 		size = "none",
 		fill = guide_legend(override.aes = list(size = 10))) -> p
+
+print(p)
+```
+
+```{r fig.width=12}
+median_melted_results %>% 
+	inner_join(aba.bed %>% 
+						 	select(AB19606 = locus_tag, left, right)) %>%
+	mutate(`Genome Coordinate` = (left + right)/2)    %>% 
+	filter(
+    	(condition == "Colistin_0.44_T2 - None_0_T2" | condition == "Rifampicin_0.34_T2 - None_0_T2") & 
+    		type == "perfect") %>% 
+    mutate(
+    	condition = case_when(
+    		condition == "Colistin_0.44_T2 - None_0_T2" ~ "Colistin at 18 hours",
+    		condition == "Rifampicin_0.34_T2 - None_0_T2" ~ "Rifampicin at 18 hours"),
+    	Pathway = case_when(
+    		unique_name %like% "rpo" ~ "RNAP",
+    		Pathway == "LOS" ~ "LOS",
+    		Pathway == "NADH" ~ "NADH"
+    	)) %>%
+		arrange(`Genome Coordinate`) %>% 
+    arrange(type) %>% 
+    ggplot(aes(x = `Genome Coordinate`, y = medLFC)) +
+    geom_hline(yintercept = 0,
+               colour = "red",
+               lty = "dashed") +
+    geom_point(
+        data = . %>% filter(is.na(Pathway)), 
+        aes(fill = Pathway, size = -log10(FDR)),
+        shape = 21,
+        colour = "black",
+        alpha = 0.2) + 
+    geom_point(
+        data = . %>% filter(!is.na(Pathway)), 
+        aes(fill = Pathway, size = -log10(FDR)),
+        shape = 21,
+        colour = "black") + 
+    theme_ipsum_rc() + 
+    geom_label_repel(
+        data = . %>% filter(
+        	Pathway %in% c("NADH", "LOS") |
+        		unique_name == "psd" |
+        		unique_name == "cdsA" |
+        		unique_name == "rpoB"), 
+        aes(label = gene_name_stylized), 
+        parse = TRUE,
+        max.overlaps = 50) + 
+    scale_fill_viridis(
+        discrete = T,
+        alpha = 0.55,
+        na.value = "grey", 
+        direction = -1) +
+    labs(
+        title = bquote(bolditalic("Acinetobacter baumannii") ~ bold("Gene Sensitivity by Pathway")), 
+        parse = TRUE) +
+    guides(
+        size = "none",
+        fill = guide_legend(override.aes = list(size = 5))) + facet_wrap(facets = "condition") -> p
 
 print(p)
 ```

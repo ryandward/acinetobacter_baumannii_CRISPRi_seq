@@ -131,12 +131,12 @@ generate_breaks = function(x, n, center = F) {
 
 plot_colors <- c(
 	colorRampPalette(
-		c("#d50000", "white"))(144^3) %>% 
+		c("#9a0007", "white"))(144^3) %>% 
 		`[`((1:144)^3) %>% 
 		`[`(-144),
 	"white",
 	rev(colorRampPalette(
-		c("#0091ea", "white"))(144^3) %>% 
+		c("#005b9f", "white"))(144^3) %>% 
 			`[`((1:144)^3) %>% 
 			`[`(-144)))
 
@@ -153,7 +153,7 @@ aba.genome <- curated_names[
 # classify genes as belonging to one pathway
 aba.genome[AB030 %in% CellWall$AB030, Pathway := "Cell Wall/PG"]
 aba.genome[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
-aba.genome[AB030 %in% LPS$AB030, Pathway := "LPS"]
+aba.genome[AB030 %in% LPS$AB030, Pathway := "LOS"]
 aba.genome[AB030 %in% NADH$AB030, Pathway := "NADH"]
 aba.genome[AB030 %in% GO0004812$AB030, Pathway := "tRNA Ligase"]
 aba.genome[is.na(Pathway), Pathway := "Other"]
@@ -303,9 +303,9 @@ melted_results <- melt_and_stack(results)
 ```
 
 
-```{r LPS activity in colistin, fig.width=10, fig.height=10}
+```{r LOS activity in colistin, fig.width=10, fig.height=10}
 median_LFC <- dcast(
-	melted_results[Pathway == "LPS" & type == "perfect"], 
+	melted_results[Pathway == "LOS" & type == "perfect"], 
 	unique_name + Pathway ~ condition, 
 	value.var = "LFC.adj", 
 	fun.aggregate = median)
@@ -614,3 +614,82 @@ to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
 print(to_plot)
 ```
 
+
+
+```{r Perform edgeR for Rifampicin and Colistin Samples}
+aba.contrasts <- c(
+	"Rifampicin_0.34_T1 - None_0_T1",
+	"Rifampicin_0.34_T2 - None_0_T2",
+	"Colistin_0.44_T1 - None_0_T1",
+	"Colistin_0.44_T2 - None_0_T2") 
+
+results <- extract_edgeR(
+	y.fit = aba.fit, 
+	y.contrasts = aba.contrasts, 
+	y.permutations = aba.permutations)
+
+results <- clean_edgeR(results)
+
+melted_results <- melt_and_stack(results)
+```
+
+```{r Cell Wall activity in Rif and Col, fig.width=10, fig.height=12}
+median_LFC <- dcast(
+	melted_results[(Pathway == "LOS" | Pathway == "NADH")  & type == "perfect"], 
+	unique_name + Pathway ~ condition, 
+	value.var = "LFC.adj", 
+	fun.aggregate = median)
+
+print(colnames(median_LFC))
+
+to_plot_title <- "Log-2 Fold Fitness Change in Knockdown Strain"
+
+# convert to matrix
+LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
+
+# name rows in matrix
+rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+
+# format genes (rows): Pathway + italic(Gene Name)
+genes.formatted <- lapply(
+	median_LFC[, .I],
+	function(x) {
+		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
+
+# format conditions (columns)
+conditions.formatted <- c(
+	bquote(Rifampicin ~ (hour[9])),
+	bquote(Rifampicin ~ (hour[18])),
+	bquote(Colistin ~ (hour[9])),
+	bquote(Colistin ~ (hour[18])))
+
+plot_matrix <- LFC_grid
+
+breaks <- generate_breaks(plot_matrix, n = 286, center = T)
+
+to_plot <- pheatmap(
+	plot_matrix,
+	col = plot_colors,
+	breaks = breaks,
+	border_color = NA,
+	main = to_plot_title,
+	cluster_cols = F,
+	angle_col = 45,
+	clustering_method = "ward.D2",
+	clustering_distance_rows = "canberra",
+	labels_row = as.expression(genes.formatted),
+	labels_col = as.expression(conditions.formatted),
+	gaps_col = 2,
+	cutree_rows = 2,
+	# cellheight = 15,
+	# cellwidth = 60,
+	fontsize = 12,
+	silent = T)
+	
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+	
+print(to_plot)
+```
