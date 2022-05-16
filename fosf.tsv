@@ -1,0 +1,813 @@
+AB19606,AB030,genes,STRING_names,gene_orthologs,unique_name,citation,gene_name,type,condition,medLFC,FDR,gene_name_stylized,Pathway
+GO593_09475,IX87_17540,accA,accA,accA,accA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.31195968594058,2.22317836250164e-05,italic('accA'),
+GO593_09475,IX87_17540,accA,accA,accA,accA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.859667780559674,0.996962890355813,italic('accA'),
+GO593_17940,IX87_21900,accB,accB,accB,accB,"",accB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.303253934472464,0.999975301670124,italic('accB'),
+GO593_17940,IX87_21900,accB,accB,accB,accB,"",accB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0221363561948058,1,italic('accB'),
+GO593_17945,IX87_21905,accC,accC,accC,accC,"",accC,perfect,fosfomycin_T2_1 - none_T2_1a,-2.82539012308936,2.41067010170063e-08,italic('accC'),
+GO593_17945,IX87_21905,accC,accC,accC,accC,"",accC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0790045885158433,0.99999999727528,italic('accC'),
+GO593_03345,IX87_11230,accD,accD,accD,accD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.13099241537326,0.238047438475611,italic('accD'),
+GO593_03345,IX87_11230,accD,accD,accD,accD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.236347482802566,0.999648733005344,italic('accD'),
+GO593_18405,IX87_06625,acnB,IX87_06625,acnB,acnB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-3.03176922127251,1.86054678980561e-07,italic('acnB'),
+GO593_18405,IX87_06625,acnB,IX87_06625,acnB,acnB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.4144881158201,0.00781286300881449,italic('acnB'),
+GO593_10285,IX87_18425,acpP,acpP,acpP,acpP,"",acpP,perfect,fosfomycin_T2_1 - none_T2_1a,-1.70161559022037,0.610493354655926,italic('acpP'),
+GO593_10285,IX87_18425,acpP,acpP,acpP,acpP,"",acpP,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0601951199047753,1,italic('acpP'),
+GO593_09085,IX87_17135,unknown,AIL80275.1,GO593_09085,acpT,https://www.genome.jp/entry/K06133,.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0397201501108335,0.999999999834967,italic('acpT'),
+GO593_09085,IX87_17135,unknown,AIL80275.1,GO593_09085,acpT,https://www.genome.jp/entry/K06133,.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0109809742798296,1,italic('acpT'),
+GO593_11470,IX87_00385,adk,IX87_00385,adk,adk,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.302143643633349,0.999996426778003,italic('adk'),
+GO593_11470,IX87_00385,adk,IX87_00385,adk,adk,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0531315604939697,0.99999999996454,italic('adk'),
+GO593_12895,IX87_04765,alaS,IX87_04765,alaS,alaS,"",alaS,perfect,fosfomycin_T2_1 - none_T2_1a,0.224910267614283,0.999998034143888,italic('alaS'),tRNA Ligase
+GO593_12895,IX87_04765,alaS,IX87_04765,alaS,alaS,"",alaS,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0310452622409491,1,italic('alaS'),tRNA Ligase
+GO593_07295,IX87_15285,argS,argS,argS,argS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.47569258794804,0.544234790738203,italic('argS'),tRNA Ligase
+GO593_07295,IX87_15285,argS,argS,argS,argS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.128032162489339,0.997934516105836,italic('argS'),tRNA Ligase
+GO593_00260,IX87_07480,aroA,aroA,aroA,aroA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.833667945729023,0.293538727279857,italic('aroA'),
+GO593_00260,IX87_07480,aroA,aroA,aroA,aroA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0411358002869449,0.999974667401732,italic('aroA'),
+GO593_04740,IX87_12780,aroB,IX87_12780,aroB,aroB,"",aroB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.759806373011849,0.97628097678559,italic('aroB'),
+GO593_04740,IX87_12780,aroB,IX87_12780,aroB,aroB,"",aroB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.128270973661816,1,italic('aroB'),
+GO593_16070,IX87_19365,aroC,aroC,aroC,aroC,"",aroC,perfect,fosfomycin_T2_1 - none_T2_1a,-3.43355785050218,0.000357137537929668,italic('aroC'),
+GO593_16070,IX87_19365,aroC,aroC,aroC,aroC,"",aroC,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.51929849041074,0.217061827888878,italic('aroC'),
+GO593_17935,IX87_21895,"aroQ, aroQ2, aroQ1",aroQ,aroQ,aroQ,"",aroQ,perfect,fosfomycin_T2_1 - none_T2_1a,-1.02140358700942,0.723352264857014,italic('aroQ'),
+GO593_17935,IX87_21895,"aroQ, aroQ2, aroQ1",aroQ,aroQ,aroQ,"",aroQ,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0812151608988519,1,italic('aroQ'),
+GO593_08645,IX87_16705,asd,asd,asd,asd,"",asd,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0856964720317759,0.999997842333041,italic('asd'),
+GO593_08645,IX87_16705,asd,asd,asd,asd,"",asd,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0634964664298682,1,italic('asd'),
+GO593_13165,IX87_04470,unknown,IX87_04470,GO593_13165,asnC,https://www.ncbi.nlm.nih.gov/ipg/WP_158160719.1,.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0114242554341766,1,italic('asnC'),
+GO593_13165,IX87_04470,unknown,IX87_04470,GO593_13165,asnC,https://www.ncbi.nlm.nih.gov/ipg/WP_158160719.1,.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00803852827841,1,italic('asnC'),
+GO593_03480,IX87_11355,aspS,aspS,aspS,aspS,"",aspS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.357518384118823,0.999984539776439,italic('aspS'),tRNA Ligase
+GO593_03480,IX87_11355,aspS,aspS,aspS,aspS,"",aspS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0367069050982454,0.999999999999998,italic('aspS'),tRNA Ligase
+GO593_07360,IX87_15350,atpA,atpA,atpA,atpA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-3.15197940225976,5.26271779573038e-07,italic('atpA'),
+GO593_07360,IX87_15350,atpA,atpA,atpA,atpA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.08413177226951,0.000674786478449103,italic('atpA'),
+GO593_07370,IX87_15360,atpD,atpD,atpD,atpD,"",atpD,perfect,fosfomycin_T2_1 - none_T2_1a,-2.05279894002271,0.00071364968131567,italic('atpD'),
+GO593_07370,IX87_15360,atpD,atpD,atpD,atpD,"",atpD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.946987393598479,0.674928542100847,italic('atpD'),
+GO593_07345,IX87_15335,atpE,atpE,atpE,atpE,"",atpE,perfect,fosfomycin_T2_1 - none_T2_1a,-2.88965856600634,2.12106242327467e-06,italic('atpE'),
+GO593_07345,IX87_15335,atpE,atpE,atpE,atpE,"",atpE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.744677968808578,0.767280128361254,italic('atpE'),
+GO593_07350,IX87_15340,atpF,atpF,atpF,atpF,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.55574146397459,0.000266066776914542,italic('atpF'),
+GO593_07350,IX87_15340,atpF,atpF,atpF,atpF,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.927206331364477,0.870788683969647,italic('atpF'),
+GO593_07365,IX87_15355,atpG,atpG,atpG,atpG,"",atpG,perfect,fosfomycin_T2_1 - none_T2_1a,-2.70021836272572,1.56001184387024e-09,italic('atpG'),
+GO593_07365,IX87_15355,atpG,atpG,atpG,atpG,"",atpG,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.42117844112897,0.461625734678354,italic('atpG'),
+GO593_07355,IX87_15345,atpH,atpH,atpH,atpH,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-4.37100833894221,7.45187861295837e-08,italic('atpH'),
+GO593_07355,IX87_15345,atpH,atpH,atpH,atpH,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.33850693091513,0.416610922547829,italic('atpH'),
+GO593_17715,IX87_21640,"bamA, opr86",bamA,bamA,bamA,"",bamA,perfect,fosfomycin_T2_1 - none_T2_1a,-1.12696490966373,0.0237415955992386,italic('bamA'),
+GO593_17715,IX87_21640,"bamA, opr86",bamA,bamA,bamA,"",bamA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.599594730503253,0.999625567137104,italic('bamA'),
+GO593_10165,IX87_18295,birA,birA,birA,birA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.632426340546887,0.754239393495368,italic('birA'),
+GO593_10165,IX87_18295,birA,birA,birA,birA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0778285176809221,0.999999998847234,italic('birA'),
+GO593_13095,IX87_04580,"antB, benB, hcaF, xylY",cbdB_1,benB,cbdB_1,"",benB,perfect,fosfomycin_T2_1 - none_T2_1a,0.0255603346031016,0.999999995421631,italic('cbdB_1'),
+GO593_13095,IX87_04580,"antB, benB, hcaF, xylY",cbdB_1,benB,cbdB_1,"",benB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0146670715937683,1,italic('cbdB_1'),
+GO593_00945,IX87_08070,cca,cca,cca,cca,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.419148714731849,0.947916222945274,italic('cca'),
+GO593_00945,IX87_08070,cca,cca,cca,cca,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.151021370933458,1,italic('cca'),
+GO593_17730,IX87_21655,cdsA,cdsA,cdsA,cdsA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.395715739153163,0.498141718882195,italic('cdsA'),
+GO593_17730,IX87_21655,cdsA,cdsA,cdsA,cdsA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.137046799308098,0.999927012082202,italic('cdsA'),
+GO593_01635,IX87_09155,"cgtA, obgE, obg",cgtA,cgtA,cgtA,"",cgtA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.196949356363243,0.999999999990052,italic('cgtA'),
+GO593_01635,IX87_09155,"cgtA, obgE, obg",cgtA,cgtA,cgtA,"",cgtA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.144125591211465,1,italic('cgtA'),
+GO593_08945,IX87_16990,clpX,clpX,clpX,clpX,"",clpX,perfect,fosfomycin_T2_1 - none_T2_1a,-0.266665576671374,0.999999938139433,italic('clpX'),
+GO593_08945,IX87_16990,clpX,clpX,clpX,clpX,"",clpX,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0662449497661204,0.999999999999149,italic('clpX'),
+GO593_15555,IX87_02265,cmk,IX87_02265,cmk,cmk,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.41434056608958,1.19574404018789e-07,italic('cmk'),
+GO593_15555,IX87_02265,cmk,IX87_02265,cmk,cmk,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.09346578145504,0.725244671813995,italic('cmk'),
+GO593_10410,IX87_01935,coaD,IX87_01935,coaD,coaD,"",coaD,perfect,fosfomycin_T2_1 - none_T2_1a,-1.04350439031996,0.396709064482356,italic('coaD'),
+GO593_10410,IX87_01935,coaD,IX87_01935,coaD,coaD,"",coaD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.318707392798719,0.999999978486512,italic('coaD'),
+GO593_08145,IX87_16190,coaE,coaE,coaE,coaE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.178076958234474,0.999999993434409,italic('coaE'),
+GO593_08145,IX87_16190,coaE,coaE,coaE,coaE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0462221064054576,1,italic('coaE'),
+GO593_10160,IX87_18290,coaX,AIL80483.1,coaX,coaX,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.650874160434335,0.973962386863925,italic('coaX'),
+GO593_10160,IX87_18290,coaX,AIL80483.1,coaX,coaX,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0345809991584339,0.999999999694819,italic('coaX'),
+GO593_18430,IX87_06650,unknown,coq7,GO593_18430,coq7,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.104477506911173,0.999997814063132,italic('coq7'),
+GO593_18430,IX87_06650,unknown,coq7,GO593_18430,coq7,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.018917003657707,1,italic('coq7'),
+GO593_04055,IX87_11990,sdhE,cptB,sdhE,cptB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.441253959160217,0.527098075772379,italic('cptB'),
+GO593_04055,IX87_11990,sdhE,cptB,sdhE,cptB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0577662965772287,0.999999772851249,italic('cptB'),
+GO593_18590,IX87_06820,cyoA,cyoA,cyoA,cyoA,"",cyoA,perfect,fosfomycin_T2_1 - none_T2_1a,-2.86368206018037,0.0963105325185073,italic('cyoA'),
+GO593_18590,IX87_06820,cyoA,cyoA,cyoA,cyoA,"",cyoA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.276141137814557,0.998424220545771,italic('cyoA'),
+GO593_18595,IX87_06825,"cyoB, coxA",IX87_06825,cyoB,cyoB,"",cyoB,perfect,fosfomycin_T2_1 - none_T2_1a,-1.95470377232407,0.0616653355140824,italic('cyoB'),
+GO593_18595,IX87_06825,"cyoB, coxA",IX87_06825,cyoB,cyoB,"",cyoB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.143037824218727,0.999696613906972,italic('cyoB'),
+GO593_18600,IX87_06830,"cyoC, coIII",cyoC,cyoC,cyoC,"",cyoC,perfect,fosfomycin_T2_1 - none_T2_1a,-2.0931320767768,0.0393187600714812,italic('cyoC'),
+GO593_18600,IX87_06830,"cyoC, coIII",cyoC,cyoC,cyoC,"",cyoC,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.05654924115499,0.667578978474028,italic('cyoC'),
+GO593_18605,IX87_06835,cyoD,cyoD,cyoD,cyoD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-3.08689275379552,0.000724093728769733,italic('cyoD'),
+GO593_18605,IX87_06835,cyoD,cyoD,cyoD,cyoD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.363990339352804,0.999990727083818,italic('cyoD'),
+GO593_18610,IX87_06840,cyoE,cyoE,cyoE,cyoE,"",cyoE,perfect,fosfomycin_T2_1 - none_T2_1a,-2.7005700155005,0.00235336411538871,italic('cyoE'),
+GO593_18610,IX87_06840,cyoE,cyoE,cyoE,cyoE,"",cyoE,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.21741251594993,0.719397429382887,italic('cyoE'),
+GO593_13525,IX87_04375,cysS,IX87_04375,cysS,cysS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.503127113758366,0.999957904213717,italic('cysS'),tRNA Ligase
+GO593_13525,IX87_04375,cysS,IX87_04375,cysS,cysS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.104669928580845,0.999999999999995,italic('cysS'),tRNA Ligase
+GO593_05915,IX87_14145,dapA,IX87_14145,dapA,dapA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.06776570432349,0.64385891410558,italic('dapA'),
+GO593_05915,IX87_14145,dapA,IX87_14145,dapA,dapA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.156683928242816,0.999999999977404,italic('dapA'),
+GO593_01845,IX87_09360,dapD,dapD,dapD,dapD,"",dapD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.597348213524725,0.985953076855936,italic('dapD'),
+GO593_01845,IX87_09360,dapD,dapD,dapD,dapD,"",dapD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0311057984210506,1,italic('dapD'),
+GO593_03060,IX87_10925,dapE,dapE,dapE,dapE,"",dapE,perfect,fosfomycin_T2_1 - none_T2_1a,-0.440517686692488,0.965277296371438,italic('dapE'),
+GO593_03060,IX87_10925,dapE,dapE,dapE,dapE,"",dapE,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0353476262709615,1,italic('dapE'),
+GO593_02140,IX87_09660,dapF,dapF,dapF,dapF,"",dapF,perfect,fosfomycin_T2_1 - none_T2_1a,-0.61983881171549,0.0384585997234817,italic('dapF'),
+GO593_02140,IX87_09660,dapF,dapF,dapF,dapF,"",dapF,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.347725941502518,0.991810658496274,italic('dapF'),
+GO593_05500,IX87_13700,"ddlB, ddlA",ddlB,"ddlB, ddlA",ddlB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.650366997058451,0.92871214521055,italic('ddlB'),Cell Wall/PG
+GO593_05500,IX87_13700,"ddlB, ddlA",ddlB,"ddlB, ddlA",ddlB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.529967743057779,0.999967796230513,italic('ddlB'),Cell Wall/PG
+GO593_07425,IX87_15415,"def1, def",IX87_15415,"def1, def",def,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.114095497911451,0.999919285934327,italic('def'),
+GO593_07425,IX87_15415,"def1, def",IX87_15415,"def1, def",def,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0396554537536184,0.999999999999993,italic('def'),
+GO593_09080,IX87_17130,der,der,der,der,"",der,perfect,fosfomycin_T2_1 - none_T2_1a,-0.683690903477432,0.703885327424074,italic('der'),
+GO593_09080,IX87_17130,der,der,der,der,"",der,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0546025106393231,0.999999999990477,italic('der'),
+GO593_01425,IX87_08950,desB,AIL78748.1,desB,desB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.596564202887277,0.285547000947313,italic('desB'),
+GO593_01425,IX87_08950,desB,AIL78748.1,desB,desB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.165324583126543,0.995286609556124,italic('desB'),
+GO593_03595,IX87_11520,"coaBC, dfp, coaC",coaBC,coaBC,dfp,"",coaBC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.379521859564723,0.957371767633863,italic('dfp'),
+GO593_03595,IX87_11520,"coaBC, dfp, coaC",coaBC,coaBC,dfp,"",coaBC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.130035876757831,1,italic('dfp'),
+GO593_06220,IX87_14445,dnaA,dnaA,dnaA,dnaA,"",dnaA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.27121096587983,0.269963285000807,italic('dnaA'),
+GO593_06220,IX87_14445,dnaA,dnaA,dnaA,dnaA,"",dnaA,perfect,fosfomycin_T2_1 - none_T2_1a,0.188631691085861,0.99999997283227,italic('dnaA'),
+GO593_18630,IX87_06860,dnaB,dnaB,dnaB,dnaB,"",dnaB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.320356045586401,0.928275803083197,italic('dnaB'),
+GO593_18630,IX87_06860,dnaB,dnaB,dnaB,dnaB,"",dnaB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.607358421387114,0.98988753911283,italic('dnaB'),
+GO593_14925,IX87_02905,dnaE,dnaE,dnaE,dnaE,"",dnaE,perfect,fosfomycin_T2_1 - none_T2_1a,0.0334026463943009,0.999999999444384,italic('dnaE'),
+GO593_14925,IX87_02905,dnaE,dnaE,dnaE,dnaE,"",dnaE,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0659170429324226,0.999999999995243,italic('dnaE'),
+GO593_10380,IX87_18520,dnaG,IX87_18520,dnaG,dnaG,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.22678548508144,0.995704712415359,italic('dnaG'),
+GO593_10380,IX87_18520,dnaG,IX87_18520,dnaG,dnaG,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0281190621666529,0.999999983311647,italic('dnaG'),
+GO593_06350,IX87_14595,dnaK,dnaK,dnaK,dnaK,"",dnaK,perfect,fosfomycin_T2_1 - none_T2_1a,-0.838464468483678,0.592885922447727,italic('dnaK'),
+GO593_06350,IX87_14595,dnaK,dnaK,dnaK,dnaK,"",dnaK,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0302437559541004,0.999882840819057,italic('dnaK'),
+GO593_06215,IX87_14440,dnaN,dnaN,dnaN,dnaN,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0880048022305531,0.999996023555052,italic('dnaN'),
+GO593_06215,IX87_14440,dnaN,dnaN,dnaN,dnaN,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0180551210950712,0.999999999231328,italic('dnaN'),
+GO593_18020,IX87_06235,dnaX,IX87_06235,dnaX,dnaX,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0709415008023592,0.999967430294542,italic('dnaX'),
+GO593_18020,IX87_06235,dnaX,IX87_06235,dnaX,dnaX,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0961505096215858,1,italic('dnaX'),
+GO593_17835,IX87_21765,unknown,IX87_21765,GO593_17835,dsrH,https://www.ncbi.nlm.nih.gov/protein/1784829538,.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.244985745213207,0.999999929605944,italic('dsrH'),
+GO593_17835,IX87_21765,unknown,IX87_21765,GO593_17835,dsrH,https://www.ncbi.nlm.nih.gov/protein/1784829538,.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0331649373314384,1,italic('dsrH'),
+GO593_10610,IX87_01725,dut,dut,dut,dut,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.317107954393617,0.997202973031198,italic('dut'),
+GO593_10610,IX87_01725,dut,dut,dut,dut,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00426440594397768,1,italic('dut'),
+GO593_17725,IX87_21650,dxr,AIL81121.1,dxr,dxr,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.586216160284766,0.998503389107545,italic('dxr'),
+GO593_17725,IX87_21650,dxr,AIL81121.1,dxr,dxr,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.106221484219351,0.999998581221676,italic('dxr'),
+GO593_04335,IX87_12270,dxs,AIL79360.1,dxs,dxs,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0568231661473513,0.868232422898248,italic('dxs'),
+GO593_04335,IX87_12270,dxs,AIL79360.1,dxs,dxs,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.991721052824981,0.971079938383654,italic('dxs'),
+GO593_01245,IX87_08770,efp,efp,efp,efp,"",efp,perfect,fosfomycin_T2_1 - none_T2_1a,-2.09423840549397,0.0255362815597777,italic('efp'),
+GO593_01245,IX87_08770,efp,efp,efp,efp,"",efp,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.145433137460505,0.999999999588713,italic('efp'),
+GO593_17305,IX87_20940,eno,eno,eno,eno,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.78458435361499,0.0790339043658914,italic('eno'),
+GO593_17305,IX87_20940,eno,eno,eno,eno,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.282861627449853,1,italic('eno'),
+GO593_12900,IX87_04760,"epd, gap, gapA",epd,"epd, gap, gapA",epd,"",gap,perfect,fosfomycin_T2_1 - none_T2_1a,-0.716494469543398,0.976730462545024,italic('epd'),
+GO593_12900,IX87_04760,"epd, gap, gapA",epd,"epd, gap, gapA",epd,"",gap,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0578176498025882,0.998194031998014,italic('epd'),
+GO593_01750,IX87_09265,era,IX87_09265,era,era,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.179613992507317,0.999982620803541,italic('era'),
+GO593_01750,IX87_09265,era,IX87_09265,era,era,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.047366257814575,0.999999999999999,italic('era'),
+GO593_06170,IX87_14395,erpA,erpA,erpA,erpA,"",erpA,perfect,fosfomycin_T2_1 - none_T2_1a,-3.27913192203932,6.58464339985705e-06,italic('erpA'),
+GO593_06170,IX87_14395,erpA,erpA,erpA,erpA,"",erpA,mismatch,fosfomycin_T2_1 - none_T2_1a,-2.3456736067019,0.057937606608079,italic('erpA'),
+GO593_02110,IX87_09640,"etfA, fixB, ydiR",AIL78883.1,"etfA, fixB, ydiR",etfA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.3031069236194,0.990298745840879,italic('etfA'),
+GO593_02110,IX87_09640,"etfA, fixB, ydiR",AIL78883.1,"etfA, fixB, ydiR",etfA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.09029697675699,0.999999999999469,italic('etfA'),
+GO593_02115,IX87_09645,"etfB, fixA, ydiQ",etfB,"etfB, fixA, ydiQ",etfB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.560706628272221,0.987941528494887,italic('etfB'),
+GO593_02115,IX87_09645,"etfB, fixA, ydiQ",etfB,"etfB, fixA, ydiQ",etfB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00339739793244944,0.99999999999999,italic('etfB'),
+GO593_08385,IX87_16440,"etfD, fixC, ydiS, ygcN",AIL80140.1,"etfD, fixC, ydiS, ygcN",etfD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.393157188601622,0.999999987261135,italic('etfD'),
+GO593_08385,IX87_16440,"etfD, fixC, ydiS, ygcN",AIL80140.1,"etfD, fixC, ydiS, ygcN",etfD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.233193722146006,1,italic('etfD'),
+GO593_08775,IX87_16865,unknown,exbB_1,GO593_08775,exbB_1,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0336942759360097,0.999999999990052,italic('exbB_1'),
+GO593_08775,IX87_16865,unknown,exbB_1,GO593_08775,exbB_1,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0539658580132989,1,italic('exbB_1'),
+GO593_08780,IX87_16870,unknown,exbD_4,GO593_08780,exbD_4,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.00944399252330223,0.999999999444384,italic('exbD_4'),
+GO593_08780,IX87_16870,unknown,exbD_4,GO593_08780,exbD_4,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00873798163930778,1,italic('exbD_4'),
+GO593_07015,IX87_01850,fabB,fabB_1,fabB,fabB_1,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0128711617815416,0.999999999990052,italic('fabB_1'),
+GO593_07015,IX87_01850,fabB,fabB_1,fabB,fabB_1,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00775937531737803,0.999999999999998,italic('fabB_1'),
+GO593_10500,IX87_01850,fabB,fabB_1,fabB,fabB_2,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0844675134041322,1,italic('fabB_2'),
+GO593_10500,IX87_01850,fabB,fabB_1,fabB,fabB_2,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0900827556379006,1,italic('fabB_2'),
+GO593_10275,IX87_18415,fabD,fabD,fabD,fabD,"",fabD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0315891740994726,0.999999999990052,italic('fabD'),
+GO593_10275,IX87_18415,fabD,fabD,fabD,fabD,"",fabD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0354971194519927,1,italic('fabD'),
+GO593_10280,IX87_18420,fabG,IX87_18420,fabG,fabG,"",fabG,perfect,fosfomycin_T2_1 - none_T2_1a,-2.36753852960827,0.00156517392790631,italic('fabG'),
+GO593_10280,IX87_18420,fabG,IX87_18420,fabG,fabG,"",fabG,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.213224609467306,0.999999999984337,italic('fabG'),
+GO593_09120,IX87_17170,fabI,AIL80282.1,fabI,fabI,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.25566452815434,0.979664723957732,italic('fabI'),
+GO593_09120,IX87_17170,fabI,AIL80282.1,fabI,fabI,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0460155616842157,1,italic('fabI'),
+GO593_17700,IX87_21625,fabZ,fabZ,fabZ,fabZ,"",fabZ,mismatch,fosfomycin_T2_1 - none_T2_1a,0.552243070649324,0.700835907472443,italic('fabZ'),LPS
+GO593_17700,IX87_21625,fabZ,fabZ,fabZ,fabZ,"",fabZ,perfect,fosfomycin_T2_1 - none_T2_1a,-0.162697414725799,0.986723009988814,italic('fabZ'),LPS
+GO593_15425,IX87_02395,"fba, gatY, kbaY, fda",IX87_02395,"fba, gatY, kbaY, fda",fba,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.32336752225026,0.00115105862622054,italic('fba'),
+GO593_15425,IX87_02395,"fba, gatY, kbaY, fda",IX87_02395,"fba, gatY, kbaY, fda",fba,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.666192172536114,1,italic('fba'),
+GO593_01960,IX87_09480,"fbp1, fbp",IX87_09480,"fbp1, fbp",fbp,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.192349203368658,0.577544793921455,italic('fbp'),
+GO593_01960,IX87_09480,"fbp1, fbp",IX87_09480,"fbp1, fbp",fbp,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.169635908681096,0.999999997681769,italic('fbp'),
+GO593_10415,IX87_01930,"yfhL, fdx1",fdx_1,"yfhL, fdx1",fdx_1,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0533507955184864,0.999040533165551,italic('fdx_1'),
+GO593_10415,IX87_01930,"yfhL, fdx1",fdx_1,"yfhL, fdx1",fdx_1,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0174815396618313,1,italic('fdx_1'),
+GO593_15735,IX87_18960,"fdx, fdx2",fdx,fdx,fdx_2,"",fdx,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0268905894383324,0.999999999999998,italic('fdx_2'),
+GO593_15735,IX87_18960,"fdx, fdx2",fdx,fdx,fdx_2,"",fdx,perfect,fosfomycin_T2_1 - none_T2_1a,-0.315999757201838,1,italic('fdx_2'),
+GO593_13635,IX87_04305,fdxA,fdxA,fdxA,fdxA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.00848742646165,0.951498530912447,italic('fdxA'),
+GO593_13635,IX87_04305,fdxA,fdxA,fdxA,fdxA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0239791666238435,1,italic('fdxA'),
+GO593_01430,IX87_08955,unknown,IX87_08955,GO593_01430,hmp_1,https://www.genome.jp/entry/abou:ACBO_13020,.,perfect,fosfomycin_T2_1 - none_T2_1a,0.446390556317545,0.000943029085959137,italic('hmp_1'),
+GO593_01430,IX87_08955,unknown,IX87_08955,GO593_01430,hmp_1,https://www.genome.jp/entry/abou:ACBO_13020,.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.042312262792833,0.999983791810516,italic('hmp_1'),
+GO593_10155,IX87_18285,ffh,ffh,ffh,ffh,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.50366280073532,5.34304609529088e-07,italic('ffh'),
+GO593_10155,IX87_18285,ffh,ffh,ffh,ffh,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.74052112354058,2.63343207736394e-05,italic('ffh'),
+GO593_18685,IX87_06920,fis,fis,fis,fis,"",fis,perfect,fosfomycin_T2_1 - none_T2_1a,-0.237943153511004,0.999999999284404,italic('fis'),
+GO593_18685,IX87_06920,fis,fis,fis,fis,"",fis,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.115823884964267,1,italic('fis'),
+GO593_06095,IX87_14320,fmt,IX87_14320,fmt,fmt,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.80314094309817,0.00134639422145047,italic('fmt'),
+GO593_06095,IX87_14320,fmt,IX87_14320,fmt,fmt,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.03896120077646,0.477563905338734,italic('fmt'),
+GO593_18475,IX87_06705,folB,folB,folB,folB,"",folB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.211782999028574,0.992202480419238,italic('folB'),
+GO593_18475,IX87_06705,folB,folB,folB,folB,"",folB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00255072062701456,1,italic('folB'),
+GO593_03340,IX87_11225,folC,AIL79172.1,folC,folC,"",folC,perfect,fosfomycin_T2_1 - none_T2_1a,-1.07780592392508,0.667349091922403,italic('folC'),
+GO593_03340,IX87_11225,folC,AIL79172.1,folC,folC,"",folC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0429456908896346,0.999999999999221,italic('folC'),
+GO593_02360,IX87_09915,folD,IX87_09915,folD,folD,"",folD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0617340448613902,0.999999999990052,italic('folD'),
+GO593_02360,IX87_09915,folD,IX87_09915,folD,folD,"",folD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0992651448992843,1,italic('folD'),
+GO593_01065,IX87_08570,"folE, folE2, folE1",folE,folE,folE,"",folE,perfect,fosfomycin_T2_1 - none_T2_1a,-2.0975373012138,5.52159006439871e-06,italic('folE'),
+GO593_01065,IX87_08570,"folE, folE2, folE1",folE,folE,folE,"",folE,mismatch,fosfomycin_T2_1 - none_T2_1a,-2.17477603569908,7.74352774641404e-05,italic('folE'),
+GO593_09350,IX87_17415,folK,folK,folK,folK,"",folK,perfect,fosfomycin_T2_1 - none_T2_1a,-0.121678178966154,0.999782265998625,italic('folK'),
+GO593_09350,IX87_17415,folK,folK,folK,folK,"",folK,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0966818893823828,0.999994040335626,italic('folK'),
+GO593_00350,IX87_07570,fpr,IX87_07570,fpr,fpr,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0607492689179337,0.999999999168388,italic('fpr'),
+GO593_00350,IX87_07570,fpr,IX87_07570,fpr,fpr,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0213298993380244,1,italic('fpr'),
+GO593_10025,IX87_18155,fpr,fpr_1,fpr,fpr_1,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0133933476187355,0.99952299084989,italic('fpr_1'),
+GO593_10025,IX87_18155,fpr,fpr_1,fpr,fpr_1,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00073750376696017,1,italic('fpr_1'),
+GO593_17740,IX87_21665,frr,frr,frr,frr,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.77951174230895,0.0168234354137782,italic('frr'),
+GO593_17740,IX87_21665,frr,frr,frr,frr,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.869565456916764,0.0396890659606989,italic('frr'),
+GO593_05490,IX87_13690,ftsA,ftsA,ftsA,ftsA,"",ftsA,perfect,fosfomycin_T2_1 - none_T2_1a,-3.38893391069773,0.0190944487515233,italic('ftsA'),
+GO593_05490,IX87_13690,ftsA,ftsA,ftsA,ftsA,"",ftsA,mismatch,fosfomycin_T2_1 - none_T2_1a,-2.570181357332,0.0472555796761885,italic('ftsA'),
+GO593_02400,IX87_09960,"ftsH, hflB",ftsH,hflB,ftsH,"",hflB,perfect,fosfomycin_T2_1 - none_T2_1a,-1.72733693714995,0.0484441325580543,italic('ftsH'),
+GO593_02400,IX87_09960,"ftsH, hflB",ftsH,hflB,ftsH,"",hflB,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.18081504915888,0.0617740669862479,italic('ftsH'),
+GO593_04805,IX87_12845,"ftsI, pbpC",IX87_12845,ftsI,ftsI,"",ftsI,perfect,fosfomycin_T2_1 - none_T2_1a,-2.79444733711742,0.192965368065808,italic('ftsI'),Cell Wall/PG
+GO593_04805,IX87_12845,"ftsI, pbpC",IX87_12845,ftsI,ftsI,"",ftsI,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.401768459331622,0.999863541438755,italic('ftsI'),Cell Wall/PG
+GO593_10560,IX87_01775,ftsK,AIL77404.1,ftsK,ftsK,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.41388420210284,0.0438298544410856,italic('ftsK'),
+GO593_10560,IX87_01775,ftsK,AIL77404.1,ftsK,ftsK,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.494306833061986,1,italic('ftsK'),
+GO593_04810,IX87_12850,ftsL,ftsL,ftsL,ftsL,"",ftsL,perfect,fosfomycin_T2_1 - none_T2_1a,-1.05976995991669,0.998442374524694,italic('ftsL'),Cell Wall/PG
+GO593_04810,IX87_12850,ftsL,ftsL,ftsL,ftsL,"",ftsL,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.125622265166136,1,italic('ftsL'),Cell Wall/PG
+GO593_05495,IX87_13695,ftsQ,IX87_13695,ftsQ,ftsQ,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.1250507303337,0.772296898687954,italic('ftsQ'),
+GO593_05495,IX87_13695,ftsQ,IX87_13695,ftsQ,ftsQ,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.464668357932554,0.999084293899087,italic('ftsQ'),
+GO593_07760,IX87_15785,ftsW,ftsW,ftsW,ftsW,"",ftsW,perfect,fosfomycin_T2_1 - none_T2_1a,-0.832265260296862,0.502368229710788,italic('ftsW'),Cell Wall/PG
+GO593_07760,IX87_15785,ftsW,ftsW,ftsW,ftsW,"",ftsW,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.197238845631685,0.999998921737286,italic('ftsW'),Cell Wall/PG
+GO593_17485,IX87_21135,"ftsY, flhF",ftsY,ftsY,ftsY,"",ftsY,perfect,fosfomycin_T2_1 - none_T2_1a,-2.51931669247406,0.000755880019669563,italic('ftsY'),
+GO593_17485,IX87_21135,"ftsY, flhF",ftsY,ftsY,ftsY,"",ftsY,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.320593036809148,0.997192672685188,italic('ftsY'),
+GO593_05485,IX87_13685,ftsZ,ftsZ,ftsZ,ftsZ,"",ftsZ,perfect,fosfomycin_T2_1 - none_T2_1a,-1.77267281120624,0.793816978520738,italic('ftsZ'),
+GO593_05485,IX87_13685,ftsZ,ftsZ,ftsZ,ftsZ,"",ftsZ,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.287845575961272,1,italic('ftsZ'),
+GO593_10655,IX87_01680,fur,fur,fur,fur,"",fur,mismatch,fosfomycin_T2_1 - none_T2_1a,0.056898285126801,0.999999997924356,italic('fur'),
+GO593_10655,IX87_01680,fur,fur,fur,fur,"",fur,perfect,fosfomycin_T2_1 - none_T2_1a,0.191068310954689,1,italic('fur'),
+GO593_10520,IX87_01830,"fusA, fusA2, fusA1",fusA,fusA,fusA,"",fusA,mismatch,fosfomycin_T2_1 - none_T2_1a,1.15636152321128,0.218344595370592,italic('fusA'),
+GO593_10520,IX87_01830,"fusA, fusA2, fusA1",fusA,fusA,fusA,"",fusA,perfect,fosfomycin_T2_1 - none_T2_1a,0.915918833245572,0.9603568682112,italic('fusA'),
+GO593_01650,IX87_09170,gap,IX87_09170,gap,gap,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.324643091054212,0.677875490484068,italic('gap'),
+GO593_01650,IX87_09170,gap,IX87_09170,gap,gap,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.441242412058737,0.978399693269617,italic('gap'),
+GO593_02920,IX87_10765,gatA,gatA,gatA,gatA,"",gatA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.265670263759359,0.999998616769494,italic('gatA'),
+GO593_02920,IX87_10765,gatA,gatA,gatA,gatA,"",gatA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.484271585754348,1,italic('gatA'),
+GO593_02925,IX87_10770,gatB,gatB,gatB,gatB,"",gatB,perfect,fosfomycin_T2_1 - none_T2_1a,-1.59350172815876,0.00597093293304837,italic('gatB'),
+GO593_02925,IX87_10770,gatB,gatB,gatB,gatB,"",gatB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0114196926943024,0.999999998460745,italic('gatB'),
+GO593_02915,IX87_10760,gatC,gatC,gatC,gatC,"",gatC,perfect,fosfomycin_T2_1 - none_T2_1a,-1.30924856993177,0.634041795776306,italic('gatC'),
+GO593_02915,IX87_10760,gatC,gatC,gatC,gatC,"",gatC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.318268467168681,1,italic('gatC'),
+GO593_05425,IX87_13615,glmM,glmM,glmM,glmM,"",glmM,perfect,fosfomycin_T2_1 - none_T2_1a,-1.62618299174858,1.5252215584552e-09,italic('glmM'),
+GO593_05425,IX87_13615,glmM,glmM,glmM,glmM,"",glmM,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.573887740769499,0.334259650013085,italic('glmM'),
+GO593_05795,IX87_14025,glmS,glmS,glmS,glmS,"",glmS,perfect,fosfomycin_T2_1 - none_T2_1a,-3.20692410455921,4.50093953670835e-06,italic('glmS'),
+GO593_05795,IX87_14025,glmS,glmS,glmS,glmS,"",glmS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.101958729215296,0.99999999990844,italic('glmS'),
+GO593_05790,IX87_14020,glmU,glmU,glmU,glmU,"",glmU,perfect,fosfomycin_T2_1 - none_T2_1a,-0.659859386243768,0.0509394017113552,italic('glmU'),
+GO593_05790,IX87_14020,glmU,glmU,glmU,glmU,"",glmU,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.607630597880003,0.899745620582933,italic('glmU'),
+GO593_01005,IX87_08130,glnA,glnA,glnA,glnA,"",glnA,perfect,fosfomycin_T2_1 - none_T2_1a,0.0687768062172148,0.999996931749907,italic('glnA'),
+GO593_01005,IX87_08130,glnA,glnA,glnA,glnA,"",glnA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.159493976437707,0.999999999999937,italic('glnA'),
+GO593_18295,IX87_06515,glnS,IX87_06515,glnS,glnS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.196151341758149,0.999999775441762,italic('glnS'),tRNA Ligase
+GO593_18295,IX87_06515,glnS,IX87_06515,glnS,glnS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.216828777725398,0.999999937433385,italic('glnS'),tRNA Ligase
+GO593_04830,IX87_12870,gltX,IX87_12870,gltX,gltX,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.481138693748105,0.999058477568452,italic('gltX'),tRNA Ligase
+GO593_04830,IX87_12870,gltX,IX87_12870,gltX,gltX,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.478861283901342,0.999999999437005,italic('gltX'),tRNA Ligase
+GO593_00420,IX87_07645,"glyA, glyA2, glyA3, glyA1",glyA,"glyA, glyA2, glyA3, glyA1",glyA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.103708304378512,0.983534496508658,italic('glyA'),
+GO593_00420,IX87_07645,"glyA, glyA2, glyA3, glyA1",glyA,"glyA, glyA2, glyA3, glyA1",glyA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0405724930212449,0.999999971369792,italic('glyA'),
+GO593_04395,IX87_12345,glyQ,glyQ,glyQ,glyQ,"",glyQ,perfect,fosfomycin_T2_1 - none_T2_1a,-1.02080105831588,0.894694024085009,italic('glyQ'),tRNA Ligase
+GO593_04395,IX87_12345,glyQ,glyQ,glyQ,glyQ,"",glyQ,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.967819257055789,0.979561197015023,italic('glyQ'),tRNA Ligase
+GO593_04400,IX87_12350,glyS,AIL79376.1,glyS,glyS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.23222454248819,0.0395948377646763,italic('glyS'),tRNA Ligase
+GO593_04400,IX87_12350,glyS,AIL79376.1,glyS,glyS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.457918066902126,0.998172740469883,italic('glyS'),tRNA Ligase
+GO593_04655,IX87_12640,gmk,IX87_12640,gmk,gmk,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.71883091871469,0.0929182576283049,italic('gmk'),
+GO593_04655,IX87_12640,gmk,IX87_12640,gmk,gmk,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.377453731396414,1,italic('gmk'),
+GO593_00140,IX87_07360,unknown,AIL78451.1,GO593_00140,GO593_00140,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.88181645871189,0.983445630392713,italic('GO593_00140'),
+GO593_00140,IX87_07360,unknown,AIL78451.1,GO593_00140,GO593_00140,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0522241380138219,0.999999999997596,italic('GO593_00140'),
+GO593_00515,unknown,unknown,unknown,GO593_00515,GO593_00515,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.177595717300795,1,italic('GO593_00515'),
+GO593_00515,unknown,unknown,unknown,GO593_00515,GO593_00515,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.178661555206513,1,italic('GO593_00515'),
+GO593_01975,IX87_09495,unknown,IX87_09495,GO593_01975,GO593_01975,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.485124139166424,0.867606166752088,italic('GO593_01975'),
+GO593_01975,IX87_09495,unknown,IX87_09495,GO593_01975,GO593_01975,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.265361588027724,0.971045590150581,italic('GO593_01975'),
+GO593_02180,IX87_09700,unknown,IX87_09700,GO593_02180,GO593_02180,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0153476262115667,0.999975835315126,italic('GO593_02180'),
+GO593_02180,IX87_09700,unknown,IX87_09700,GO593_02180,GO593_02180,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00112392964586887,1,italic('GO593_02180'),
+GO593_05760,IX87_13990,unknown,IX87_13990,GO593_05760,GO593_05760,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.32598991440023,4.62579309827267e-05,italic('GO593_05760'),
+GO593_05760,IX87_13990,unknown,IX87_13990,GO593_05760,GO593_05760,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.73582351423077,0.00540991219238233,italic('GO593_05760'),
+GO593_06495,IX87_14745,unknown,AIL79820.1,GO593_06495,GO593_06495,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.978421066111095,0.642795326881918,italic('GO593_06495'),
+GO593_06495,IX87_14745,unknown,AIL79820.1,GO593_06495,GO593_06495,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.241337666520262,0.999999999992623,italic('GO593_06495'),
+GO593_07290,IX87_15280,unknown,AIL79924.1,GO593_07290,GO593_07290,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.310464947976798,0.999981812998654,italic('GO593_07290'),
+GO593_07290,IX87_15280,unknown,AIL79924.1,GO593_07290,GO593_07290,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.159433258271184,1,italic('GO593_07290'),
+GO593_07665,IX87_15675,unknown,AIL79998.1,GO593_07665,GO593_07665,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.497939339293352,0.986380879990845,italic('GO593_07665'),
+GO593_07665,IX87_15675,unknown,AIL79998.1,GO593_07665,GO593_07665,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.107561172902616,1,italic('GO593_07665'),
+GO593_10640,IX87_01695,unknown,AIL77388.1,GO593_10640,GO593_10640,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.51949382371706,5.83564348474125e-10,italic('GO593_10640'),
+GO593_10640,IX87_01695,unknown,AIL77388.1,GO593_10640,GO593_10640,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-3.91758498497139,2.65503420752798e-08,italic('GO593_10640'),
+GO593_11535,unknown,unknown,unknown,GO593_11535,GO593_11535,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0156346744913039,0.999999994316474,italic('GO593_11535'),
+GO593_11535,unknown,unknown,unknown,GO593_11535,GO593_11535,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0147064390842221,1,italic('GO593_11535'),
+GO593_11615,IX87_00220,unknown,AIL77108.1,GO593_11615,GO593_11615,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0290537281437423,0.999999999988678,italic('GO593_11615'),
+GO593_11615,IX87_00220,unknown,AIL77108.1,GO593_11615,GO593_11615,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0812699567782262,1,italic('GO593_11615'),
+GO593_12335,IX87_05435,unknown,IX87_05435,GO593_12335,GO593_12335,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0202926811947477,0.999999996247018,italic('GO593_12335'),
+GO593_12335,IX87_05435,unknown,IX87_05435,GO593_12335,GO593_12335,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0122236299169017,0.999999999999927,italic('GO593_12335'),
+GO593_13170,IX87_04465,unknown,AIL77913.1,GO593_13170,GO593_13170,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0840532959917508,0.99948931302235,italic('GO593_13170'),
+GO593_13170,IX87_04465,unknown,AIL77913.1,GO593_13170,GO593_13170,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0326111904473908,0.999999999834967,italic('GO593_13170'),
+GO593_13175,IX87_04460,unknown,IX87_04460,GO593_13175,GO593_13175,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0320466242406807,0.999998642835073,italic('GO593_13175'),
+GO593_13175,IX87_04460,unknown,IX87_04460,GO593_13175,GO593_13175,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00170693202942058,1,italic('GO593_13175'),
+GO593_13215,IX87_04190,unknown,IX87_04190,GO593_13215,GO593_13215,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0608084564097238,0.999924511874835,italic('GO593_13215'),
+GO593_13215,IX87_04190,unknown,IX87_04190,GO593_13215,GO593_13215,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0077370420044022,1,italic('GO593_13215'),
+GO593_13220,IX87_04420,unknown,IX87_04420,GO593_13220,GO593_13220,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0272952188262218,0.999992976775011,italic('GO593_13220'),
+GO593_13220,IX87_04420,unknown,IX87_04420,GO593_13220,GO593_13220,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0356104907610898,1,italic('GO593_13220'),
+GO593_15125,unknown,unknown,unknown,GO593_15125,GO593_15125,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.977970806752973,0.73235966985251,italic('GO593_15125'),
+GO593_15125,unknown,unknown,unknown,GO593_15125,GO593_15125,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0568908509993729,1,italic('GO593_15125'),
+GO593_15205,IX87_02640,unknown,AIL77565.1,GO593_15205,GO593_15205,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.034196043198618,0.999993538747608,italic('GO593_15205'),
+GO593_15205,IX87_02640,unknown,AIL77565.1,GO593_15205,GO593_15205,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00519789314924582,1,italic('GO593_15205'),
+GO593_17830,IX87_21760,unknown,IX87_21760,GO593_17830,GO593_17830,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.00723559699470778,0.999999996549311,italic('GO593_17830'),
+GO593_17830,IX87_21760,unknown,IX87_21760,GO593_17830,GO593_17830,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0638500131969335,1,italic('GO593_17830'),
+GO593_18140,IX87_06370,unknown,IX87_06370,GO593_18140,GO593_18140,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0197306498872346,0.999999994932411,italic('GO593_18140'),
+GO593_18140,IX87_06370,unknown,IX87_06370,GO593_18140,GO593_18140,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0135539689945152,1,italic('GO593_18140'),
+GO593_18720,IX87_06955,unknown,IX87_06955,GO593_18720,GO593_18720,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.41849885433831,0.000390820184343729,italic('GO593_18720'),
+GO593_18720,IX87_06955,unknown,IX87_06955,GO593_18720,GO593_18720,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.433604833366993,0.989160131448713,italic('GO593_18720'),
+GO593_18760,unknown,unknown,unknown,GO593_18760,GO593_18760,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.119240857277728,0.943279078890414,italic('GO593_18760'),
+GO593_18760,unknown,unknown,unknown,GO593_18760,GO593_18760,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0288772240504701,1,italic('GO593_18760'),
+GO593_18770,unknown,unknown,unknown,GO593_18770,GO593_18770,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0200826506026939,0.999999999990052,italic('GO593_18770'),
+GO593_18770,unknown,unknown,unknown,GO593_18770,GO593_18770,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0163150501972907,1,italic('GO593_18770'),
+GO593_07690,IX87_15700,"gpmI, gpmM, pgm",gpmI,"gpmI, gpmM, pgm",gpmI,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.478025346608586,0.61949436962228,italic('gpmI'),
+GO593_07690,IX87_15700,"gpmI, gpmM, pgm",gpmI,"gpmI, gpmM, pgm",gpmI,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.264561514763374,0.667086315739575,italic('gpmI'),
+GO593_00180,IX87_07400,gpsA,gpsA,gpsA,gpsA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.256807380023025,0.999994136114796,italic('gpsA'),
+GO593_00180,IX87_07400,gpsA,gpsA,gpsA,gpsA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0795267360445437,0.999999352252301,italic('gpsA'),
+GO593_02305,IX87_09860,"groEL, groL",groEL,groL,groEL,"",groL,perfect,fosfomycin_T2_1 - none_T2_1a,0.00283657406318409,0.999999999990052,italic('groEL'),
+GO593_02305,IX87_09860,"groEL, groL",groEL,groL,groEL,"",groL,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0543986455588639,0.999999999999977,italic('groEL'),
+GO593_02310,IX87_09865,"groS, groES",groS,"groS, groES",groS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.216284774831642,0.999807072328103,italic('groS'),
+GO593_02310,IX87_09865,"groS, groES",groS,"groS, groES",groS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.008095054736437,1,italic('groS'),
+GO593_03530,IX87_11425,unknown,gtrOC1,GO593_03530,gtrOC1,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0900986177549627,0.999987799603476,italic('gtrOC1'),
+GO593_03530,IX87_11425,unknown,gtrOC1,GO593_03530,gtrOC1,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0538840672442761,1,italic('gtrOC1'),
+GO593_07255,IX87_15245,guaA,guaA,guaA,guaA,"",guaA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.139212556541495,0.999906083308575,italic('guaA'),
+GO593_07255,IX87_15245,guaA,guaA,guaA,guaA,"",guaA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0325343839035162,0.999999963397393,italic('guaA'),
+GO593_05430,IX87_13620,guaB,IX87_13620,guaB,guaB,"",guaB,perfect,fosfomycin_T2_1 - none_T2_1a,1.64051859973464,0.337734471816196,italic('guaB'),
+GO593_05430,IX87_13620,guaB,IX87_13620,guaB,guaB,"",guaB,mismatch,fosfomycin_T2_1 - none_T2_1a,1.08100315230591,0.952274677716776,italic('guaB'),
+GO593_02105,IX87_09635,gyrA,gyrA,gyrA,gyrA,"",gyrA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.107230773240001,0.778990004039011,italic('gyrA'),
+GO593_02105,IX87_09635,gyrA,gyrA,gyrA,gyrA,"",gyrA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.316453928868406,0.967064482521272,italic('gyrA'),
+GO593_06205,IX87_14430,gyrB,gyrB,gyrB,gyrB,"",gyrB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.771520056758164,0.617864102220759,italic('gyrB'),
+GO593_06205,IX87_14430,gyrB,gyrB,gyrB,gyrB,"",gyrB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.302385612928134,0.999999983603573,italic('gyrB'),
+GO593_10375,IX87_18515,hemA,AIL80524.1,hemA,hemA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.04140286445282,0.701372197948033,italic('hemA'),
+GO593_10375,IX87_18515,hemA,AIL80524.1,hemA,hemA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0506555248720549,0.999999622275364,italic('hemA'),
+GO593_10710,IX87_01620,hemB,hemB,hemB,hemB,"",hemB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.274314703093373,0.999166270810915,italic('hemB'),
+GO593_10710,IX87_01620,hemB,hemB,hemB,hemB,"",hemB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0145935088079908,1,italic('hemB'),
+GO593_07835,IX87_15860,hemC,hemC,hemC,hemC,"",hemC,perfect,fosfomycin_T2_1 - none_T2_1a,-1.50497042734279,0.0281343612922438,italic('hemC'),
+GO593_07835,IX87_15860,hemC,hemC,hemC,hemC,"",hemC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.427585126763176,0.999951938714619,italic('hemC'),
+GO593_07840,IX87_15865,hemD,AIL80035.1,hemD,hemD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.499144913088509,0.951351893996874,italic('hemD'),
+GO593_07840,IX87_15865,hemD,AIL80035.1,hemD,hemD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0623652037086251,0.999999999999946,italic('hemD'),
+GO593_01090,IX87_08605,hemE,AIL78684.1,hemE,hemE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.968046122610888,0.0215253781145174,italic('hemE'),
+GO593_01090,IX87_08605,hemE,AIL78684.1,hemE,hemE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.77740699860998,0.115242735318928,italic('hemE'),
+GO593_04345,IX87_12280,hemF,hemF,hemF,hemF,"",hemF,perfect,fosfomycin_T2_1 - none_T2_1a,-0.355943225203316,0.999619492753925,italic('hemF'),
+GO593_04345,IX87_12280,hemF,hemF,hemF,hemF,"",hemF,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.079417093843214,1,italic('hemF'),
+GO593_08405,IX87_16460,hemH,hemH,hemH,hemH,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.34294556124374,0.458201123334094,italic('hemH'),
+GO593_08405,IX87_16460,hemH,hemH,hemH,hemH,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0346988234772491,0.99999999995923,italic('hemH'),
+GO593_10495,IX87_01855,hemJ,IX87_01855,hemJ,hemJ,"",hemJ,perfect,fosfomycin_T2_1 - none_T2_1a,-0.759401655322515,0.883844549036426,italic('hemJ'),
+GO593_10495,IX87_01855,hemJ,IX87_01855,hemJ,hemJ,"",hemJ,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.105720917234263,0.999999999999715,italic('hemJ'),
+GO593_01460,IX87_08985,hemL,AIL78755.1,hemL,hemL,"",hemL,perfect,fosfomycin_T2_1 - none_T2_1a,-1.0194606565199,0.0515818725235701,italic('hemL'),
+GO593_01460,IX87_08985,hemL,AIL78755.1,hemL,hemL,"",hemL,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0386851295306896,0.999999999997968,italic('hemL'),
+GO593_18325,IX87_06545,hfq,hfq,hfq,hfq,"",hfq,perfect,fosfomycin_T2_1 - none_T2_1a,0.42831063505176,0.997926245774843,italic('hfq'),
+GO593_18325,IX87_06545,hfq,hfq,hfq,hfq,"",hfq,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.747016996987827,0.999916361922186,italic('hfq'),
+GO593_09065,IX87_17115,hisS,AIL80271.1,hisS,hisS,"",hisS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.399365609796536,0.999999999662887,italic('hisS'),tRNA Ligase
+GO593_09065,IX87_17115,hisS,AIL80271.1,hisS,hisS,"",hisS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0505332093854672,1,italic('hisS'),tRNA Ligase
+GO593_09140,IX87_17190,holA,holA,holA,holA,"",holA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.691539771468545,0.936617869195653,italic('holA'),
+GO593_09140,IX87_17190,holA,holA,holA,holA,"",holA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.22610048653216,0.998539917555792,italic('holA'),
+GO593_15490,IX87_02330,holB,AIL77504.1,holB,holB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.67160850782442,0.871800267255323,italic('holB'),
+GO593_15490,IX87_02330,holB,AIL77504.1,holB,holB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.193765221914743,0.999999993695195,italic('holB'),
+GO593_15740,IX87_18965,hscA,hscA,hscA,hscA,"",hscA,perfect,fosfomycin_T2_1 - none_T2_1a,-2.73628779994382,1.33591118813488e-05,italic('hscA'),
+GO593_15740,IX87_18965,hscA,hscA,hscA,hscA,"",hscA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.157325104546306,0.999048093705291,italic('hscA'),
+GO593_15745,IX87_18970,hscB,hscB,hscB,hscB,"",hscB,perfect,fosfomycin_T2_1 - none_T2_1a,-1.25018212441583,0.221427648107481,italic('hscB'),
+GO593_15745,IX87_18970,hscB,hscB,hscB,hscB,"",hscB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.854376484419502,0.997940778604799,italic('hscB'),
+GO593_15565,IX87_02255,"ihfB, himD",ihfB,"ihfB, himD",ihfB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.22531225671036,0.0383442937882707,italic('ihfB'),
+GO593_15565,IX87_02255,"ihfB, himD",ihfB,"ihfB, himD",ihfB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.179816734560737,0.999999164109347,italic('ihfB'),
+GO593_06435,IX87_14685,ileS,ileS,ileS,ileS,"",ileS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.53121010830158,0.998708766501929,italic('ileS'),tRNA Ligase
+GO593_06435,IX87_14685,ileS,ileS,ileS,ileS,"",ileS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.252001854579933,0.99999999968243,italic('ileS'),tRNA Ligase
+GO593_08615,IX87_16675,infA,infA,infA,infA,"",infA,perfect,fosfomycin_T2_1 - none_T2_1a,0.46632287765069,0.980597837042427,italic('infA'),
+GO593_08615,IX87_16675,infA,infA,infA,infA,"",infA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.395321783859924,0.990703920849668,italic('infA'),
+GO593_08195,IX87_16250,infB,infB,infB,infB,"",infB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.610707272853984,0.999937819391892,italic('infB'),
+GO593_08195,IX87_16250,infB,infB,infB,infB,"",infB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0481622686651233,1,italic('infB'),
+GO593_09390,IX87_17455,infC,infC,infC,infC,"",infC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.251091289224105,0.999982198237951,italic('infC'),
+GO593_09390,IX87_17455,infC,infC,infC,infC,"",infC,mismatch,fosfomycin_T2_1 - none_T2_1a,0.196065726103757,0.999992271007227,italic('infC'),
+GO593_15750,IX87_18975,iscA,iscA,iscA,iscA,"",iscA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.770208570669393,0.901369465320147,italic('iscA'),
+GO593_15750,IX87_18975,iscA,iscA,iscA,iscA,"",iscA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.304012238221966,0.999999999800599,italic('iscA'),
+GO593_15765,IX87_18990,iscR,IX87_18990,iscR,iscR,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.17461413150864,0.00357061337608986,italic('iscR'),
+GO593_15765,IX87_18990,iscR,IX87_18990,iscR,iscR,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.00011503352959,0.692429349719439,italic('iscR'),
+GO593_15760,IX87_18985,iscS,IX87_18985,iscS,iscS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.94925877074875,9.55739103595034e-07,italic('iscS'),
+GO593_15760,IX87_18985,iscS,IX87_18985,iscS,iscS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.837960667689487,0.0334133153488182,italic('iscS'),
+GO593_02660,IX87_10240,ispB,IX87_10240,ispB,ispB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.256544408325976,0.999982013759413,italic('ispB'),
+GO593_02660,IX87_10240,ispB,IX87_10240,ispB,ispB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.02872574665042,1,italic('ispB'),
+GO593_17290,IX87_20925,"ispD, ygbP",IX87_20925,"ispD, ygbP",ispD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.14099826782279,0.999840189923022,italic('ispD'),
+GO593_17290,IX87_20925,"ispD, ygbP",IX87_20925,"ispD, ygbP",ispD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0049650427748856,0.999999999629833,italic('ispD'),
+GO593_10360,IX87_18500,"ispE, ipk",IX87_18500,ispE,ispE,"",ispE,perfect,fosfomycin_T2_1 - none_T2_1a,-2.08126647100933,0.000327914978078254,italic('ispE'),
+GO593_10360,IX87_18500,"ispE, ipk",IX87_18500,ispE,ispE,"",ispE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.638994069298312,0.970807668153264,italic('ispE'),
+GO593_17785,IX87_21705,"ispF, ygbB",ispF,ispF,ispF,"",ispF,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0710389006454312,0.999999013019658,italic('ispF'),
+GO593_17785,IX87_21705,"ispF, ygbB",ispF,ispF,ispF,"",ispF,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0115339057659565,0.999999999999451,italic('ispF'),
+GO593_09060,IX87_17110,"ispG, gcpE",IX87_17110,ispG,ispG,"",ispG,perfect,fosfomycin_T2_1 - none_T2_1a,-1.23446689933209,0.515813668431443,italic('ispG'),
+GO593_09060,IX87_17110,"ispG, gcpE",IX87_17110,ispG,ispG,"",ispG,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0289484576971406,0.99999999937325,italic('ispG'),
+GO593_04650,IX87_12635,"ispH, lytB",ispH,ispH,ispH,"",ispH,perfect,fosfomycin_T2_1 - none_T2_1a,-0.74490340023268,0.995613135152309,italic('ispH'),
+GO593_04650,IX87_12635,"ispH, lytB",ispH,ispH,ispH,"",ispH,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.282897888075973,0.999565498236092,italic('ispH'),
+GO593_03615,IX87_11540,"ispZ, yciB",ispZ,"ispZ, yciB",ispZ,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.17581832146367,0.156349550495876,italic('ispZ'),
+GO593_03615,IX87_11540,"ispZ, yciB",ispZ,"ispZ, yciB",ispZ,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.214956992962126,1,italic('ispZ'),
+GO593_17310,IX87_20945,kdsA,IX87_20945,kdsA,kdsA,"",kdsA,perfect,fosfomycin_T2_1 - none_T2_1a,0.000717050314804402,0.999990799544627,italic('kdsA'),LPS
+GO593_17310,IX87_20945,kdsA,IX87_20945,kdsA,kdsA,"",kdsA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.151415241099867,1,italic('kdsA'),LPS
+GO593_15485,IX87_02335,kdsB,IX87_02335,kdsB,kdsB,"",kdsB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.688211135328884,0.686179036189785,italic('kdsB'),LPS
+GO593_15485,IX87_02335,kdsB,IX87_02335,kdsB,kdsB,"",kdsB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.131471017272961,0.999999998182433,italic('kdsB'),LPS
+GO593_13535,IX87_04365,kdsC,kdsC,kdsC,kdsC,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0736720074081521,0.999999662797518,italic('kdsC'),LPS
+GO593_13535,IX87_04365,kdsC,kdsC,kdsC,kdsC,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0149219598983404,1,italic('kdsC'),LPS
+GO593_13530,IX87_04370,kdsD,kdsD,kdsD,kdsD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.353810005373497,0.999858856570792,italic('kdsD'),LPS
+GO593_13530,IX87_04370,kdsD,kdsD,kdsD,kdsD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0660249099586366,1,italic('kdsD'),LPS
+GO593_05390,IX87_13580,"kdtA, waaA",AIL79601.1,"kdtA, waaA",kdtA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.263958187239941,0.996000874452103,italic('kdtA'),LPS
+GO593_05390,IX87_13580,"kdtA, waaA",AIL79601.1,"kdtA, waaA",kdtA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0803580021091219,1,italic('kdtA'),LPS
+GO593_01765,IX87_09280,lepB,lepB,lepB,lepB,"",lepB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.941646679680388,0.226963035118531,italic('lepB'),
+GO593_01765,IX87_09280,lepB,lepB,lepB,lepB,"",lepB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.108944612141639,0.997607334935309,italic('lepB'),
+GO593_09150,IX87_17200,leuS,AIL80288.1,leuS,leuS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.787783086664505,0.993860076460292,italic('leuS'),tRNA Ligase
+GO593_09150,IX87_17200,leuS,AIL80288.1,leuS,leuS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.232915971668755,0.999999999994162,italic('leuS'),tRNA Ligase
+GO593_08815,IX87_16905,lgt,lgt,lgt,lgt,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.03737677496171,0.192386318565279,italic('lgt'),
+GO593_08815,IX87_16905,lgt,lgt,lgt,lgt,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0274519431479679,0.999999975493938,italic('lgt'),
+GO593_10190,IX87_18330,"ligA, lig",ligA,ligA,ligA,"",ligA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0266526000166764,0.999999997131047,italic('ligA'),
+GO593_10190,IX87_18330,"ligA, lig",ligA,ligA,ligA,"",ligA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0391362041658369,1,italic('ligA'),
+GO593_02590,IX87_10165,lipB,lipB,lipB,lipB,"",lipB,perfect,fosfomycin_T2_1 - none_T2_1a,0.0329662301609722,0.99996498180067,italic('lipB'),
+GO593_02590,IX87_10165,lipB,lipB,lipB,lipB,"",lipB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00725725159223814,1,italic('lipB'),
+GO593_08370,IX87_16425,lnt,lnt,lnt,lnt,"",lnt,mismatch,fosfomycin_T2_1 - none_T2_1a,0.249492431254125,0.0107306768203859,italic('lnt'),
+GO593_08370,IX87_16425,lnt,lnt,lnt,lnt,"",lnt,perfect,fosfomycin_T2_1 - none_T2_1a,0.144407204406859,0.96153429117159,italic('lnt'),
+GO593_02640,IX87_10215,lolA,lolA,lolA,lolA,"",lolA,perfect,fosfomycin_T2_1 - none_T2_1a,-2.51588490771061,5.13559232981516e-05,italic('lolA'),
+GO593_02640,IX87_10215,lolA,lolA,lolA,lolA,"",lolA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.48390394483853,0.484412250403102,italic('lolA'),
+GO593_10365,IX87_18505,lolB,lolB,lolB,lolB,"",lolB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0854082557983149,0.99998237287408,italic('lolB'),
+GO593_10365,IX87_18505,lolB,lolB,lolB,lolB,"",lolB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.106663553867712,1,italic('lolB'),
+GO593_02040,IX87_09570,"lolC, lolE",AIL78869.1,"lolC, lolE",lolCE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.13838508811191,0.00747838654662788,italic('lolCE'),
+GO593_02040,IX87_09570,"lolC, lolE",AIL78869.1,"lolC, lolE",lolCE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.183216605202027,0.99407494020448,italic('lolCE'),
+GO593_02035,IX87_09565,lolD,lolD,lolD,lolD,"",lolD,perfect,fosfomycin_T2_1 - none_T2_1a,-2.76183697446476,2.71405877372772e-12,italic('lolD'),
+GO593_02035,IX87_09565,lolD,lolD,lolD,lolD,"",lolD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.483336549624878,0.296741464813597,italic('lolD'),
+GO593_13545,IX87_04355,lptA,lptA,lptA,lptA,"",lptA,perfect,fosfomycin_T2_1 - none_T2_1a,-1.33519468438648,0.112499020780049,italic('lptA'),LPS
+GO593_13545,IX87_04355,lptA,lptA,lptA,lptA,"",lptA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00579715465663823,0.999999999999605,italic('lptA'),LPS
+GO593_13550,IX87_04350,lptB,lptB,lptB,lptB,"",lptB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.140672670493658,0.999999999990052,italic('lptB'),LPS
+GO593_13550,IX87_04350,lptB,lptB,lptB,lptB,"",lptB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0053782481408893,1,italic('lptB'),LPS
+GO593_13540,IX87_04360,lptC,lptC,lptC,lptC,"",lptC,perfect,fosfomycin_T2_1 - none_T2_1a,-1.13229254192001,0.844247112168093,italic('lptC'),LPS
+GO593_13540,IX87_04360,lptC,lptC,lptC,lptC,"",lptC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0515256353880468,1,italic('lptC'),LPS
+GO593_15435,IX87_02385,"ostA, lptD",AIL77515.1,lptD,lptD,"",lptD,perfect,fosfomycin_T2_1 - none_T2_1a,-1.07854084171038,0.61457372464854,italic('lptD'),LPS
+GO593_15435,IX87_02385,"ostA, lptD",AIL77515.1,lptD,lptD,"",lptD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.394210560346301,0.999412054791115,italic('lptD'),LPS
+GO593_07680,IX87_15690,lptF,lptF,lptF,lptF,"",lptF,perfect,fosfomycin_T2_1 - none_T2_1a,-0.192774958767677,0.997781905490661,italic('lptF'),LPS
+GO593_07680,IX87_15690,lptF,lptF,lptF,lptF,"",lptF,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.348647783632373,0.999972708706055,italic('lptF'),LPS
+GO593_07685,IX87_15695,lptG,AIL80002.1,lptG,lptG,"",lptG,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0353314710076469,0.997951543306597,italic('lptG'),LPS
+GO593_07685,IX87_15695,lptG,AIL80002.1,lptG,lptG,"",lptG,perfect,fosfomycin_T2_1 - none_T2_1a,-0.215714370863157,0.999995867650503,italic('lptG'),LPS
+GO593_17695,IX87_21620,lpxA,lpxA,lpxA,lpxA,"",lpxA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.207393098804076,0.999972121222934,italic('lpxA'),LPS
+GO593_17695,IX87_21620,lpxA,lpxA,lpxA,lpxA,"",lpxA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.039643409404302,1,italic('lpxA'),LPS
+GO593_15950,IX87_19185,lpxB,lpxB,lpxB,lpxB,"",lpxB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.523289316380634,0.881729449364547,italic('lpxB'),LPS
+GO593_15950,IX87_19185,lpxB,lpxB,lpxB,lpxB,"",lpxB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0367205146285394,0.999999999867115,italic('lpxB'),LPS
+GO593_05480,IX87_13680,lpxC,lpxC,lpxC,lpxC,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.860858574983542,0.438722765869769,italic('lpxC'),LPS
+GO593_05480,IX87_13680,lpxC,lpxC,lpxC,lpxC,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.603697595023751,0.984437877422587,italic('lpxC'),LPS
+GO593_17705,IX87_21630,lpxD,lpxD,lpxD,lpxD,"",lpxD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.399527497094939,0.999999992927263,italic('lpxD'),LPS
+GO593_17705,IX87_21630,lpxD,lpxD,lpxD,lpxD,"",lpxD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0218168960375557,1,italic('lpxD'),LPS
+GO593_18305,IX87_06525,lpxH,IX87_06525,lpxH,lpxH,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.128514289850098,0.999994090077504,italic('lpxH'),LPS
+GO593_18305,IX87_06525,lpxH,IX87_06525,lpxH,lpxH,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.000447788932995533,1,italic('lpxH'),LPS
+GO593_15480,IX87_02340,lpxK,lpxK,lpxK,lpxK,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.252457592124069,0.999999999990052,italic('lpxK'),LPS
+GO593_15480,IX87_02340,lpxK,lpxK,lpxK,lpxK,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00411216380438117,1,italic('lpxK'),LPS
+GO593_02025,IX87_09555,unknown,IX87_09555,GO593_02025,lpxL,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.418751562202655,0.989543463509495,italic('lpxL'),LPS
+GO593_02025,IX87_09555,unknown,IX87_09555,GO593_02025,lpxL,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0584117180149603,1,italic('lpxL'),LPS
+GO593_06430,IX87_14680,"lspA1, lspA2, lspA",lspA,"lspA1, lspA2, lspA",lspA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.16392516877942,0.185278084895828,italic('lspA'),
+GO593_06430,IX87_14680,"lspA1, lspA2, lspA",lspA,"lspA1, lspA2, lspA",lspA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0793103693844752,1,italic('lspA'),
+GO593_12600,IX87_05125,lysC,lysC,lysC,lysC,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.25109201717906,0.0120746184004573,italic('lysC'),
+GO593_12600,IX87_05125,lysC,lysC,lysC,lysC,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.118325410728961,0.988499641188513,italic('lysC'),
+GO593_11345,IX87_00530,"lysS, lysU",lysS,lysS,lysS,"",lysS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.501347699605618,0.999997653987322,italic('lysS'),tRNA Ligase
+GO593_11345,IX87_00530,"lysS, lysU",lysS,lysS,lysS,"",lysS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.141753258842453,1,italic('lysS'),tRNA Ligase
+GO593_12465,IX87_05280,"hcaR, marR",marR_1,"hcaR, marR",marR_1,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.00236165677581635,0.999999999990052,italic('marR_1'),
+GO593_12465,IX87_05280,"hcaR, marR",marR_1,"hcaR, marR",marR_1,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0305764381793053,1,italic('marR_1'),
+GO593_15290,IX87_02540,metK,metK,metK,metK,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.60749612065461,0.122181766106427,italic('metK'),
+GO593_15290,IX87_02540,metK,metK,metK,metK,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.128038299310043,0.999999999999965,italic('metK'),
+GO593_10585,IX87_01750,minC,minC,minC,minC,"",minC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.273097047034505,0.999999602440503,italic('minC'),
+GO593_10585,IX87_01750,minC,minC,minC,minC,"",minC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00546110162184297,1,italic('minC'),
+GO593_10575,IX87_01760,minE,minE,minE,minE,"",minE,perfect,fosfomycin_T2_1 - none_T2_1a,-1.07939368468561,0.110734259382872,italic('minE'),
+GO593_10575,IX87_01760,minE,minE,minE,minE,"",minE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.049017570591598,0.999999999999998,italic('minE'),
+GO593_08225,IX87_16280,phaC,mnhC1,phaC,mnhC1,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.88389102428332,0.0403746916933748,italic('mnhC1'),
+GO593_08225,IX87_16280,phaC,mnhC1,phaC,mnhC1,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.60537413738697,0.189273741335593,italic('mnhC1'),
+GO593_01330,IX87_08855,"mnmA, trmU",mnmA,mnmA,mnmA,"",mnmA,perfect,fosfomycin_T2_1 - none_T2_1a,0.0767411734921795,0.999997239792738,italic('mnmA'),
+GO593_01330,IX87_08855,"mnmA, trmU",mnmA,mnmA,mnmA,"",mnmA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0217728804615125,0.99999999988004,italic('mnmA'),
+GO593_17870,IX87_21800,moaE,moaE,moaE,moaE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0330262715465277,0.999999860963684,italic('moaE'),
+GO593_17870,IX87_21800,moaE,moaE,moaE,moaE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0397435387795223,1,italic('moaE'),
+GO593_04790,IX87_12830,mraY,IX87_12830,mraY,mraY,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.83104594307579,0.00122927577671461,italic('mraY'),Cell Wall/PG
+GO593_04790,IX87_12830,mraY,IX87_12830,mraY,mraY,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.975921095787958,0.371812765636154,italic('mraY'),Cell Wall/PG
+GO593_08210,IX87_16265,phaF,mrpF,phaF,mrpF,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.65631575746418,0.0219438161913275,italic('mrpF'),
+GO593_08210,IX87_16265,phaF,mrpF,phaF,mrpF,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.996862203830994,0.731979603769391,italic('mrpF'),
+GO593_15475,IX87_02345,msbA,IX87_02345,msbA,msbA,"",msbA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.59252509961052,0.907578785453935,italic('msbA'),LPS
+GO593_15475,IX87_02345,msbA,IX87_02345,msbA,msbA,"",msbA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0086212473461595,0.999997066261539,italic('msbA'),LPS
+GO593_11270,IX87_00610,cynT,mtcA2,cynT,mtcA2,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.18604463710736,0.999999970231576,italic('mtcA2'),
+GO593_11270,IX87_00610,cynT,mtcA2,cynT,mtcA2,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0557281918669241,1,italic('mtcA2'),
+GO593_09595,IX87_17660,murA,murA,murA,murA,"",murA,perfect,fosfomycin_T2_1 - none_T2_1a,-4.72404656452213,0.52582636534982,italic('murA'),Cell Wall/PG
+GO593_09595,IX87_17660,murA,murA,murA,murA,"",murA,mismatch,fosfomycin_T2_1 - none_T2_1a,-3.67593848779812,1,italic('murA'),Cell Wall/PG
+GO593_17990,IX87_06200,murB,murB,murB,murB,"",murB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.257594909272516,0.993489736046907,italic('murB'),
+GO593_17990,IX87_06200,murB,murB,murB,murB,"",murB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0762424572327648,1,italic('murB'),
+GO593_05505,IX87_13705,murC,murC,murC,murC,"",murC,perfect,fosfomycin_T2_1 - none_T2_1a,-1.47759360292106,0.28959391965354,italic('murC'),Cell Wall/PG
+GO593_05505,IX87_13705,murC,murC,murC,murC,"",murC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.85854806610155,1,italic('murC'),Cell Wall/PG
+GO593_07755,IX87_15780,murD,murD,murD,murD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.140237375638681,0.999999999990052,italic('murD'),
+GO593_07755,IX87_15780,murD,murD,murD,murD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0616572020798956,1,italic('murD'),
+GO593_04800,IX87_12840,murE,murE,murE,murE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.42818958675595,0.0581292996215381,italic('murE'),Cell Wall/PG
+GO593_04800,IX87_12840,murE,murE,murE,murE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0654019750865307,0.99999999999794,italic('murE'),Cell Wall/PG
+GO593_04795,IX87_12835,murF,murF,murF,murF,"",murF,perfect,fosfomycin_T2_1 - none_T2_1a,-3.15259691622168,0.00245513246546761,italic('murF'),Cell Wall/PG
+GO593_04795,IX87_12835,murF,murF,murF,murF,"",murF,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.180676093547089,0.999999253474302,italic('murF'),Cell Wall/PG
+GO593_05510,IX87_13710,murG,murG,murG,murG,"",murG,mismatch,fosfomycin_T2_1 - none_T2_1a,-2.51518266124654,0.888681928138569,italic('murG'),Cell Wall/PG
+GO593_05510,IX87_13710,murG,murG,murG,murG,"",murG,perfect,fosfomycin_T2_1 - none_T2_1a,-1.24960048000109,0.990552434498033,italic('murG'),Cell Wall/PG
+GO593_06815,IX87_14820,"mviN, murJ, pslK",mviN,murJ,murJ,"",murJ,perfect,fosfomycin_T2_1 - none_T2_1a,-0.220324361260996,0.999999842458628,italic('murJ'),
+GO593_06815,IX87_14820,"mviN, murJ, pslK",mviN,murJ,murJ,"",murJ,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0814167725611019,1,italic('murJ'),
+GO593_10480,IX87_01870,nadE,IX87_01870,nadE,nadE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.695499677501344,0.734461210960852,italic('nadE'),
+GO593_10480,IX87_01870,nadE,IX87_01870,nadE,nadE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.520410092820623,0.999916747799309,italic('nadE'),
+GO593_01880,IX87_09395,unknown,AIL78836.1,GO593_01880,nadM,https://www.genome.jp/dbget-bin/www_bget?ko:K13522,.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.722408142746609,0.94862064938865,italic('nadM'),
+GO593_01880,IX87_09395,unknown,AIL78836.1,GO593_01880,nadM,https://www.genome.jp/dbget-bin/www_bget?ko:K13522,.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0383764655709568,0.999999999999998,italic('nadM'),
+GO593_09040,IX87_17090,ndk,ndk,ndk,ndk,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.547008802044492,0.998884966763771,italic('ndk'),
+GO593_09040,IX87_17090,ndk,ndk,ndk,ndk,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.134710031934256,1,italic('ndk'),
+GO593_13310,IX87_06920,fis,fis,fis,ninH,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.00216709772132406,0.999999998540345,italic('ninH'),
+GO593_13310,IX87_06920,fis,fis,fis,ninH,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0329984724746102,1,italic('ninH'),
+GO593_03265,IX87_11135,unknown,nphR_2,GO593_03265,nphR_2,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.21682491254942,0.267040769167027,italic('nphR_2'),
+GO593_03265,IX87_11135,unknown,nphR_2,GO593_03265,nphR_2,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0089717325455503,0.999999248899756,italic('nphR_2'),
+GO593_09915,IX87_18015,"nrdA, nrdJa",nrdA,"nrdA, nrdJa",nrdA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.14974083972799,0.999999809905168,italic('nrdA'),
+GO593_09915,IX87_18015,"nrdA, nrdJa",nrdA,"nrdA, nrdJa",nrdA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.115718812377465,0.999999999999858,italic('nrdA'),
+GO593_09905,IX87_18005,nrdB,AIL80430.1,nrdB,nrdB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.539026939597089,0.999127673663083,italic('nrdB'),
+GO593_09905,IX87_18005,nrdB,AIL80430.1,nrdB,nrdB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0640104142282975,0.999999996666347,italic('nrdB'),
+GO593_09945,IX87_18075,nuoA,nuoA,nuoA,nuoA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-4.42266286118913,1.69502949379288e-08,italic('nuoA'),NADH
+GO593_09945,IX87_18075,nuoA,nuoA,nuoA,nuoA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.26277311133592,0.000786541784973974,italic('nuoA'),NADH
+GO593_09950,IX87_18080,nuoB,nuoB,nuoB,nuoB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.52770036156136,4.35556511459293e-11,italic('nuoB'),NADH
+GO593_09950,IX87_18080,nuoB,nuoB,nuoB,nuoB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.545788356823243,0.716276040965912,italic('nuoB'),NADH
+GO593_09955,IX87_18085,"nuoCD, nuoC, nuoD",nuoD,nuoC,nuoD,"",nuoC,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.69294731745539,1.62564651966826e-06,italic('nuoD'),NADH
+GO593_09955,IX87_18085,"nuoCD, nuoC, nuoD",nuoD,nuoC,nuoD,"",nuoC,perfect,fosfomycin_T2_1 - none_T2_1a,-3.26932296027651,0.00763250665342541,italic('nuoD'),NADH
+GO593_09960,IX87_18090,nuoE,nuoE,nuoE,nuoE,"",nuoE,perfect,fosfomycin_T2_1 - none_T2_1a,-1.93155814959518,5.54198767285239e-10,italic('nuoE'),NADH
+GO593_09960,IX87_18090,nuoE,nuoE,nuoE,nuoE,"",nuoE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.581449800494988,0.581430973450479,italic('nuoE'),NADH
+GO593_09965,IX87_18095,nuoF,IX87_18095,nuoF,nuoF,"",nuoF,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.72510501555879,1.70654536710997e-05,italic('nuoF'),NADH
+GO593_09965,IX87_18095,nuoF,IX87_18095,nuoF,nuoF,"",nuoF,perfect,fosfomycin_T2_1 - none_T2_1a,-2.19929798118747,9.61386231960881e-05,italic('nuoF'),NADH
+GO593_09970,IX87_18100,nuoG,nuoG,nuoG,nuoG,"",nuoG,mismatch,fosfomycin_T2_1 - none_T2_1a,-3.41188928465148,3.73533904704657e-16,italic('nuoG'),NADH
+GO593_09970,IX87_18100,nuoG,nuoG,nuoG,nuoG,"",nuoG,perfect,fosfomycin_T2_1 - none_T2_1a,-4.169364367969,5.33938212244246e-08,italic('nuoG'),NADH
+GO593_09975,IX87_18105,nuoH,nuoH,nuoH,nuoH,"",nuoH,perfect,fosfomycin_T2_1 - none_T2_1a,-5.07234589679114,2.18107102966287e-11,italic('nuoH'),NADH
+GO593_09975,IX87_18105,nuoH,nuoH,nuoH,nuoH,"",nuoH,mismatch,fosfomycin_T2_1 - none_T2_1a,-2.44715464018105,1.74729524973808e-07,italic('nuoH'),NADH
+GO593_09980,IX87_18110,nuoI,nuoI,nuoI,nuoI,"",nuoI,mismatch,fosfomycin_T2_1 - none_T2_1a,-2.87839103058214,1.20485738362291e-12,italic('nuoI'),NADH
+GO593_09980,IX87_18110,nuoI,nuoI,nuoI,nuoI,"",nuoI,perfect,fosfomycin_T2_1 - none_T2_1a,-4.08147218682462,2.45467163196635e-10,italic('nuoI'),NADH
+GO593_09985,IX87_18115,nuoJ,nuoJ,nuoJ,nuoJ,"",nuoJ,mismatch,fosfomycin_T2_1 - none_T2_1a,-2.10808097034269,1.91606498143601e-18,italic('nuoJ'),NADH
+GO593_09985,IX87_18115,nuoJ,nuoJ,nuoJ,nuoJ,"",nuoJ,perfect,fosfomycin_T2_1 - none_T2_1a,-3.19552572174396,4.55847934952935e-12,italic('nuoJ'),NADH
+GO593_09990,IX87_18120,nuoK,nuoK,nuoK,nuoK,"",nuoK,perfect,fosfomycin_T2_1 - none_T2_1a,-3.54057616406456,2.48860965536919e-12,italic('nuoK'),NADH
+GO593_09990,IX87_18120,nuoK,nuoK,nuoK,nuoK,"",nuoK,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.07365559994618,1.14637141576836e-10,italic('nuoK'),NADH
+GO593_09995,IX87_18125,nuoL,IX87_18125,nuoL,nuoL,"",nuoL,perfect,fosfomycin_T2_1 - none_T2_1a,-2.16943979785599,4.93942467941791e-06,italic('nuoL'),NADH
+GO593_09995,IX87_18125,nuoL,IX87_18125,nuoL,nuoL,"",nuoL,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.915650277190176,1,italic('nuoL'),NADH
+GO593_10000,IX87_18130,nuoM,IX87_18130,nuoM,nuoM,"",nuoM,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.79462046177164,6.40414839228166e-20,italic('nuoM'),NADH
+GO593_10000,IX87_18130,nuoM,IX87_18130,nuoM,nuoM,"",nuoM,perfect,fosfomycin_T2_1 - none_T2_1a,-2.39907774912081,5.54585986911462e-14,italic('nuoM'),NADH
+GO593_10005,IX87_18135,nuoN,AIL80452.1,nuoN,nuoN,"",nuoN,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.984446799869838,6.18561239344711e-08,italic('nuoN'),NADH
+GO593_10005,IX87_18135,nuoN,AIL80452.1,nuoN,nuoN,"",nuoN,perfect,fosfomycin_T2_1 - none_T2_1a,-2.56003754249644,0.000274411927324481,italic('nuoN'),NADH
+GO593_08190,IX87_16245,nusA,nusA,nusA,nusA,"",nusA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.505725352180913,0.999942593435563,italic('nusA'),
+GO593_08190,IX87_16245,nusA,nusA,nusA,nusA,"",nusA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.604004565246206,0.999991668055138,italic('nusA'),
+GO593_07930,IX87_15960,nusG,nusG,nusG,nusG,"",nusG,perfect,fosfomycin_T2_1 - none_T2_1a,-0.752644999240334,0.999910315700907,italic('nusG'),
+GO593_07930,IX87_15960,nusG,nusG,nusG,nusG,"",nusG,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.212068843796083,1,italic('nusG'),
+GO593_09110,IX87_17160,orn,orn,orn,orn,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.57522662482913,0.014530122806689,italic('orn'),
+GO593_09110,IX87_17160,orn,orn,orn,orn,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0114727334772878,0.999986652391579,italic('orn'),
+GO593_09360,IX87_17425,panC,IX87_17425,panC,panC,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.38701316224194,0.99999964724131,italic('panC'),
+GO593_09360,IX87_17425,panC,IX87_17425,panC,panC,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0533900666061903,0.999999802953188,italic('panC'),
+GO593_15460,IX87_02360,spoOJ,parB,spoOJ,parB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.189109622140141,0.999999985648656,italic('parB'),
+GO593_15460,IX87_02360,spoOJ,parB,spoOJ,parB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0543429787858407,1,italic('parB'),
+GO593_07570,IX87_15570,parC,parC,parC,parC,"",parC,perfect,fosfomycin_T2_1 - none_T2_1a,-1.24040483382627,0.668030706740733,italic('parC'),
+GO593_07570,IX87_15570,parC,parC,parC,parC,"",parC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.253528754008704,0.999999999992429,italic('parC'),
+GO593_05625,IX87_13845,parE,parE,parE,parE,"",parE,perfect,fosfomycin_T2_1 - none_T2_1a,-0.00745406120001531,0.999998278265295,italic('parE'),
+GO593_05625,IX87_13845,parE,parE,parE,parE,"",parE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0371916974045801,0.999999999965564,italic('parE'),
+GO593_03765,IX87_11690,pdxA,pdxA,pdxA,pdxA,"",pdxA,perfect,fosfomycin_T2_1 - none_T2_1a,-1.07835850701073,0.944902621215136,italic('pdxA'),
+GO593_03765,IX87_11690,pdxA,pdxA,pdxA,pdxA,"",pdxA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0426460607547321,0.999999999999801,italic('pdxA'),
+GO593_05420,IX87_13610,pdxH,pdxH,pdxH,pdxH,"",pdxH,perfect,fosfomycin_T2_1 - none_T2_1a,-0.187756852196261,0.999998612148189,italic('pdxH'),
+GO593_05420,IX87_13610,pdxH,pdxH,pdxH,pdxH,"",pdxH,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.108063240770993,1,italic('pdxH'),
+GO593_01735,IX87_09250,pdxJ,pdxJ,pdxJ,pdxJ,"",pdxJ,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0823711523618217,0.984570119909727,italic('pdxJ'),
+GO593_01735,IX87_09250,pdxJ,pdxJ,pdxJ,pdxJ,"",pdxJ,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.000173216689520493,0.999980328684537,italic('pdxJ'),
+GO593_15415,IX87_02405,pgk,pgk,pgk,pgk,"",pgk,perfect,fosfomycin_T2_1 - none_T2_1a,0.732370410721696,0.00655145786586544,italic('pgk'),
+GO593_15415,IX87_02405,pgk,pgk,pgk,pgk,"",pgk,mismatch,fosfomycin_T2_1 - none_T2_1a,0.165925714129229,0.994434608595232,italic('pgk'),
+GO593_08075,IX87_16120,pgsA,pgsA,pgsA,pgsA,"",pgsA,perfect,fosfomycin_T2_1 - none_T2_1a,-3.68753376736646,7.69357076501403e-19,italic('pgsA'),
+GO593_08075,IX87_16120,pgsA,pgsA,pgsA,pgsA,"",pgsA,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.60525739568982,3.5735001703704e-09,italic('pgsA'),
+GO593_08230,IX87_16285,phaAB,AIL80109.1,phaAB,phaAB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.83161545542871,0.0143869132577952,italic('phaAB'),
+GO593_08230,IX87_16285,phaAB,AIL80109.1,phaAB,phaAB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.544391925954265,0.760795879532596,italic('phaAB'),
+GO593_08220,IX87_16275,phaD,AIL80107.1,phaD,phaD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.1849327810604,0.0197411716208346,italic('phaD'),
+GO593_08220,IX87_16275,phaD,AIL80107.1,phaD,phaD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.15921912169445,0.0323274652557409,italic('phaD'),
+GO593_08215,IX87_16270,phaE,phaE,phaE,phaE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.34091338640529,0.0264665841496317,italic('phaE'),
+GO593_08215,IX87_16270,phaE,phaE,phaE,phaE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.786073961356111,0.983697170456928,italic('phaE'),
+GO593_09435,IX87_17505,pheS,pheS,pheS,pheS,"",pheS,perfect,fosfomycin_T2_1 - none_T2_1a,-1.52892324708876,0.397540640143036,italic('pheS'),tRNA Ligase
+GO593_09435,IX87_17505,pheS,pheS,pheS,pheS,"",pheS,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0542523740241195,0.999999999356104,italic('pheS'),tRNA Ligase
+GO593_09440,IX87_17510,pheT,pheT,pheT,pheT,"",pheT,perfect,fosfomycin_T2_1 - none_T2_1a,-1.5279253850904,0.142353200551913,italic('pheT'),tRNA Ligase
+GO593_09440,IX87_17510,pheT,pheT,pheT,pheT,"",pheT,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.308170384002373,1,italic('pheT'),tRNA Ligase
+GO593_04255,IX87_12190,plsB,plsB,plsB,plsB,"",plsB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.963337839274395,0.941150358031784,italic('plsB'),
+GO593_04255,IX87_12190,plsB,plsB,plsB,plsB,"",plsB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.188620815976309,1,italic('plsB'),
+GO593_08310,IX87_16365,pnp,pnp,pnp,pnp,"",pnp,perfect,fosfomycin_T2_1 - none_T2_1a,-0.157178445504548,0.983628467669672,italic('pnp'),
+GO593_08310,IX87_16365,pnp,pnp,pnp,pnp,"",pnp,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0315647749439278,0.999999999715435,italic('pnp'),
+GO593_09495,IX87_17560,polA,polA,polA,polA,"",polA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0651288654248352,0.999999992349489,italic('polA'),
+GO593_09495,IX87_17560,polA,polA,polA,polA,"",polA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00164932726315991,1,italic('polA'),
+GO593_07590,IX87_15590,ppa,IX87_15590,ppa,ppa,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.53661706198651,0.336592771144358,italic('ppa'),
+GO593_07590,IX87_15590,ppa,IX87_15590,ppa,ppa,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.476278462008722,0.99908926484831,italic('ppa'),
+GO593_00295,IX87_07515,"ppnK, nadK",ppnK,"ppnK, nadK",ppnK,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.520563504769869,8.46408358786312e-05,italic('ppnK'),
+GO593_00295,IX87_07515,"ppnK, nadK",ppnK,"ppnK, nadK",ppnK,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.702323172107988,0.0109679363336759,italic('ppnK'),
+GO593_18520,IX87_06750,prfA,prfA,prfA,prfA,"",prfA,perfect,fosfomycin_T2_1 - none_T2_1a,-1.17458232111653,0.0668280288112838,italic('prfA'),
+GO593_18520,IX87_06750,prfA,prfA,prfA,prfA,"",prfA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.267305262630164,0.984688401636528,italic('prfA'),
+GO593_05405,IX87_13595,prfB,IX87_13595,prfB,prfB,"",prfB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.172607985623381,0.999999999990052,italic('prfB'),
+GO593_05405,IX87_13595,prfB,IX87_13595,prfB,prfB,"",prfB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.106724421259055,1,italic('prfB'),
+GO593_08345,IX87_16400,priA,priA,priA,priA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.104234408946903,0.999999999990052,italic('priA'),
+GO593_08345,IX87_16400,priA,priA,priA,priA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00570958323697831,1,italic('priA'),
+GO593_03110,IX87_10975,proS,AIL79124.1,proS,proS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.41800120395978,0.117478901273338,italic('proS'),tRNA Ligase
+GO593_03110,IX87_10975,proS,AIL79124.1,proS,proS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.869170660827458,0.98636608913023,italic('proS'),tRNA Ligase
+GO593_10335,IX87_18475,prs,prs,prs,prs,"",prs,perfect,fosfomycin_T2_1 - none_T2_1a,-0.394622283934965,0.999999997131047,italic('prs'),
+GO593_10335,IX87_18475,prs,prs,prs,prs,"",prs,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.261729106435292,0.999999999999862,italic('prs'),
+GO593_05715,IX87_13955,psd,psd,psd,psd,"",psd,perfect,fosfomycin_T2_1 - none_T2_1a,-0.258615404785158,0.998445193043102,italic('psd'),
+GO593_05715,IX87_13955,psd,psd,psd,psd,"",psd,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0545853384791247,0.999999999995232,italic('psd'),
+GO593_03875,IX87_11800,pssA,pssA,pssA,pssA,"",pssA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.580708111749435,0.991096094236172,italic('pssA'),
+GO593_03875,IX87_11800,pssA,pssA,pssA,pssA,"",pssA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0139991413461089,0.999999999998284,italic('pssA'),
+GO593_10325,IX87_18465,pth,IX87_18465,pth,pth,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.236019575815573,0.99998100983657,italic('pth'),
+GO593_10325,IX87_18465,pth,IX87_18465,pth,pth,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0581996143387529,0.99999999999998,italic('pth'),
+GO593_13345,IX87_07845,prtR,AIL78543.1,prtR,ptrR,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0255833467169826,0.999999995832711,italic('ptrR'),
+GO593_13345,IX87_07845,prtR,AIL78543.1,prtR,ptrR,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0333274194693906,1,italic('ptrR'),
+GO593_12910,IX87_04750,purA,IX87_04750,purA,purA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.128839455016104,0.99824470412327,italic('purA'),
+GO593_12910,IX87_04750,purA,IX87_04750,purA,purA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.223971946968281,0.998509918435408,italic('purA'),
+GO593_01340,IX87_08865,purB,IX87_08865,purB,purB,"",purB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.750462629473305,0.29054819336029,italic('purB'),
+GO593_01340,IX87_08865,purB,IX87_08865,purB,purB,"",purB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0422739871664561,0.999999998712041,italic('purB'),
+GO593_08765,IX87_16855,"purU, purU1, purU2",IX87_16855,purU,purU,"",purU,perfect,fosfomycin_T2_1 - none_T2_1a,-0.70074456761694,0.994401224472013,italic('purU'),
+GO593_08765,IX87_16855,"purU, purU1, purU2",IX87_16855,purU,purU,"",purU,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.194537426221678,1,italic('purU'),
+GO593_12050,IX87_05625,pyrC,IX87_05625,pyrC,pyrC,"",pyrC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.637652550456058,0.941184920046931,italic('pyrC'),
+GO593_12050,IX87_05625,pyrC,IX87_05625,pyrC,pyrC,"",pyrC,mismatch,fosfomycin_T2_1 - none_T2_1a,0.102357800018634,0.99999913193091,italic('pyrC'),
+GO593_17315,IX87_20950,pyrG,pyrG,pyrG,pyrG,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.492753020733957,0.305031086120513,italic('pyrG'),
+GO593_17315,IX87_20950,pyrG,pyrG,pyrG,pyrG,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0142422032716818,0.922476585544871,italic('pyrG'),
+GO593_17745,IX87_21670,pyrH,pyrH,pyrH,pyrH,"",pyrH,mismatch,fosfomycin_T2_1 - none_T2_1a,0.129366812029613,0.823216969896801,italic('pyrH'),
+GO593_17745,IX87_21670,pyrH,pyrH,pyrH,pyrH,"",pyrH,perfect,fosfomycin_T2_1 - none_T2_1a,-0.40747474474484,0.900282015684701,italic('pyrH'),
+GO593_10605,IX87_01730,rep,AIL77395.1,rep,rep,"",rep,perfect,fosfomycin_T2_1 - none_T2_1a,-0.639046841445006,0.989727224703945,italic('rep'),
+GO593_10605,IX87_01730,rep,AIL77395.1,rep,rep,"",rep,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0218928022494066,0.999999999999982,italic('rep'),
+GO593_09460,IX87_17525,rho,rho,rho,rho,"",rho,perfect,fosfomycin_T2_1 - none_T2_1a,0.0247057598499917,0.999999999990052,italic('rho'),
+GO593_09460,IX87_17525,rho,rho,rho,rho,"",rho,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0358098405185607,1,italic('rho'),
+GO593_04340,IX87_12275,ribA,ribA,ribA,ribA,"",ribA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.684234767424767,0.386287898042707,italic('ribA'),
+GO593_04340,IX87_12275,ribA,ribA,ribA,ribA,"",ribA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.000658391156326064,0.999986537291082,italic('ribA'),
+GO593_07645,IX87_15655,ribD,ribD,ribD,ribD,"",ribD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0746562485614826,0.999818547613453,italic('ribD'),
+GO593_07645,IX87_15655,ribD,ribD,ribD,ribD,"",ribD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0115235581539666,1,italic('ribD'),
+GO593_07655,IX87_15665,"ribE, ribC",IX87_15665,"ribE, ribC",ribE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.117760191851068,0.999998731599941,italic('ribE'),
+GO593_07655,IX87_15665,"ribE, ribC",IX87_15665,"ribE, ribC",ribE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0315026674620815,0.999999999999915,italic('ribE'),
+GO593_06440,IX87_14690,ribF,IX87_14690,ribF,ribF,"",ribF,perfect,fosfomycin_T2_1 - none_T2_1a,0.034641873996582,0.999957681261763,italic('ribF'),
+GO593_06440,IX87_14690,ribF,IX87_14690,ribF,ribF,"",ribF,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0925289951891292,0.999999999762246,italic('ribF'),
+GO593_05770,IX87_14000,"ribH, ribE",ribH,ribE,ribH,"",ribE,perfect,fosfomycin_T2_1 - none_T2_1a,-0.74044097859115,0.995250307252118,italic('ribH'),
+GO593_05770,IX87_14000,"ribH, ribE",ribH,ribE,ribH,"",ribE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0200843197066932,0.999999999999997,italic('ribH'),
+GO593_06230,IX87_14455,rnpA,rnpA,rnpA,rnpA,"",rnpA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0882322234411132,0.999999999990052,italic('rnpA'),
+GO593_06230,IX87_14455,rnpA,rnpA,rnpA,rnpA,"",rnpA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0489974287675886,1,italic('rnpA'),
+GO593_09690,IX87_17755,rpe,rpe,rpe,rpe,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.180091322763373,0.984624235723494,italic('rpe'),
+GO593_09690,IX87_17755,rpe,rpe,rpe,rpe,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00699691524613308,0.999999999946114,italic('rpe'),
+GO593_17400,IX87_21035,rpiA,rpiA,rpiA,rpiA,"",rpiA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.020215184742141,0.996388514945869,italic('rpiA'),
+GO593_17400,IX87_21035,rpiA,rpiA,rpiA,rpiA,"",rpiA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00178773261088161,1,italic('rpiA'),
+GO593_07940,IX87_15970,rplA,rplA,rplA,rplA,"",rplA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.331980877598687,0.99984054960322,italic('rplA'),Ribosome
+GO593_07940,IX87_15970,rplA,rplA,rplA,rplA,"",rplA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00029856582453295,0.999999999999636,italic('rplA'),Ribosome
+GO593_04185,IX87_12120,rplB,rplB,rplB,rplB,"",rplB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0600441997020361,0.999999999999958,italic('rplB'),Ribosome
+GO593_04185,IX87_12120,rplB,rplB,rplB,rplB,"",rplB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0731775853525755,1,italic('rplB'),Ribosome
+GO593_04200,IX87_12135,rplC,rplC,rplC,rplC,"",rplC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0564295472874529,0.999997220377503,italic('rplC'),Ribosome
+GO593_04200,IX87_12135,rplC,rplC,rplC,rplC,"",rplC,mismatch,fosfomycin_T2_1 - none_T2_1a,0.039709312764229,0.999999994933727,italic('rplC'),Ribosome
+GO593_04195,IX87_12130,rplD,rplD,rplD,rplD,"",rplD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.076043644095624,0.999999994692424,italic('rplD'),Ribosome
+GO593_04195,IX87_12130,rplD,rplD,rplD,rplD,"",rplD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0988234019896161,1,italic('rplD'),Ribosome
+GO593_04140,IX87_12075,rplE,IX87_12075,rplE,rplE,"",rplE,perfect,fosfomycin_T2_1 - none_T2_1a,0.407987709070155,0.999997456518907,italic('rplE'),Ribosome
+GO593_04140,IX87_12075,rplE,IX87_12075,rplE,rplE,"",rplE,mismatch,fosfomycin_T2_1 - none_T2_1a,0.19840763876153,0.999999990519926,italic('rplE'),Ribosome
+GO593_04125,IX87_12060,rplF,rplF,rplF,rplF,"",rplF,perfect,fosfomycin_T2_1 - none_T2_1a,0.344288591470637,0.99965916802455,italic('rplF'),Ribosome
+GO593_04125,IX87_12060,rplF,rplF,rplF,rplF,"",rplF,mismatch,fosfomycin_T2_1 - none_T2_1a,0.171434738714738,0.99999999998981,italic('rplF'),Ribosome
+GO593_07945,IX87_15975,rplJ,rplJ,rplJ,rplJ,"",rplJ,perfect,fosfomycin_T2_1 - none_T2_1a,-0.191232849598656,0.999999834456253,italic('rplJ'),Ribosome
+GO593_07945,IX87_15975,rplJ,rplJ,rplJ,rplJ,"",rplJ,mismatch,fosfomycin_T2_1 - none_T2_1a,0.115602457091558,0.999999999998565,italic('rplJ'),Ribosome
+GO593_07935,IX87_15965,rplK,rplK,rplK,rplK,"",rplK,perfect,fosfomycin_T2_1 - none_T2_1a,0.23919798632374,0.999924538719515,italic('rplK'),Ribosome
+GO593_07935,IX87_15965,rplK,rplK,rplK,rplK,"",rplK,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00982362913499408,1,italic('rplK'),Ribosome
+GO593_03770,IX87_11695,rplM,rplM,rplM,rplM,"",rplM,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0901114628284132,0.999999999990052,italic('rplM'),Ribosome
+GO593_03770,IX87_11695,rplM,rplM,rplM,rplM,"",rplM,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0150167131950565,1,italic('rplM'),Ribosome
+GO593_04150,IX87_12085,rplN,rplN,rplN,rplN,"",rplN,perfect,fosfomycin_T2_1 - none_T2_1a,-0.899418887556008,0.999985993892027,italic('rplN'),Ribosome
+GO593_04150,IX87_12085,rplN,rplN,rplN,rplN,"",rplN,mismatch,fosfomycin_T2_1 - none_T2_1a,0.279994880263695,0.999999999582859,italic('rplN'),Ribosome
+GO593_04105,IX87_12040,rplO,rplO,rplO,rplO,"",rplO,perfect,fosfomycin_T2_1 - none_T2_1a,-0.159002696629747,0.999999459257901,italic('rplO'),Ribosome
+GO593_04105,IX87_12040,rplO,rplO,rplO,rplO,"",rplO,mismatch,fosfomycin_T2_1 - none_T2_1a,0.457381374836426,0.999999965936033,italic('rplO'),Ribosome
+GO593_04165,IX87_12100,rplP,rplP,rplP,rplP,"",rplP,perfect,fosfomycin_T2_1 - none_T2_1a,-0.144233879403694,0.99999910897492,italic('rplP'),Ribosome
+GO593_04165,IX87_12100,rplP,rplP,rplP,rplP,"",rplP,mismatch,fosfomycin_T2_1 - none_T2_1a,0.189602351980285,1,italic('rplP'),Ribosome
+GO593_04070,IX87_12005,rplQ,rplQ,rplQ,rplQ,"",rplQ,perfect,fosfomycin_T2_1 - none_T2_1a,-0.518798156092605,0.999898589265577,italic('rplQ'),Ribosome
+GO593_04070,IX87_12005,rplQ,rplQ,rplQ,rplQ,"",rplQ,mismatch,fosfomycin_T2_1 - none_T2_1a,0.191109162482267,0.999945525433821,italic('rplQ'),Ribosome
+GO593_04120,IX87_12055,rplR,rplR,rplR,rplR,"",rplR,mismatch,fosfomycin_T2_1 - none_T2_1a,0.193525970634884,0.999989589219962,italic('rplR'),Ribosome
+GO593_04120,IX87_12055,rplR,rplR,rplR,rplR,"",rplR,perfect,fosfomycin_T2_1 - none_T2_1a,-0.194489181123572,0.999999999990052,italic('rplR'),Ribosome
+GO593_04595,IX87_12580,rplS,rplS,rplS,rplS,"",rplS,perfect,fosfomycin_T2_1 - none_T2_1a,0.0288855576481675,0.999998572377283,italic('rplS'),Ribosome
+GO593_04595,IX87_12580,rplS,rplS,rplS,rplS,"",rplS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0421758730592803,0.999999999999836,italic('rplS'),Ribosome
+GO593_09415,IX87_17480,rplT,rplT,rplT,rplT,"",rplT,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0515332758382434,0.999999999990052,italic('rplT'),Ribosome
+GO593_09415,IX87_17480,rplT,rplT,rplT,rplT,"",rplT,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0432162524285435,1,italic('rplT'),Ribosome
+GO593_02650,IX87_10225,rplU,rplU,rplU,rplU,"",rplU,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0586904007644061,0.999833345403486,italic('rplU'),Ribosome
+GO593_02650,IX87_10225,rplU,rplU,rplU,rplU,"",rplU,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0797361790152405,0.999999999999988,italic('rplU'),Ribosome
+GO593_04175,IX87_12110,rplV,rplV,rplV,rplV,"",rplV,perfect,fosfomycin_T2_1 - none_T2_1a,0.116530002040648,0.999964340551866,italic('rplV'),Ribosome
+GO593_04175,IX87_12110,rplV,rplV,rplV,rplV,"",rplV,mismatch,fosfomycin_T2_1 - none_T2_1a,0.252004376214366,0.999999999235477,italic('rplV'),Ribosome
+GO593_04190,IX87_12125,rplW,IX87_12125,rplW,rplW,"",rplW,perfect,fosfomycin_T2_1 - none_T2_1a,-0.713734201106082,0.999894928709938,italic('rplW'),Ribosome
+GO593_04190,IX87_12125,rplW,IX87_12125,rplW,rplW,"",rplW,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0587370558057667,1,italic('rplW'),Ribosome
+GO593_04145,IX87_12080,rplX,rplX,rplX,rplX,"",rplX,perfect,fosfomycin_T2_1 - none_T2_1a,0.120535157226311,0.988960256158177,italic('rplX'),Ribosome
+GO593_04145,IX87_12080,rplX,rplX,rplX,rplX,"",rplX,mismatch,fosfomycin_T2_1 - none_T2_1a,0.255650822122547,0.999999999999998,italic('rplX'),Ribosome
+GO593_10330,IX87_18470,rplY,rplY,rplY,rplY,"",rplY,perfect,fosfomycin_T2_1 - none_T2_1a,0.167401414426814,0.999685985982565,italic('rplY'),Ribosome
+GO593_10330,IX87_18470,rplY,rplY,rplY,rplY,"",rplY,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0301161289363638,1,italic('rplY'),Ribosome
+GO593_02645,IX87_10220,rpmA,rpmA,rpmA,rpmA,"",rpmA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0926329140500491,0.999999966659063,italic('rpmA'),Ribosome
+GO593_02645,IX87_10220,rpmA,rpmA,rpmA,rpmA,"",rpmA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0206946070395267,1,italic('rpmA'),Ribosome
+GO593_08750,IX87_16810,rpmB,rpmB,rpmB,rpmB,"",rpmB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.264850091588127,0.99999604263854,italic('rpmB'),Ribosome
+GO593_08750,IX87_16810,rpmB,rpmB,rpmB,rpmB,"",rpmB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0310963016336296,1,italic('rpmB'),Ribosome
+GO593_04160,IX87_12095,rpmC,rpmC,rpmC,rpmC,"",rpmC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.107888387502018,0.999618458774903,italic('rpmC'),Ribosome
+GO593_04160,IX87_12095,rpmC,rpmC,rpmC,rpmC,"",rpmC,mismatch,fosfomycin_T2_1 - none_T2_1a,0.136372377091255,0.999999999811324,italic('rpmC'),Ribosome
+GO593_04110,IX87_12045,rpmD,rpmD,rpmD,rpmD,"",rpmD,perfect,fosfomycin_T2_1 - none_T2_1a,0.0888776808230277,0.999998884756138,italic('rpmD'),Ribosome
+GO593_04110,IX87_12045,rpmD,rpmD,rpmD,rpmD,"",rpmD,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0488840811642865,0.99999999965695,italic('rpmD'),Ribosome
+GO593_10270,IX87_18410,rpmF,rpmF,rpmF,rpmF,"",rpmF,perfect,fosfomycin_T2_1 - none_T2_1a,0.524477372711011,0.988245138261195,italic('rpmF'),Ribosome
+GO593_10270,IX87_18410,rpmF,rpmF,rpmF,rpmF,"",rpmF,mismatch,fosfomycin_T2_1 - none_T2_1a,0.578638005971961,0.999896600436789,italic('rpmF'),Ribosome
+GO593_09410,IX87_17475,rpmI,rpmI,rpmI,rpmI,"",rpmI,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0787614127374319,0.999999999990052,italic('rpmI'),Ribosome
+GO593_09410,IX87_17475,rpmI,rpmI,rpmI,rpmI,"",rpmI,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0553584474879166,1,italic('rpmI'),Ribosome
+GO593_04095,IX87_12030,rpmJ,rpmJ,rpmJ,rpmJ,"",rpmJ,mismatch,fosfomycin_T2_1 - none_T2_1a,0.171782810080737,0.952388493916441,italic('rpmJ'),Ribosome
+GO593_04095,IX87_12030,rpmJ,rpmJ,rpmJ,rpmJ,"",rpmJ,perfect,fosfomycin_T2_1 - none_T2_1a,0.256459754596432,0.999256583968213,italic('rpmJ'),Ribosome
+GO593_04075,IX87_12010,rpoA,IX87_12010,rpoA,rpoA,"",rpoA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.125591462499807,0.999701106076103,italic('rpoA'),
+GO593_04075,IX87_12010,rpoA,IX87_12010,rpoA,rpoA,"",rpoA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.40580249503788,0.999986896958862,italic('rpoA'),
+GO593_07955,IX87_15985,rpoB,rpoB,rpoB,rpoB,"",rpoB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.390283440298386,0.999742975749409,italic('rpoB'),
+GO593_07955,IX87_15985,rpoB,rpoB,rpoB,rpoB,"",rpoB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0500517050978058,0.999999830835541,italic('rpoB'),
+GO593_07960,IX87_15990,rpoC,rpoC,rpoC,rpoC,"",rpoC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.457336308203545,0.997854709760848,italic('rpoC'),
+GO593_07960,IX87_15990,rpoC,rpoC,rpoC,rpoC,"",rpoC,mismatch,fosfomycin_T2_1 - none_T2_1a,0.396588725902482,0.998249708448692,italic('rpoC'),
+GO593_02580,IX87_10155,rpoD,rpoD,rpoD,rpoD,"",rpoD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.807427184327081,0.97423909416473,italic('rpoD'),
+GO593_02580,IX87_10155,rpoD,rpoD,rpoD,rpoD,"",rpoD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0375298567043093,0.999999313606054,italic('rpoD'),
+GO593_00210,IX87_07430,rpoH,rpoH,rpoH,rpoH,"",rpoH,perfect,fosfomycin_T2_1 - none_T2_1a,-0.921079969033663,0.302967589569229,italic('rpoH'),
+GO593_00210,IX87_07430,rpoH,rpoH,rpoH,rpoH,"",rpoH,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.598677726134528,0.3899270385806,italic('rpoH'),
+GO593_15560,IX87_02260,rpsA,rpsA,rpsA,rpsA,"",rpsA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.406648214027221,0.998130999956205,italic('rpsA'),Ribosome
+GO593_15560,IX87_02260,rpsA,rpsA,rpsA,rpsA,"",rpsA,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0138419729795343,1,italic('rpsA'),Ribosome
+GO593_00870,IX87_07990,rpsB,rpsB,rpsB,rpsB,"",rpsB,perfect,fosfomycin_T2_1 - none_T2_1a,0.177763991441008,0.997383741163187,italic('rpsB'),Ribosome
+GO593_00870,IX87_07990,rpsB,rpsB,rpsB,rpsB,"",rpsB,mismatch,fosfomycin_T2_1 - none_T2_1a,0.173225417117433,0.999999244110302,italic('rpsB'),Ribosome
+GO593_04170,IX87_12105,rpsC,IX87_12105,rpsC,rpsC,"",rpsC,mismatch,fosfomycin_T2_1 - none_T2_1a,0.234039968253556,1,italic('rpsC'),Ribosome
+GO593_04170,IX87_12105,rpsC,IX87_12105,rpsC,rpsC,"",rpsC,perfect,fosfomycin_T2_1 - none_T2_1a,0.0246664962937664,1,italic('rpsC'),Ribosome
+GO593_04080,IX87_12015,rpsD,IX87_12015,rpsD,rpsD,"",rpsD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.310951825754385,0.999900671827853,italic('rpsD'),Ribosome
+GO593_04080,IX87_12015,rpsD,IX87_12015,rpsD,rpsD,"",rpsD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0354679230219249,0.999999999998,italic('rpsD'),Ribosome
+GO593_04115,IX87_12050,rpsE,IX87_12050,rpsE,rpsE,"",rpsE,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0354576409502538,0.999716476541143,italic('rpsE'),Ribosome
+GO593_04115,IX87_12050,rpsE,IX87_12050,rpsE,rpsE,"",rpsE,mismatch,fosfomycin_T2_1 - none_T2_1a,0.15741335101564,0.999997193637186,italic('rpsE'),Ribosome
+GO593_18615,IX87_06845,rpsF,rpsF,rpsF,rpsF,"",rpsF,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0861221230179601,0.999999987261135,italic('rpsF'),Ribosome
+GO593_18615,IX87_06845,rpsF,rpsF,rpsF,rpsF,"",rpsF,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0474377607855974,1,italic('rpsF'),Ribosome
+GO593_10515,IX87_01835,rpsG,rpsG,rpsG,rpsG,"",rpsG,mismatch,fosfomycin_T2_1 - none_T2_1a,0.411106942420133,0.881666088752137,italic('rpsG'),Ribosome
+GO593_10515,IX87_01835,rpsG,rpsG,rpsG,rpsG,"",rpsG,perfect,fosfomycin_T2_1 - none_T2_1a,-0.105368065396786,1,italic('rpsG'),Ribosome
+GO593_04130,IX87_12065,rpsH,IX87_12065,rpsH,rpsH,"",rpsH,perfect,fosfomycin_T2_1 - none_T2_1a,-0.371103651591086,0.999999917607643,italic('rpsH'),Ribosome
+GO593_04130,IX87_12065,rpsH,IX87_12065,rpsH,rpsH,"",rpsH,mismatch,fosfomycin_T2_1 - none_T2_1a,0.222791397268121,0.999999999917611,italic('rpsH'),Ribosome
+GO593_03775,IX87_11700,rpsI,rpsI,rpsI,rpsI,"",rpsI,perfect,fosfomycin_T2_1 - none_T2_1a,-0.357914473101152,0.999980355306486,italic('rpsI'),Ribosome
+GO593_03775,IX87_11700,rpsI,rpsI,rpsI,rpsI,"",rpsI,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.421731466648303,0.999999532663137,italic('rpsI'),Ribosome
+GO593_04205,IX87_12140,rpsJ,rpsJ,rpsJ,rpsJ,"",rpsJ,perfect,fosfomycin_T2_1 - none_T2_1a,0.108628312079687,0.999986173417611,italic('rpsJ'),Ribosome
+GO593_04205,IX87_12140,rpsJ,rpsJ,rpsJ,rpsJ,"",rpsJ,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0344280708083772,1,italic('rpsJ'),Ribosome
+GO593_04085,IX87_12020,rpsK,rpsK,rpsK,rpsK,"",rpsK,perfect,fosfomycin_T2_1 - none_T2_1a,-0.488388160119685,0.99999997283227,italic('rpsK'),Ribosome
+GO593_04085,IX87_12020,rpsK,rpsK,rpsK,rpsK,"",rpsK,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.328117459012359,0.999999999992727,italic('rpsK'),Ribosome
+GO593_10510,IX87_01840,rpsL,rpsL,rpsL,rpsL,"",rpsL,mismatch,fosfomycin_T2_1 - none_T2_1a,0.557035780686939,0.265915183101905,italic('rpsL'),Ribosome
+GO593_10510,IX87_01840,rpsL,rpsL,rpsL,rpsL,"",rpsL,perfect,fosfomycin_T2_1 - none_T2_1a,0.47522198451963,0.999860720089684,italic('rpsL'),Ribosome
+GO593_04090,IX87_12025,rpsM,rpsM,rpsM,rpsM,"",rpsM,perfect,fosfomycin_T2_1 - none_T2_1a,-0.545645913031669,0.977537783188547,italic('rpsM'),Ribosome
+GO593_04090,IX87_12025,rpsM,rpsM,rpsM,rpsM,"",rpsM,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0780958960521489,0.998491605726004,italic('rpsM'),Ribosome
+GO593_04135,IX87_12070,rpsN,rpsN,rpsN,rpsN,"",rpsN,perfect,fosfomycin_T2_1 - none_T2_1a,0.757542637215836,0.998099485445028,italic('rpsN'),Ribosome
+GO593_04135,IX87_12070,rpsN,rpsN,rpsN,rpsN,"",rpsN,mismatch,fosfomycin_T2_1 - none_T2_1a,0.282318147373918,0.999524161247743,italic('rpsN'),Ribosome
+GO593_08305,IX87_16360,rpsO,rpsO,rpsO,rpsO,"",rpsO,perfect,fosfomycin_T2_1 - none_T2_1a,0.0349858000643005,0.999986942925986,italic('rpsO'),Ribosome
+GO593_08305,IX87_16360,rpsO,rpsO,rpsO,rpsO,"",rpsO,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0423880779131306,0.999999999985811,italic('rpsO'),Ribosome
+GO593_04610,IX87_12595,rpsP,rpsP,rpsP,rpsP,"",rpsP,mismatch,fosfomycin_T2_1 - none_T2_1a,0.138195879677446,0.999993713076168,italic('rpsP'),Ribosome
+GO593_04610,IX87_12595,rpsP,rpsP,rpsP,rpsP,"",rpsP,perfect,fosfomycin_T2_1 - none_T2_1a,-0.19731703796982,0.999995840718607,italic('rpsP'),Ribosome
+GO593_04155,IX87_12090,rpsQ,rpsQ,rpsQ,rpsQ,"",rpsQ,mismatch,fosfomycin_T2_1 - none_T2_1a,0.397051264269741,0.99999869954346,italic('rpsQ'),Ribosome
+GO593_04155,IX87_12090,rpsQ,rpsQ,rpsQ,rpsQ,"",rpsQ,perfect,fosfomycin_T2_1 - none_T2_1a,-0.147206008942655,0.999999999990052,italic('rpsQ'),Ribosome
+GO593_18620,IX87_06850,rpsR,rpsR,rpsR,rpsR,"",rpsR,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0415094092065127,0.999999996634403,italic('rpsR'),Ribosome
+GO593_18620,IX87_06850,rpsR,rpsR,rpsR,rpsR,"",rpsR,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0298359762614222,1,italic('rpsR'),Ribosome
+GO593_04180,IX87_12115,rpsS,IX87_12115,rpsS,rpsS,"",rpsS,mismatch,fosfomycin_T2_1 - none_T2_1a,0.105429813037233,1,italic('rpsS'),Ribosome
+GO593_04180,IX87_12115,rpsS,IX87_12115,rpsS,rpsS,"",rpsS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.346307368995682,1,italic('rpsS'),Ribosome
+GO593_00120,IX87_07340,rpsU,rpsU,rpsU,rpsU,"",rpsU,perfect,fosfomycin_T2_1 - none_T2_1a,-0.160341521231004,0.999999999990052,italic('rpsU'),Ribosome
+GO593_00120,IX87_07340,rpsU,rpsU,rpsU,rpsU,"",rpsU,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0152498106622168,1,italic('rpsU'),Ribosome
+GO593_02535,IX87_10110,sdhA,IX87_10110,sdhA,sdhA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.517112539104893,0.99704031126143,italic('sdhA'),
+GO593_02535,IX87_10110,sdhA,IX87_10110,sdhA,sdhA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.332425866480883,0.999999989631545,italic('sdhA'),
+GO593_02530,IX87_10105,sdhB,sdhB,sdhB,sdhB,"",sdhB,perfect,fosfomycin_T2_1 - none_T2_1a,-1.05697700614867,0.863381607594768,italic('sdhB'),
+GO593_02530,IX87_10105,sdhB,sdhB,sdhB,sdhB,"",sdhB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.460082681125261,0.998938174108421,italic('sdhB'),
+GO593_02545,IX87_10120,sdhC,sdhC,sdhC,sdhC,"",sdhC,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.45465042497848,0.873493644992868,italic('sdhC'),
+GO593_02545,IX87_10120,sdhC,sdhC,sdhC,sdhC,"",sdhC,perfect,fosfomycin_T2_1 - none_T2_1a,-1.0450585144658,0.950407274747876,italic('sdhC'),
+GO593_02540,IX87_10115,sdhD,sdhD,sdhD,sdhD,"",sdhD,perfect,fosfomycin_T2_1 - none_T2_1a,-1.58569847499523,0.0737037053706679,italic('sdhD'),
+GO593_02540,IX87_10115,sdhD,sdhD,sdhD,sdhD,"",sdhD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.372723174615046,0.999561247544218,italic('sdhD'),
+GO593_03315,IX87_11200,secA,secA,secA,secA,"",secA,perfect,fosfomycin_T2_1 - none_T2_1a,-1.28365067284725,0.974783065946299,italic('secA'),
+GO593_03315,IX87_11200,secA,secA,secA,secA,"",secA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0435203668127436,1,italic('secA'),
+GO593_03585,IX87_11510,secD,secD,secD,secD,"",secD,perfect,fosfomycin_T2_1 - none_T2_1a,-2.46183490100429,6.69406109478558e-09,italic('secD'),
+GO593_03585,IX87_11510,secD,secD,secD,secD,"",secD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.836289124691383,0.0882970230867423,italic('secD'),
+GO593_07925,IX87_15955,secE,secE,secE,secE,"",secE,perfect,fosfomycin_T2_1 - none_T2_1a,-1.19993749427915,0.860290063306817,italic('secE'),
+GO593_07925,IX87_15955,secE,secE,secE,secE,"",secE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.784151076550869,0.999999580693352,italic('secE'),
+GO593_03590,IX87_11515,secF,secF,secF,secF,"",secF,perfect,fosfomycin_T2_1 - none_T2_1a,-0.293858300669275,0.99994071026489,italic('secF'),
+GO593_03590,IX87_11515,secF,secF,secF,secF,"",secF,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0716058077094125,0.999999999901125,italic('secF'),
+GO593_04100,IX87_12035,secY,secY,secY,secY,"",secY,perfect,fosfomycin_T2_1 - none_T2_1a,-0.380586895719367,0.996718905215932,italic('secY'),
+GO593_04100,IX87_12035,secY,secY,secY,secY,"",secY,mismatch,fosfomycin_T2_1 - none_T2_1a,0.189108265235983,1,italic('secY'),
+GO593_02060,IX87_09590,serC,serC,serC,serC,"",serC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0404101305518123,0.999999999990052,italic('serC'),
+GO593_02060,IX87_09590,serC,serC,serC,serC,"",serC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0299501811191871,1,italic('serC'),
+GO593_02630,IX87_10205,serS,serS,serS,serS,"",serS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.476123355631677,0.999166795232215,italic('serS'),tRNA Ligase
+GO593_02630,IX87_10205,serS,serS,serS,serS,"",serS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0187290491897517,0.999999999729929,italic('serS'),tRNA Ligase
+GO593_11915,IX87_05760,unknown,smc_2,GO593_11915,smc_2,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.809751681829006,0.328899660978568,italic('smc_2'),
+GO593_11915,IX87_05760,unknown,smc_2,GO593_11915,smc_2,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.122216693792282,1,italic('smc_2'),
+GO593_05260,IX87_13440,ssb,ssb,ssb,ssb,"",ssb,perfect,fosfomycin_T2_1 - none_T2_1a,0.101827809677061,0.999999898559219,italic('ssb'),
+GO593_05260,IX87_13440,ssb,ssb,ssb,ssb,"",ssb,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0927649788458535,0.999999992309389,italic('ssb'),
+GO593_02510,IX87_10095,"sucB, odhB, bkdB",sucB,odhB,sucB,"",odhB,perfect,fosfomycin_T2_1 - none_T2_1a,-0.918667170691579,0.416226316968361,italic('sucB'),
+GO593_02510,IX87_10095,"sucB, odhB, bkdB",sucB,odhB,sucB,"",odhB,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.07713951136831,0.98432595317074,italic('sucB'),
+GO593_18420,IX87_06640,tamA,AIL78322.1,tamA,tamA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.033879944243417,0.999999974152575,italic('tamA'),
+GO593_18420,IX87_06640,tamA,AIL78322.1,tamA,tamA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0506620352356924,1,italic('tamA'),
+GO593_18415,IX87_06635,tamB,AIL78321.1,tamB,tamB,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.520107269477185,0.853510460771291,italic('tamB'),
+GO593_18415,IX87_06635,tamB,AIL78321.1,tamB,tamB,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0477384354412537,0.999999988304859,italic('tamB'),
+GO593_10295,IX87_18435,thiD,thiD,thiD,thiD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.115683486072621,0.999999999990052,italic('thiD'),
+GO593_10295,IX87_18435,thiD,thiD,thiD,thiD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00974072715285998,1,italic('thiD'),
+GO593_01465,IX87_08990,thiE,thiE,thiE,thiE,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0364134467415266,0.999999998141607,italic('thiE'),
+GO593_01465,IX87_08990,thiE,thiE,thiE,thiE,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.00141613222421174,1,italic('thiE'),
+GO593_05780,IX87_14010,thiL,thiL,thiL,thiL,"",thiL,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0933498817900388,0.999999881523077,italic('thiL'),
+GO593_05780,IX87_14010,thiL,thiL,thiL,thiL,"",thiL,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0189751616886964,1,italic('thiL'),
+GO593_09385,IX87_17450,thrS,IX87_17450,thrS,thrS,"",thrS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.324636707986891,0.999941953150742,italic('thrS'),tRNA Ligase
+GO593_09385,IX87_17450,thrS,IX87_17450,thrS,thrS,"",thrS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.12854278417367,0.999999999979489,italic('thrS'),tRNA Ligase
+GO593_07340,IX87_15330,atpB,IX87_15330,atpB,atpB,"",atpB,perfect,fosfomycin_T2_1 - none_T2_1a,-4.69506955783058,1.77009459463832e-08,italic('atpB'),
+GO593_07340,IX87_15330,atpB,IX87_15330,atpB,atpB,"",atpB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.735634431703892,0.357963019436917,italic('atpB'),
+GO593_08800,IX87_16890,thyA,thyA,thyA,thyA,"",thyA,perfect,fosfomycin_T2_1 - none_T2_1a,-2.55255426484784,0.00100634151052591,italic('thyA'),
+GO593_08800,IX87_16890,thyA,thyA,thyA,thyA,"",thyA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.428791557003026,0.999967322185862,italic('thyA'),
+GO593_09480,IX87_17545,tilS,tilS,tilS,tilS,"",tilS,perfect,fosfomycin_T2_1 - none_T2_1a,-0.12623815421678,0.999999999444384,italic('tilS'),
+GO593_09480,IX87_17545,tilS,tilS,tilS,tilS,"",tilS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0863373510627589,1,italic('tilS'),
+GO593_15295,IX87_02535,"tkt, tktB, tktA",IX87_02535,tkt,tkt,"",tkt,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0621279474269657,1,italic('tkt'),
+GO593_15295,IX87_02535,"tkt, tktB, tktA",IX87_02535,tkt,tkt,"",tkt,perfect,fosfomycin_T2_1 - none_T2_1a,-0.57652190134324,1,italic('tkt'),
+GO593_01795,IX87_09310,tmk,tmk,tmk,tmk,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-2.71366701435912,1.33387378926659e-06,italic('tmk'),
+GO593_01795,IX87_09310,tmk,tmk,tmk,tmk,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.152394214909467,0.999742762699767,italic('tmk'),
+GO593_08770,IX87_16860,unknown,IX87_16860,GO593_08770,tonB,https://www.genome.jp/dbget-bin/www_bget?ko:K03832,.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.1285040351389,0.9999792840681,italic('tonB'),
+GO593_08770,IX87_16860,unknown,IX87_16860,GO593_08770,tonB,https://www.genome.jp/dbget-bin/www_bget?ko:K03832,.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0377420621443444,1,italic('tonB'),
+GO593_08700,IX87_16760,topA,topA,topA,topA,"",topA,perfect,fosfomycin_T2_1 - none_T2_1a,-2.41483029880666,5.00885770904242e-05,italic('topA'),
+GO593_08700,IX87_16760,topA,topA,topA,topA,"",topA,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.67298316342695,0.0155636295258257,italic('topA'),
+GO593_08165,IX87_16210,tpiA,tpiA,tpiA,tpiA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.853924104363426,0.839593002685535,italic('tpiA'),
+GO593_08165,IX87_16210,tpiA,tpiA,tpiA,tpiA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0999312058154854,1,italic('tpiA'),
+GO593_04600,IX87_12585,trmD,trmD,trmD,trmD,"",trmD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.670665718184597,0.999993065836652,italic('trmD'),
+GO593_04600,IX87_12585,trmD,trmD,trmD,trmD,"",trmD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0500473013599907,1,italic('trmD'),
+GO593_02490,IX87_10075,trpS,IX87_10075,trpS,trpS,"",trpS,perfect,fosfomycin_T2_1 - none_T2_1a,-1.25168964272862,0.386910732638485,italic('trpS'),tRNA Ligase
+GO593_02490,IX87_10075,trpS,IX87_10075,trpS,trpS,"",trpS,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0529988370180903,0.606257374587265,italic('trpS'),tRNA Ligase
+GO593_09665,IX87_17730,tsaB,tsaB,tsaB,tsaB,"",tsaB,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.204324260470407,0.999999766725436,italic('tsaB'),
+GO593_09665,IX87_17730,tsaB,tsaB,tsaB,tsaB,"",tsaB,perfect,fosfomycin_T2_1 - none_T2_1a,-1.05902874090916,1,italic('tsaB'),
+GO593_07410,IX87_15400,tsaC,tsaC,tsaC,tsaC,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.281476970882446,0.995926958983739,italic('tsaC'),
+GO593_07410,IX87_15400,tsaC,tsaC,tsaC,tsaC,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0490991831624096,0.999999999999926,italic('tsaC'),
+GO593_00115,IX87_07335,"tsaD, gcp",tsaD,tsaD,tsaD,"",tsaD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.413178728778605,0.984750513013879,italic('tsaD'),
+GO593_00115,IX87_07335,"tsaD, gcp",tsaD,tsaD,tsaD,"",tsaD,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.00752785044146458,0.999999998455071,italic('tsaD'),
+GO593_18340,IX87_06560,tsaE,tsaE,tsaE,tsaE,"",tsaE,perfect,fosfomycin_T2_1 - none_T2_1a,-0.284643239185312,0.91975062583521,italic('tsaE'),
+GO593_18340,IX87_06560,tsaE,tsaE,tsaE,tsaE,"",tsaE,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0816006469581062,1,italic('tsaE'),
+GO593_00865,IX87_07985,tsf,tsf,tsf,tsf,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.623535430574254,0.807358843471185,italic('tsf'),
+GO593_00865,IX87_07985,tsf,tsf,tsf,tsf,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0574841582263325,0.999946592575273,italic('tsf'),
+GO593_08380,IX87_16435,"sirA, tusA",tusA,tusA,tusA,"",tusA,perfect,fosfomycin_T2_1 - none_T2_1a,-0.11300819190372,0.999999999990052,italic('tusA'),
+GO593_08380,IX87_16435,"sirA, tusA",tusA,tusA,tusA,"",tusA,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0236822053127961,1,italic('tusA'),
+GO593_17825,IX87_21755,tusD,tusD,tusD,tusD,"",tusD,perfect,fosfomycin_T2_1 - none_T2_1a,-0.068230547745106,0.999999999990052,italic('tusD'),
+GO593_17825,IX87_21755,tusD,tusD,tusD,tusD,"",tusD,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0270725687273212,0.999999999999912,italic('tusD'),
+GO593_06155,IX87_14380,"tyrS, tyrZ",IX87_14380,"tyrS, tyrZ",tyrS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-1.10024770178094,0.0655954161618728,italic('tyrS'),tRNA Ligase
+GO593_06155,IX87_14380,"tyrS, tyrZ",IX87_14380,"tyrS, tyrZ",tyrS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.182237476233555,0.980599558976235,italic('tyrS'),tRNA Ligase
+GO593_00995,IX87_08120,ubiA,ubiA,ubiA,ubiA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0385906375576908,0.999999594900128,italic('ubiA'),
+GO593_00995,IX87_08120,ubiA,ubiA,ubiA,ubiA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0799761885148629,0.999999999957629,italic('ubiA'),
+GO593_08265,IX87_16320,ubiE,ubiE,ubiE,ubiE,"",ubiE,perfect,fosfomycin_T2_1 - none_T2_1a,-2.71126371312423,2.56601657571315e-05,italic('ubiE'),
+GO593_08265,IX87_16320,ubiE,ubiE,ubiE,ubiE,"",ubiE,mismatch,fosfomycin_T2_1 - none_T2_1a,-1.24248348767856,0.279967206904914,italic('ubiE'),
+GO593_06510,IX87_14760,ubiG,ubiG,ubiG,ubiG,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.226658534577108,0.999992236089007,italic('ubiG'),
+GO593_06510,IX87_14760,ubiG,ubiG,ubiG,ubiG,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.10605692785783,1,italic('ubiG'),
+GO593_11930,IX87_05745,ubiH,AIL78154.1,ubiH,ubiH,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.12324274189554,0.999999966194811,italic('ubiH'),
+GO593_11930,IX87_05745,ubiH,AIL78154.1,ubiH,ubiH,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0666604954453902,1,italic('ubiH'),
+GO593_11935,IX87_05740,ubiI,ubiI,ubiI,ubiI,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.240077879812374,0.999999999990052,italic('ubiI'),
+GO593_11935,IX87_05740,ubiI,ubiI,ubiI,ubiI,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0759413245162606,1,italic('ubiI'),
+GO593_17735,IX87_21660,"uppS, ispU",uppS,uppS,uppS,"",uppS,mismatch,fosfomycin_T2_1 - none_T2_1a,0.607309035516573,0.0046272070848466,italic('uppS'),
+GO593_17735,IX87_21660,"uppS, ispU",uppS,uppS,uppS,"",uppS,perfect,fosfomycin_T2_1 - none_T2_1a,0.720281936805781,0.404353182425946,italic('uppS'),
+GO593_02715,IX87_10295,valS,AIL79006.1,valS,valS,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.706923345952441,0.987739196083598,italic('valS'),tRNA Ligase
+GO593_02715,IX87_10295,valS,AIL79006.1,valS,valS,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.186679189988234,0.999999999999348,italic('valS'),tRNA Ligase
+GO593_06865,IX87_14860,wzx,IX87_14860,wzx,wzx,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.160374473825747,0.999999999990052,italic('wzx'),
+GO593_06865,IX87_14860,wzx,IX87_14860,wzx,wzx,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0824498353059002,1,italic('wzx'),
+GO593_02585,IX87_10160,ybeD,ybeD,ybeD,ybeD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.0270877383547023,1,italic('ybeD'),
+GO593_02585,IX87_10160,ybeD,ybeD,ybeD,ybeD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.0310094004085851,1,italic('ybeD'),
+GO593_03925,IX87_11850,ybeY,ybeY,ybeY,ybeY,"",ybeY,perfect,fosfomycin_T2_1 - none_T2_1a,-0.0768751275984847,0.999999745121714,italic('ybeY'),
+GO593_03925,IX87_11850,ybeY,ybeY,ybeY,ybeY,"",ybeY,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0317337470508757,1,italic('ybeY'),
+GO593_01925,IX87_09445,ybgC,ybgC,ybgC,ybgC,"",ybgC,perfect,fosfomycin_T2_1 - none_T2_1a,-0.402583394405862,0.999999986536661,italic('ybgC'),
+GO593_01925,IX87_09445,ybgC,ybgC,ybgC,ybgC,"",ybgC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.154373454459529,1,italic('ybgC'),
+GO593_10265,IX87_18405,yceD,AIL80506.1,yceD,yceD,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,0.398999598811539,0.992576830108953,italic('yceD'),
+GO593_10265,IX87_18405,yceD,AIL80506.1,yceD,yceD,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,0.32791590877595,0.999990029863012,italic('yceD'),
+GO593_03135,IX87_11000,ygfZ,ygfZ,ygfZ,ygfZ,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.282010346059433,0.999951419201556,italic('ygfZ'),
+GO593_03135,IX87_11000,ygfZ,ygfZ,ygfZ,ygfZ,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.0881557194943336,1,italic('ygfZ'),
+GO593_06240,IX87_14465,"oxaA, yidC",yidC,yidC,yidC,"",yidC,perfect,fosfomycin_T2_1 - none_T2_1a,-2.64763915916826,0.00641358994791035,italic('yidC'),
+GO593_06240,IX87_14465,"oxaA, yidC",yidC,yidC,yidC,"",yidC,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.680118958630281,0.27268437182748,italic('yidC'),
+GO593_04235,IX87_12170,yihA,IX87_12170,yihA,yihA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.549069360133183,0.987006927034205,italic('yihA'),
+GO593_04235,IX87_12170,yihA,IX87_12170,yihA,yihA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.356996262522807,0.996381347861831,italic('yihA'),
+GO593_10185,IX87_18325,zipA,zipA,zipA,zipA,"",.,perfect,fosfomycin_T2_1 - none_T2_1a,-0.859320707481285,0.947735718365549,italic('zipA'),
+GO593_10185,IX87_18325,zipA,zipA,zipA,zipA,"",.,mismatch,fosfomycin_T2_1 - none_T2_1a,-0.498605810620337,0.999999992948991,italic('zipA'),
