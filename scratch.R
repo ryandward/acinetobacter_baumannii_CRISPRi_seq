@@ -1,4 +1,4 @@
-mixed <- fread("../acinetobacter_baumannii_chemical_genomics/fosf.tsv") %>% 
+mixed <- fread("fosf.tsv") %>% 
 	as_tibble %>% 
 	dplyr::select(AB19606, medLFC, FDR, condition, type) %>% 
 	rbind(median_melted_results[condition %like% "Imipenem_0.09_T2 - None_0_T2"] %>% 
