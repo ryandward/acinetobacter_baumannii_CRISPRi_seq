@@ -88,3 +88,18 @@ followup.1.plot <-
 
 print(followup.1.plot)
 
+
+followup.1.plot <- 
+	followup.1 %>% 
+	filter(!is.na(strain)) %>%
+	ggplot(aes(x = time, y = OD600, fill = dose, colour = strain)) + 
+	stat_smooth(fullrange = TRUE, level = 0.999) +
+	facet_wrap(facets = c("drug", "dose", "induced"), ncol = 2) +
+	scale_colour_brewer(palette = "Set1") +
+	scale_fill_brewer(palette = "Set1") +
+	theme_ipsum()
+
+
+print(followup.1.plot)
+
+################################################################################
