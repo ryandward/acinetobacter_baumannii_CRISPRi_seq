@@ -16,7 +16,7 @@ interested.genes <- c(
 	"nuoB",
 	"nuoC",
 	"nuoE",
-	"nuoF",
+	"nuoH",
 	"nuoG",
 	"nuoI",
 	"nuoJ",
@@ -818,11 +818,11 @@ print(plot.graphic)
 ```
 
 
-```{r plot nuoF vulnerability}
+```{r plot nuoH vulnerability}
 
-plot.genes <- c("nuoF")
+plot.genes <- c("nuoH")
 plot.conditions <- c("None_0_T2 - None_0_T0", "Rifampicin_0.34_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0")
-plot.title <- bquote(bold(Gene ~ bolditalic(nuoF) ~ vulnerability ~ at ~ t[2] ~ '(CI = 90%)'))
+plot.title <- bquote(bold(Gene ~ bolditalic(nuoH) ~ vulnerability ~ at ~ t[2] ~ '(CI = 90%)'))
 plot.graphic <- fit_predictions %>% 
 	filter(
 		Gene %in% plot.genes &
