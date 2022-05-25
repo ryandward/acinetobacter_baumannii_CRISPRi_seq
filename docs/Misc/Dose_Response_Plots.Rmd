@@ -574,6 +574,71 @@ plot.graphic <- fit_predictions %>%
 
 print(plot.graphic)
 ```
+
+
+```{r plot nuoE vulnerability}
+
+plot.genes <- c("nuoE")
+plot.conditions <- c("None_0_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0", "Rifampicin_0.34_T2 - None_0_T0")
+plot.title <- bquote(bold(Gene ~ bolditalic(nuoE) ~ vulnerability ~ at ~ t[2] ~ '(CI = 90%)'))
+
+plot.graphic <- fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+		ggplot() +
+	geom_hline(
+		yintercept = 0, 
+		linetype = "dashed", 
+		color = "black", 
+		size = 0.5) +
+			geom_line(
+			alpha = 1, 
+			size = 2, 
+			aes(
+				x = y_pred, 
+				y = .fitted, 
+				color = Condition)) +
+	geom_point(
+		data = fit_points %>% filter(
+			Gene %in% plot.genes & 
+				Condition %in% plot.conditions),
+		shape = 20, 
+		size = 5,
+			aes(
+				x = y_pred, 
+				y = LFC.adj, 
+				color = Condition)) + 
+	geom_ribbon(
+		data = fit_predictions %>% filter(
+			Gene %in% plot.genes &
+				Condition %in% plot.conditions),
+		alpha = 0.30,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Condition)) +
+	scale_fill_viridis(discrete = TRUE, direction = -1) +
+	scale_color_viridis(discrete = TRUE, direction = -1) +
+	xlab("Predicted Knockdown") +
+	ylab("Log-2 Fitness Foldchange") +
+	xlim(
+		0, 
+		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
+	coord_cartesian(
+		ylim = c(
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
+	theme_ipsum() +
+	theme(legend.position = "bottom") +
+	ggtitle(plot.title)
+
+
+print(plot.graphic)
+```
+
 ```{r plot thiD vulnerability}
 plot.genes <- c("thiD")
 plot.conditions <- c("None_0_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0", "Rifampicin_0.34_T2 - None_0_T0")
