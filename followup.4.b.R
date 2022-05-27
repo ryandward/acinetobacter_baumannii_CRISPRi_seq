@@ -58,8 +58,9 @@ followup.4.b[, dose := factor(as.character(dose))]
 
 followup.4.b.plot <- 
 	followup.4.b %>% 
+	mutate(hour = time/60/60) %>%
 	filter(!is.na(strain)) %>%
-	ggplot(aes(x = time, y = OD600, fill = strain, colour = strain)) + 
+	ggplot(aes(x = hour, y = OD600, fill = strain, colour = strain)) + 
 	stat_smooth(
 		fullrange = TRUE, 
 		level = 0.99999,

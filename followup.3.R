@@ -6,7 +6,7 @@ followup.3 <- fread(
 	"Followups/followup3.tsv",
 	header = TRUE)
 
-##########################################################################################
+################################################################################
 # wrangle the data from the sunrise machine... 
 
 setnames(followup.3, t(followup.3)[,1])
@@ -25,7 +25,7 @@ followup.3 <-
 followup.3[, OD600 := as.numeric(OD600)]
 followup.3[, time := as.numeric(levels(time))[time]]
 
-##########################################################################################
+################################################################################
 # declare a pattern that corresponds to the wells that actually have cells in them
 
 wells.filled <-
@@ -56,7 +56,7 @@ followup.3.wells <- cbind(
 	followup.3.drug, 
 	followup.3.dose)
 
-##########################################################################################
+################################################################################
 # combine the data about the identity of each well with the plate reader data
 followup.3 <- followup.3 %>% full_join(followup.3.wells)
 followup.3[, dose := factor(as.character(dose))]
@@ -66,7 +66,8 @@ followup.3 <- followup.3 %>% filter(time <= (18*60*60))
 followup.3.plot <- 
 	followup.3 %>% 
 	filter(!is.na(strain)) %>%
-	ggplot(aes(x = time, y = OD600, fill = strain, colour = strain)) + 
+	mutate(hour = time/60/60) %>%
+	ggplot(aes(x = hour, y = OD600, fill = strain, colour = strain)) + 
 	stat_smooth(
 		fullrange = TRUE, 
 		level = 0.99999,
@@ -81,31 +82,3 @@ followup.3.plot <-
 print(followup.3.plot)
 
 ################################################################################
-# below this is experimental
-# 
-# followup.3 %>%
-# 	filter(!is.na(strain)) %>%
-# 	mutate(drug_presence = case_when(dose == 0 ~ "-drug", dose != 0 ~ "+drug")) %>% 
-# 	group_by(time, drug, rep, induced, strain) %>% ggplot(aes(x = time, y = OD600, fill = strain, colour = strain)) + 
-# 	stat_smooth() + 
-# 	facet_wrap(facets = c("drug", "drug_presence", "induced"), ncol = 4)
-# 
-# followup.3.stats <- followup.3 %>%
-# 	filter(!is.na(strain)) %>%
-# 	mutate(drug_presence = case_when(dose == 0 ~ "-drug", dose != 0 ~ "+drug")) %>% 
-# 	group_by(time, drug, rep, induced, strain) %>% 
-# 	pivot_wider(id_cols = c("time","drug", "rep", "induced", "strain"), names_from = "drug_presence", values_from = "OD600") %>% 
-# 	mutate(OD600_ratio = `+drug`/`-drug`)
-# 
-# followup.3.stats %>% 
-# 	filter(strain == "control.2") %>% 
-# 	select(OD600_ratio) %>% 
-# 	rename(OD600_ratio_control = OD600_ratio) %>% 
-# 	ungroup %>% 
-# 	select(-strain) %>% 
-# 	inner_join(followup.3.stats) %>% 
-# 	mutate(OD600_ratio_adj = OD600_ratio/OD600_ratio_control) %>%
-# 	filter(strain != "control.2") %>%
-# 	ggplot(aes(x = time, y = OD600_ratio_adj, fill = strain, colour = strain)) + 
-# 	stat_smooth() + 
-# 	facet_wrap(facets = c("drug", "induced"))
