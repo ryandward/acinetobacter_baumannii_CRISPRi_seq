@@ -7,7 +7,7 @@ followup.2 <- fread(
 	header = TRUE)
 
 ##########################################################################################
-# wrangle the data from the sunrise machine... 
+# wrangle the data from the infinite machine... 
 
 setnames(followup.2, t(followup.2)[,1])
 followup.2 <- followup.2[-1:-2,]
