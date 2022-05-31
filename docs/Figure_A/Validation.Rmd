@@ -12,6 +12,12 @@ library(pacman)
 
 p_load(data.table, edgeR, ggplot2, hrbrthemes, viridis, tidyverse, scales)
 
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
 curated_names <- fread(
 	"../../curated_names.tsv")
 
@@ -73,7 +79,7 @@ row.names(aba_grid_matrix) <- aba_grid$spacer
 ```
 
 ```{r MDS CPM for all times}
-d <- dist(t(cpm(aba_grid_matrix)))
+d <- dist(t(cpm(aba_grid_matrix)), method = "canberra")
 
 d_fit <- cmdscale(d,eig = TRUE, k = 2) # k is the number of dim
 
@@ -87,26 +93,41 @@ d_scale[, Chemical := paste(drug, dose, "ug/mL")]
 
 setnames(d_scale, c("V1", "V2"), c("Dimension 1", "Dimension 2"))
 
-this_title <- "Multidimensional Scaling: Counts per Million"
+this_title <- "MDS by Sample"
 
-plot_object <- ggplot(
-	data = d_scale,
+plot_object <- d_scale %>% 
+	arrange(dose) %>%
+	mutate(Chemical = factor(Chemical, levels = unique(Chemical))) %>%
+	ggplot(
 	aes(
 		x = `Dimension 1`, 
 		y = `Dimension 2`,
 		fill = Chemical,
 		shape = Timing)) +
-	geom_point(size = 6) +
-	theme_ipsum() +
+	geom_point(size = 5) +
+	doc_theme +
 	ggtitle(this_title) +
-	scale_fill_viridis(discrete = TRUE, alpha = 0.35 ) +
-	scale_shape_manual(name = "Timing", values = c(21, 22, 23)) +
+	scale_fill_manual(
+		values = alpha(
+			c(
+				"grey",    # no drug
+				"#a6cee3", # Imipenem 0.06 
+				"#1f78b4", # Imipenem 0.09
+				"#b2df8a", # Meropenem 0.11
+				"#33a02c", # Meropenem 0.17
+				"#e31a1c", # Rifampicin 0.34 
+				"#ff7f00"  # Colistin 0.44 
+				),
+			0.35)) +
+	scale_shape_manual(
+		name = "Timing", 
+		values = c(21, 22, 23)) +
 	guides(
-		fill = guide_legend(
-			override.aes = list(shape = 21),
-			order = 1))
+		fill = guide_legend(override.aes = list(shape = 21, stroke = 0), order = 1))
 
 print(plot_object)
+
+ggsave("MDS.svg", width = 6, height = 4, dpi = 600, units = "in", device='svg')
 
 ```
 
@@ -119,7 +140,7 @@ samples_T1_matrix <- data.matrix(samples_T1[, -1])
 
 rownames(samples_T1_matrix) <- samples_T1$spacer
 
-d <- dist(t(cpm(samples_T1_matrix)))
+d <- dist(t(cpm(samples_T1_matrix)), method = "canberra")
 
 d_fit <- cmdscale(d,eig = TRUE, k = 2) # k is the number of dim
 
@@ -133,26 +154,39 @@ d_scale[, Chemical := paste(drug, dose, "ug/mL")]
 
 setnames(d_scale, c("V1", "V2"), c("Dimension 1", "Dimension 2"))
 
-this_title <- "Multidimensional Scaling at t[1]: Counts per Million"
+this_title <- "MDS by Sample at t1"
 
-plot_object <- ggplot(
-	data = d_scale,
+plot_object <- d_scale %>%
+	arrange(dose) %>%
+	mutate(Chemical = factor(Chemical, levels = unique(Chemical))) %>%
+	ggplot(
 	aes(
 		x = `Dimension 1`, 
 		y = `Dimension 2`,
-		fill = Chemical,
-		shape = Timing)) +
-	geom_point(size = 6) +
-	theme_ipsum() +
+		fill = Chemical)) +
+	geom_point(size = 5, shape = 22) +
+	doc_theme +
 	ggtitle(this_title) +
-	scale_fill_viridis(discrete = TRUE, alpha = 0.35 ) +
-	scale_shape_manual(name = "Timing", values = c(22)) +
+scale_fill_manual(
+		values = alpha(
+			c(
+				"grey",
+				"#a6cee3",
+				"#1f78b4",
+				"#b2df8a",
+				"#33a02c",
+				"#e31a1c",
+				"#ff7f00"),
+			0.35)) +
 	guides(
 		fill = guide_legend(
 			override.aes = list(shape = 22),
 			order = 1))
 
 print(plot_object)
+
+ggsave("MDS_T1.svg", width = 6, height = 4, dpi = 600, units = "in", device='svg')
+
 ```
 
 ```{r MDS CPM for T2}
@@ -164,7 +198,7 @@ samples_T1_matrix <- data.matrix(samples_T1[, -1])
 
 rownames(samples_T1_matrix) <- samples_T1$spacer
 
-d <- dist(t(cpm(samples_T1_matrix)))
+d <- dist(t(cpm(samples_T1_matrix)), method = "canberra")
 
 d_fit <- cmdscale(d,eig = TRUE, k = 2) # k is the number of dim
 
@@ -178,26 +212,39 @@ d_scale[, Chemical := paste(drug, dose, "ug/mL")]
 
 setnames(d_scale, c("V1", "V2"), c("Dimension 1", "Dimension 2"))
 
-this_title <- "Multidimensional Scaling at t[2]: Counts per Million"
+this_title <- "MDS by Sample at t2"
 
-plot_object <- ggplot(
-	data = d_scale,
+plot_object <- d_scale %>%
+	arrange(dose) %>%
+	mutate(Chemical = factor(Chemical, levels = unique(Chemical))) %>%
+	ggplot(
 	aes(
 		x = `Dimension 1`, 
 		y = `Dimension 2`,
-		fill = Chemical,
-		shape = Timing)) +
-	geom_point(size = 6) +
-	theme_ipsum() +
+		fill = Chemical)) +
+	geom_point(size = 5, shape = 23) +
+	doc_theme +
 	ggtitle(this_title) +
-	scale_fill_viridis(discrete = TRUE, alpha = 0.35 ) +
-	scale_shape_manual(name = "Timing", values = c(23)) +
+scale_fill_manual(
+		values = alpha(
+			c(
+				"grey",
+				"#a6cee3",
+				"#1f78b4",
+				"#b2df8a",
+				"#33a02c",
+				"#e31a1c",
+				"#ff7f00"),
+			0.35)) +
 	guides(
 		fill = guide_legend(
 			override.aes = list(shape = 23),
 			order = 1))
 
 print(plot_object)
+
+ggsave("MDS_T2.svg", width = 6, height = 4, dpi = 600, units = "in", device='svg')
+
 ```
 
 ```{r message=FALSE, warning=FALSE, fig.width=7, fig.height=7}
@@ -233,7 +280,7 @@ aba.cpm <- aba.cpm %>%
 				aes(x = `Replicate 1`, y = `Replicate 2`)) +
 				geom_point() +
 				geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
-				theme_ipsum() +
+				doc_theme +
 				theme(legend.position = "bottom") +
 				ggtitle(paste("CPM:", .y)) +
 				scale_x_continuous(

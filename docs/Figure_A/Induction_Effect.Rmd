@@ -12,6 +12,12 @@ library(pacman)
 
 p_load(tidyverse, data.table, edgeR, ggplot2, hrbrthemes, viridis, scales, rmarkdown)
 
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
 curated_names <- fread(
 	"../../curated_names.tsv")
 
@@ -213,6 +219,32 @@ Do stats to normalize by z-score and change to distribution of controls. https:/
 # aba.cpm <- aba.cpm %>% mutate(cpm.fit = map(cpm.fit, ~.x %>% mutate(`Normalized Fitted CPM` = z * sd.y + mean.y)))
 ```
 
+```{r fig.height=3, fig.width=12}
+aba.cpm %>% 
+	unnest(cpm.fit) %>% 
+	select(Type, Condition, `Fitted CPM`) %>% 
+	ggplot(aes(x = `Fitted CPM`, fill = `Condition`)) + 
+	geom_density() + 	
+	scale_fill_viridis(
+    discrete = TRUE, 
+    alpha = 0.35, 
+    direction = -1, 
+    option = "cividis") + scale_x_continuous(
+        trans = scales::pseudo_log_trans(base = 10),
+        breaks = c(0, 10^(1:6)),
+        labels = label_number(scale_cut = cut_short_scale())) + 
+	facet_wrap(~ Type) + 
+	doc_theme
+
+ggsave(
+	"Induction_Density.svg", 
+	width = 12, 
+	height = 3, 
+	dpi = 600, 
+	units = "in", 
+	device = "svg")
+```
+
 
 ```{r fig.height=5, fig.width=10}
 
@@ -232,8 +264,8 @@ aba.cpm.t <- aba.cpm %>%
 				aes(x = `Fitted CPM`, fill = `Condition`)) +
 				geom_density() +
 				ggtitle(.y) +
-				theme_ipsum() +
-	scale_fill_viridis(
+				doc_theme +	
+				scale_fill_viridis(
 		discrete = TRUE, 
 		alpha = 0.3, 
 		direction = -1, 
@@ -270,7 +302,7 @@ aba.cpm.t <- aba.cpm %>%
 				aes(x = `Fitted CPM`, fill = `Type`)) +
 				geom_density() +
 				ggtitle(.y) +
-				theme_ipsum() +
+				doc_theme +
 	scale_fill_viridis(
 		discrete = TRUE, 
 		alpha = 0.3, 
@@ -497,7 +529,7 @@ aba.counts.stats.reps <- aba.counts.stats.reps %>%
 			geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
 			geom_point(aes(color = Type), shape = 20) +
 			ggtitle(.y) +
-			theme_ipsum() +
+			doc_theme +
 			xlim(logFC.range) +
 			ylim(logFC.range) +
 			# scale_alpha_manual(values = c(0.5, 0.15, 0.25)) +
@@ -532,7 +564,8 @@ aba.counts.violin <- aba.counts.stats %>%
 			Type = factor(type),
 			Type = factor(Type, levels = rev(levels(Type)))) %>%
 	ggplot(aes(x = Condition, y = `logFC.adj`, fill = Type)) + 
-	geom_violin(alpha = 0.5, width = 0.65) + theme_ipsum() + 
+	geom_violin(alpha = 0.5, width = 0.65) + 
+	doc_theme + 
 	scale_fill_viridis(discrete = T, direction = 1, option = "viridis") + 
 		coord_flip() +
 	  guides(fill = guide_legend(reverse = TRUE)) +
