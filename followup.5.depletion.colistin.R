@@ -1,6 +1,6 @@
 library(pacman)
 
-p_load(data.table, tidyverse, hrbrthemes)
+p_load(data.table, tidyverse, hrbrthemes, growthcurver)
 
 followup.5.depletion.colistin <- fread(
 	"Followups/followup.5.depletion.colistin.tsv",

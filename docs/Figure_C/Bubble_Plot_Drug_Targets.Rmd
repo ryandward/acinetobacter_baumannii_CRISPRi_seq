@@ -24,7 +24,7 @@ median_melted_results[Pathway == "LPS", Pathway := "LOS"]
 
 
 median_melted_results %>% 
-	filter(condition == "Imipenem_0.09_T2 - None_0_T2" & type == "perfect") %>% 
+	filter(condition == "Imipenem_0.06_T1 - None_0_T1" & type == "perfect") %>% 
 	arrange(AB19606) %>% 
 	mutate(`Locus Tag Position` = factor(AB19606, levels = unique(AB19606))) %>% 
 	mutate(`Locus Tag Position` = 1:n()) %>% 
@@ -57,7 +57,7 @@ median_melted_results %>%
 		direction = -1) +
 	labs(
 		title = bquote(bolditalic("Acinetobacter baumannii") ~ bold("Gene Sensitivity by Pathway")), 
-		subtitle = "Fitness effects beyond induction in Imipenem",
+		subtitle = "Fitness effects beyond induction in Imipenem at t1",
 		parse = TRUE) +
 	guides(
 		size = "none",

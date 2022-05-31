@@ -10,7 +10,7 @@ editor_options:
 ```{r Shape Data}
 library(pacman)
 
-p_load(data.table, edgeR, ggplot2, hrbrthemes, viridis, tidyverse)
+p_load(data.table, edgeR, ggplot2, hrbrthemes, viridis, tidyverse, scales)
 
 curated_names <- fread(
 	"../../curated_names.tsv")
@@ -216,10 +216,10 @@ aba.cpm <-
 			data, ~.x %>% pivot_wider(id_cols = spacer, names_from = rep, values_from = CPM))) %>%
 	filter(timing != "T0") %>%
 	mutate(
-		correlation = paste0("(Cor=", round(
+		correlation = paste0("(", round(
 			map_dbl(
 				data, 
-				~cor(.$`Replicate 1`, .$`Replicate 2`)), 3), ")")) %>%
+				~cor(.$`Replicate 1`, .$`Replicate 2`)), 2), ")")) %>%
 	unite("Sample Name", c("verbose", "timing", "correlation"), sep = " ")
 	
 
@@ -244,4 +244,42 @@ aba.cpm <- aba.cpm %>%
 					limits = c(1, pmax(max(.$`Replicate 1`), max(.$`Replicate 2`))))))
 
 print(aba.cpm$plot)
+```
+
+
+```{r}
+aba.cpm %>% select(-plot) %>%
+	filter(`Sample Name` %like% "No drug") %>%
+	unnest(cols = `data`) %>% 
+	ggplot(
+		aes(x = `Replicate 1`, y = `Replicate 2`)) + 
+	geom_point() + 
+	facet_wrap(facets = "`Sample Name`") + 
+	scale_x_continuous(
+		trans = scales::pseudo_log_trans(base = 10),
+		breaks = c(0, 10^(1:6)),
+		labels = label_number_si()) +
+	scale_y_continuous(
+		trans = scales::pseudo_log_trans(base = 10),
+		breaks = c(0, 10^(1:6)),
+		labels = label_number_si()) +
+	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") 
+
+aba.cpm %>% select(-plot) %>%
+	filter(!`Sample Name` %like% "No drug") %>%
+	unnest(cols = `data`) %>% 
+	ggplot(
+		aes(x = `Replicate 1`, y = `Replicate 2`)) + 
+	geom_point() + 
+	facet_wrap(facets = "`Sample Name`") + 
+	scale_x_continuous(
+		trans = scales::pseudo_log_trans(base = 10),
+		breaks = c(0, 10^(1:6)),
+		labels = label_number_si()) +
+	scale_y_continuous(
+		trans = scales::pseudo_log_trans(base = 10),
+		breaks = c(0, 10^(1:6)),
+		labels = label_number_si()) +
+	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") 
+
 ```

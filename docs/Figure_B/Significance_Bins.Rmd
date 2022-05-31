@@ -8,7 +8,7 @@ output: html_document
 ```{r overlap calculations}
 library(pacman)
 
-p_load(eulerr, data.table, viridis, grid, ComplexHeatmap, tidyverse, ComplexUpset)
+p_load(eulerr, data.table, viridis, grid, ComplexHeatmap, tidyverse, ComplexUpset, ggsankey)
 
 interest <- fread("../../interest.tsv", sep = "\t")
 
@@ -88,4 +88,49 @@ UpSet(
 	row_labels = c(
 		as.expression(bquote(Vulnerable~at~t[1])), 
 		as.expression(bquote(Vulnerable~at~t[2]))))
+```
+
+```{r sankey plot}
+median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
+
+induced_only_results <-
+	median_melted_results %>% 
+	filter(condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
+	filter(type == "perfect")
+
+induced_only_results %>% 
+	mutate(
+		Response = case_when(
+			medLFC < -8 & FDR < 0.05 ~ "Very Vulnerable (LFC < -8)",
+			medLFC < -1 & FDR < 0.05 ~ "Vulnerable (LFC < -1)",
+			medLFC > 1 & FDR < 0.05 ~ "Resistant",
+			TRUE ~ "No Response")) %>%
+	select(AB19606, condition, Response) %>% 
+	mutate(condition = case_when(
+		condition == "None_0_T1 - None_0_T0" ~ "Significant at t1",
+		condition == "None_0_T2 - None_0_T0" ~ "Significant at t2"))	%>%
+	pivot_longer(!c(condition, AB19606)) %>% 
+	pivot_wider(id_cols = c(AB19606), names_from = condition, values_from = value) %>%
+	make_long(`Significant at t1`, `Significant at t2`) %>% 
+	ggplot(aes(
+		x = x, 
+		next_x = next_x,
+		node = node,
+		next_node = next_node,
+		fill = factor(node),
+		label = node)) +
+	geom_sankey(
+		flow.colour = "black",
+		flow.alpha = 0.25, 
+		node.color = "black") +
+	scale_fill_manual(values = c(
+		"grey", "#e53935", "#ffb300")) +
+	geom_sankey_label(aes(colour = "node"),
+										size = 3.5, color = 1) +
+	theme_sankey(base_size = 16) +
+	guides(
+		fill = guide_legend(title = "Relative Response to Knockdown")) +
+	theme(
+		axis.title.x = element_blank(),
+		legend.position = "bottom")
 ```
