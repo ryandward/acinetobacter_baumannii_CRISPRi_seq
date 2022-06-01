@@ -10,6 +10,7 @@ Using a new paradigm, we estimate gene vulnerability and/or resistance using CRI
 ```{r interested conditions and genes}
 
 interested.genes <- c(
+	"murA",
 	"psd",
 	"asd",
 	"nuoA",
@@ -76,6 +77,11 @@ conflict_prefer("gaussian", "drc")
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
 
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
 ```
 
 ```{r load files}
@@ -249,7 +255,7 @@ plot.graphic <- fit_predictions %>%
 	# 	ylim = c(
 	# 		mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 	# 		mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -314,7 +320,7 @@ plot.graphic <- fit_predictions %>%
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -324,9 +330,9 @@ print(plot.graphic)
 
 ```{r plot cell wall vulnerability}
 	
-plot.genes <- c("mraY", "murC", "murG")
-plot.conditions <- c("Meropenem_0.17_T1 - None_0_T0")
-plot.title <- bquote(bold(Cell ~ wall ~ genes ~ vulnerability ~ at ~ t[1] ~ 'in' ~ meropenem ~ '(CI = 90%)'))
+plot.genes <- c("mraY", "murC", "murG", "murA")
+plot.conditions <- c("Imipenem_0.06_T1 - None_0_T0")
+plot.title <- bquote(bold(PG~ vulnerability ~ at ~ t[1] ~ 'in Imipenem 0.06,' ~ 'ci = 0.9'))
 
 plot.graphic <- fit_predictions %>% 
 	filter(
@@ -338,13 +344,21 @@ plot.graphic <- fit_predictions %>%
 		linetype = "dashed", 
 		color = "black", 
 		size = 0.5) +
-			geom_line(
-			alpha = 1, 
-			size = 2, 
-			aes(
-				x = y_pred, 
-				y = .fitted, 
-				color = Gene)) +
+	geom_line(
+		alpha = 1,
+		size = 2,
+		aes(
+			x = y_pred,
+			y = .fitted,
+			color = Gene)) +
+	geom_ribbon(
+		alpha = 0.30,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Gene)) +
 	geom_point(
 		data = fit_points %>% filter(
 			Gene %in% plot.genes & 
@@ -355,17 +369,7 @@ plot.graphic <- fit_predictions %>%
 				x = y_pred, 
 				y = LFC.adj, 
 				color = Gene)) + 
-	geom_ribbon(
-		data = fit_predictions %>% filter(
-			Gene %in% plot.genes &
-				Condition %in% plot.conditions),
-		alpha = 0.30,
-		aes(
-			x = y_pred, 
-			y = .fitted, 
-			ymin = .lower, 
-			ymax = .upper, 
-			fill = Gene)) +
+	
 	scale_fill_viridis(discrete = TRUE, direction = -1) +
 	scale_color_viridis(discrete = TRUE, direction = -1) +
 	xlab("Predicted Knockdown") +
@@ -377,7 +381,7 @@ plot.graphic <- fit_predictions %>%
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -440,7 +444,7 @@ plot.graphic <- fit_predictions %>%
 	# 	ylim = c(
 	# 		mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 	# 		mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -503,7 +507,7 @@ plot.graphic <- fit_predictions %>%
 	# 	ylim = c(
 	# 		mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 	# 		mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -567,7 +571,7 @@ plot.graphic <- fit_predictions %>%
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -631,7 +635,7 @@ plot.graphic <- fit_predictions %>%
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -693,7 +697,7 @@ plot.graphic <- fit_predictions %>%
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -754,7 +758,7 @@ plot.graphic <- fit_predictions %>%
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -816,7 +820,7 @@ plot.graphic <- fit_predictions %>%
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -874,7 +878,7 @@ plot.graphic <- fit_predictions %>%
 	xlim(
 		0, 
 		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -933,7 +937,7 @@ plot.graphic <- fit_predictions %>%
 	xlim(
 		0, 
 		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -991,7 +995,7 @@ plot.graphic <- fit_predictions %>%
 	xlim(
 		0, 
 		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -1055,7 +1059,7 @@ plot.graphic <- fit_predictions %>%
 	xlim(
 		0, 
 		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title)
 
@@ -1113,7 +1117,7 @@ plot.graphic <- fit_predictions %>%
 	xlim(
 		0, 
 		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
-	theme_ipsum() +
+	doc_theme +
 	theme(legend.position = "bottom") +
 	ggtitle(plot.title) +
   coord_cartesian(
