@@ -5,7 +5,7 @@ keep_md: no
 ```{r Read files and prepare framework for analyis}
 library(pacman)
 
-p_load(data.table, edgeR, pheatmap, viridis, tidyverse, hrbrthemes)
+p_load(data.table, edgeR, pheatmap, viridis, tidyverse, hrbrthemes, poolr)
 
 # reads
 aba.counts <- fread(
@@ -36,7 +36,11 @@ LPS <- fread("../../LPS.tsv")
 NADH <- fread("../../NADH.tsv") 
 
 # Aminoacyl-tRNA synthetase, GO
-GO0004812 <- fread("../../GO0004812.tsv") 
+GO0004812 <- fread("../../GO0004812.tsv")
+
+# https://version-11-5.string-db.org/cgi/globalenrichment?networkId=b1Fd534fBhzJ
+CL707 <- fread ("../../CL707.tsv") # "Cell Shape/Lipid Glyc."
+CL273 <- fread ("../../CL273.tsv") # "tRNA Aminoacylation"
 ```
 
 ```{r Functions for use in results parsing}
@@ -450,13 +454,14 @@ print(to_plot)
 ```
 
 
+
 ```{r Perform edgeR for Imipenem (high) Samples}
 aba.contrasts <- c(
-	"None_0_T1 - None_0_T0",
-	"Imipenem_0.09_T1 - None_0_T0",
+	# "None_0_T1 - None_0_T0",
+	# "Imipenem_0.09_T1 - None_0_T0",
 	"Imipenem_0.09_T1 - None_0_T1",
-	"None_0_T2 - None_0_T0",
-	"Imipenem_0.09_T2 - None_0_T0",
+	# "None_0_T2 - None_0_T0",
+	# "Imipenem_0.09_T2 - None_0_T0",
 	"Imipenem_0.09_T2 - None_0_T2") 
 
 results <- extract_edgeR(
@@ -470,118 +475,46 @@ melted_results <- melt_and_stack(results)
 ```
 
 ```{r Cell Wall activity in Imipenem, fig.width=10, fig.height=12}
-median_LFC <- dcast(
-	melted_results[Pathway == "Cell Wall/PG" & type == "perfect"], 
-	unique_name + Pathway ~ condition, 
-	value.var = "LFC.adj", 
-	fun.aggregate = median)
+median_LFC <- melted_results %>% 
+	group_by(condition, type, unique_name) %>% 
+	mutate(FDR.p = stouffer(FDR)$p, medLFC.adj = median(LFC.adj)) %>% 
+	mutate(
+    Pathway = NA_character_,
+    Pathway = case_when(
+        AB030 %in% CL707$AB030 ~ "(Cell Shape/Lipid Glyc.)",
+        AB030 %in% CL273$AB030 ~ "(tRNA Aminoacylation)")) %>% 
+    filter(!is.na(Pathway)) %>%
+    group_by(unique_name, type, condition, Pathway) %>%
+    summarise(medLFC.adj = median(LFC.adj), FDR.p = stouffer(FDR)$p) %>% 
+    filter(FDR.p < 0.01 & type == "perfect") %>%
+    pivot_wider(id_cols = c(unique_name, Pathway), names_from = condition, values_from = medLFC.adj)
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Median LogFC in Perfect Guides"
+to_plot_title <- "Fitness Changes in Perfect Guides"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
 
 # name rows in matrix
-rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+rownames(LFC_grid) <- median_LFC %>% pluck("unique_name")
 
-# format genes (rows): Pathway + italic(Gene Name)
-genes.formatted <- lapply(
-	median_LFC[, .I],
-	function(x) { 
-		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
-
-# format conditions (columns)
-conditions.formatted <- c(
-	bquote(Induction ~ (t[1] - t[0])),
-	bquote(Imipenem ~ (high) ~ (t[1] - t[0])),
-	bquote(Imipenem ~ (high) - Induction ~ (t[1] - t[1])),
-	bquote(Induction ~ (t[2] - t[0])),
-	bquote(Imipenem ~ (high) ~ (t[2] - t[0])),
-	bquote(Imipenem ~ (high) - Induction ~ (t[2] - t[2])))
-
-plot_matrix <- LFC_grid
-
-breaks <- generate_breaks(plot_matrix, n = 286, center = T)
-
-to_plot <- pheatmap(
-	plot_matrix,
-	col = plot_colors,
-	breaks = breaks,
-	border_color = NA,
-	main = to_plot_title,
-	cluster_cols = F,
-	angle_col = 45,
-	clustering_method = "ward.D2",
-	clustering_distance_rows = "canberra",
-	labels_row = as.expression(genes.formatted),
-	labels_col = as.expression(conditions.formatted),
-	gaps_col = 3,
-	cutree_rows = 4,
-	cellheight = 24,
-	cellwidth = 48,
-	fontsize = 12,
-	silent = T)
-	
-to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
-to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
-	
-print(to_plot)
-```
-
-```{r Perform edgeR for Meropenem (high) Samples}
-aba.contrasts <- c(
-	"None_0_T1 - None_0_T0",
-	"Meropenem_0.17_T1 - None_0_T0",
-	"Meropenem_0.17_T1 - None_0_T1",
-	"None_0_T2 - None_0_T0",
-	"Meropenem_0.17_T2 - None_0_T0",
-	"Meropenem_0.17_T2 - None_0_T2") 
-
-results <- extract_edgeR(
-	y.fit = aba.fit, 
-	y.contrasts = aba.contrasts, 
-	y.permutations = aba.permutations)
-
-results <- clean_edgeR(results)
-
-melted_results <- melt_and_stack(results)
-```
-
-```{r Cell Wall activity in Meropenem, fig.width=10, fig.height=12}
-median_LFC <- dcast(
-	melted_results[Pathway == "Cell Wall/PG" & type == "perfect"], 
-	unique_name + Pathway ~ condition, 
-	value.var = "LFC.adj", 
-	fun.aggregate = median)
-
-print(colnames(median_LFC))
-
-to_plot_title <- "Median LogFC in Perfect Guides"
-
-# convert to matrix
-LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
-
-# name rows in matrix
-rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+median_LFC <- data.table(median_LFC)
 
 # format genes (rows): Pathway + italic(Gene Name)
 genes.formatted <- lapply(
 	median_LFC[, .I],
 	function(x) {
-		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
+		bquote(italic(.(median_LFC[x]$unique_name)) ~ .(median_LFC[x]$Pathway))})
 
 # format conditions (columns)
 conditions.formatted <- c(
-	bquote(Induction ~ (t[1] - t[0])),
-	bquote(Meropenem ~ (high) ~ (t[1] - t[0])),
-	bquote(Meropenem ~ (high) - Induction ~ (t[1] - t[1])),
-	bquote(Induction ~ (t[2] - t[0])),
-	bquote(Meropenem ~ (high) ~ (t[2] - t[0])),
-	bquote(Meropenem ~ (high) - Induction ~ (t[2] - t[2])))
+	# bquote(Induction ~ (t[1] - t[0])),
+	# bquote(Imipenem ~ (0.09) ~ (t[1] - t[0])),
+	bquote(Imipenem ~ (0.09) ~ t[1]),
+	# bquote(Induction ~ (t[2] - t[0])),
+	# bquote(Imipenem ~ (0.09) ~ (t[2] - t[0])),
+	bquote(Imipenem ~ (0.09) ~ t[2]))
 
 plot_matrix <- LFC_grid
 
@@ -599,17 +532,17 @@ to_plot <- pheatmap(
 	clustering_distance_rows = "canberra",
 	labels_row = as.expression(genes.formatted),
 	labels_col = as.expression(conditions.formatted),
-	gaps_col = 3,
-	cutree_rows = 4,
-	cellheight = 24,
+	# gaps_col = 3,
+	cutree_rows = 3,
+	# cellheight = 24,
 	cellwidth = 48,
 	fontsize = 12,
 	silent = T)
 	
-to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
-to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+# to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Courier"
+# to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
+# to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Courier"
+# to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Courier"
 	
 print(to_plot)
 ```
@@ -642,7 +575,7 @@ median_LFC <- dcast(
 
 print(colnames(median_LFC))
 
-to_plot_title <- "Log-2 Fold Fitness Change in Knockdown Strain"
+to_plot_title <- "Fitness Change in Knockdown Strains"
 
 # convert to matrix
 LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
@@ -686,10 +619,10 @@ to_plot <- pheatmap(
 	fontsize = 12,
 	silent = T)
 	
-to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial"
 to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
-to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial"
 	
 print(to_plot)
 ```

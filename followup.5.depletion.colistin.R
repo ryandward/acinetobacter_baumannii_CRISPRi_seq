@@ -2,6 +2,13 @@ library(pacman)
 
 p_load(data.table, tidyverse, hrbrthemes, growthcurver)
 
+
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
 followup.5.depletion.colistin <- fread(
 	"Followups/followup.5.depletion.colistin.tsv",
 	header = TRUE)
@@ -67,20 +74,21 @@ followup.5.depletion.colistin.plot <-
 	mutate(hour = time/60/60) %>%
 	filter(!is.na(strain)) %>%
 	filter(note != "cannot fit data") %>%
+	filter(induced == "on") %>%
 	ggplot(aes(x = hour, y = OD600, fill = strain, colour = strain)) + 
 	stat_smooth(
 		fullrange = TRUE, 
 		level = 0.99999,
 		method = "gam",
 		formula = y ~ s(x, bs = "cs")) +
-	geom_hline(yintercept = 0.5, linetype="dashed", color = "red") +
-	facet_wrap(facets = c("drug", "dose", "induced"), ncol = 4) +
+	# geom_hline(yintercept = 0.5, linetype="dashed", color = "red") +
+	facet_wrap(facets = c("drug", "dose"), ncol = 4) +
 	scale_colour_brewer(palette = "Dark2") +
 	scale_fill_brewer(palette = "Dark2") +
 	ggtitle(
 		bquote(bold("Growth Phenotypes for")~bolditalic("Acinetobacter baumannii.")),
 		subtitle = ~"Induced 18 hours before exposure to antibiotics.") +
-	theme_ipsum()
+	doc_theme
 
 print(followup.5.depletion.colistin.plot)
 
@@ -91,7 +99,7 @@ print(followup.5.depletion.colistin.plot)
 # 	geom_boxplot(position = "dodge") +
 # 	ggtitle(
 # 		bquote(bold("Hours to reach half capacity")~bolditalic("Acinetobacter baumannii."))) +
-# 	theme_ipsum()+
+# 	doc_theme +
 # 	scale_fill_brewer(palette = "Dark2") +
 # 	ylim(0, NA) +
 # 	facet_wrap(facets = c("drug", "induced"), ncol = 2) %>%
