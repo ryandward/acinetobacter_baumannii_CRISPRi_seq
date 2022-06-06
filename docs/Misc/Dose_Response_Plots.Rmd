@@ -38,11 +38,16 @@ interested.genes <- c(
 	"nuoL",
 	"nuoM",
 	"nuoN",
-	"lpxC",
+	"aroA",
+	"aroC",
+	"aroQ",
 	"nuoB",
 	"thiD",
 	"GO593_00515",
+	"folB", 
+	"folE",
 	"folK",
+	"ftsA",
 	"ftsI",
 	"gatB")
 
@@ -106,9 +111,15 @@ curated_names <- fread(
 
 ```{r define constants}
 
+# function to rescale between 0 and 1
+range01 <- function(x){(x - min(x))/(max(x) - min(x))}
+
+melted_results[!is.na(y_pred), y_pred := range01(y_pred)]
+
 melted_results <- tibble(melted_results)
 
-drm.parameters <- c("hill", "min_value", "max_value", "ec_50")
+
+drm.parameters <- c("hill", "min_value", "max_value", "kd_50")
 
 lower_range <- min(melted_results$y_pred, na.rm = T)
 
@@ -117,6 +128,8 @@ upper_range <- max(melted_results$y_pred, na.rm = T)
 drm.try <- possibly(drm, otherwise = NA)
 
 augment.try <- possibly(augment, otherwise = NA)
+
+
 ```
 
 ```{r estimate dose-response models, warning=FALSE}
@@ -138,9 +151,9 @@ mismatches <- mismatches %>%
 	
 mismatches <- mismatches %>%
 	mutate(
-		ec_50.tibble = map(
+		kd_50.tibble = map(
 			p.vals, 
-			~filter(.x, term == 'ec_50') %>%
+			~filter(.x, term == 'kd_50') %>%
 				select(p.value) %>%
 				rename (., vuln.p = p.value))) %>%
 	mutate(
@@ -149,8 +162,8 @@ mismatches <- mismatches %>%
 			p.vals, 
 			~augment.try(
 				.x,
-				newdata = .y %>% filter (term == "ec_50") %>% select (estimate)) %>% 
-				rename (., vuln.est = .fitted, vuln.ec_50 = estimate))) %>%
+				newdata = .y %>% filter (term == "kd_50") %>% select (estimate)) %>% 
+				rename (., vuln.est = .fitted, vuln.kd_50 = estimate))) %>%
 	mutate(
 		hill.tibble = map(
 			p.vals, 
@@ -160,7 +173,7 @@ mismatches <- mismatches %>%
 
 mismatches <- mismatches %>%
 	unnest(vuln.tibble) %>%
-	unnest(ec_50.tibble) %>%
+	unnest(kd_50.tibble) %>%
 	unnest(hill.tibble) %>%
 	select(-c(p.vals))
 
@@ -176,7 +189,7 @@ vuln.summary <- mismatches %>% select(
 	unique_name, 
 	condition, 
 	vuln.est, 
-	vuln.ec_50, 
+	vuln.kd_50, 
 	vuln.p, 
 	hill.est, 
 	hill.p, 
@@ -208,7 +221,68 @@ fit_points <- mismatches %>%
 	unnest(data)
 ```
 
+```{r Very vulnerable at T2}
+	
+plot.genes <- c("aroC", "murA", "ftsI")
+plot.conditions <- c("None_0_T2 - None_0_T0")
+plot.title <- bquote(bold("Very vulnerable" ~ at ~ t[2] ~ 'after Induction,' ~ 'CI = 0.9'))
 
+plot.graphic <- fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+		ggplot() +
+	geom_hline(
+		yintercept = 0, 
+		linetype = "dashed", 
+		color = "black", 
+		size = 0.5) +
+			geom_line(
+			alpha = 0.65, 
+			size = 1.5, 
+			aes(
+				x = y_pred, 
+				y = .fitted, 
+				color = Gene)) +
+	geom_point(
+		data = fit_points %>% filter(
+			Gene %in% plot.genes & 
+				Condition %in% plot.conditions),
+		shape = 20, 
+		size = 3.5,
+			aes(
+				x = y_pred, 
+				y = LFC.adj, 
+				color = Gene)) + 
+	geom_ribbon(
+		data = fit_predictions %>% filter(
+			Gene %in% plot.genes &
+				Condition %in% plot.conditions),
+		alpha = 0.25,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Gene)) +
+    scale_fill_brewer(palette = "Set1") +
+    scale_color_brewer(palette = "Set1") +
+	xlab("Predicted Knockdown") +
+	ylab("Log-2 Fitness Foldchange") +
+	xlim(
+		0, 
+		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
+	coord_cartesian(
+		ylim = c(
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
+	doc_theme +
+	theme(legend.position = "bottom") +
+	ggtitle(plot.title)
+
+
+print(plot.graphic)
+```
 
 ```{r plot ftsI vulnerability}
 
