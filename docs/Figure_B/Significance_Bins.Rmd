@@ -16,7 +16,7 @@ median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
 bins <- 
 	median_melted_results[
-		, .(significant = FDR < 0.01 & medLFC < 0), 
+		, .(significant = FDR < 0.05 & medLFC < -1), 
 		by = .(condition, unique_name, type)]
 
 bins <- bins[condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")]
@@ -52,79 +52,97 @@ p <- setGrob(p, "tag.label.3", newGrob)
 print(p)
 ```
 
-```{r Cell Wall activity in Meropenem, fig.width=6, fig.height=4}
+```{r, fig.width=6, fig.height=4}
+# 580 x 400
 vulnerability.comb_mat <- 
-	median_melted_results %>% 
+    median_melted_results %>% 
     filter(type == "perfect") %>%
-    mutate(depleted = (FDR < 0.01 & medLFC < 0)) %>%  
+    mutate(depleted = (FDR < 0.05 & medLFC < -1)) %>%  
     pivot_wider(
-    	id_cols = unique_name, 
-    	names_from = condition, values_from = depleted) %>% 
-	select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
-	make_comb_mat() 
+        id_cols = unique_name, 
+        names_from = condition, values_from = depleted) %>% 
+    select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
+    make_comb_mat() 
 
 UpSet(
-	vulnerability.comb_mat, 
-	top_annotation = HeatmapAnnotation(
-		"Intersection" = anno_barplot(
-			comb_size(vulnerability.comb_mat),
-			border = FALSE, 
-			height = unit(6, "cm"),
-			add_numbers = T,
-			gp = gpar(fill = "grey", lty = "blank")), 
-		annotation_name_side = "right", 
-		annotation_name_rot = 90,
-		show_annotation_name = FALSE),
-	right_annotation = rowAnnotation(
-		"Genes Vulnerable Upon Induction" = anno_barplot(
-			set_size(vulnerability.comb_mat),
-			border = FALSE,
-			gp = gpar(fill =  viridis(3, direction = -1, alpha = 0.5)[2:3], lwd = 3),
-			width = unit(7, "cm"),
-			add_numbers = T),
-			annotation_name_gp = gpar(fontsize = 8)),
-	set_order = order(set_size(vulnerability.comb_mat)),
-	row_names_gp = grid::gpar(fontsize = 10),
-	row_labels = c(
-		as.expression(bquote(Vulnerable~at~t[1])), 
-		as.expression(bquote(Vulnerable~at~t[2]))))
+    vulnerability.comb_mat, 
+    top_annotation = HeatmapAnnotation(
+        "Intersection" = anno_barplot(
+            comb_size(vulnerability.comb_mat),
+            border = FALSE, 
+            height = unit(6, "cm"),
+            add_numbers = T,
+            gp = gpar(fill = "grey", lty = "blank")), 
+        annotation_name_side = "right", 
+        annotation_name_rot = 90,
+        show_annotation_name = FALSE),
+    right_annotation = rowAnnotation(
+        "Genes Vulnerable Upon Induction" = anno_barplot(
+            set_size(vulnerability.comb_mat),
+            border = FALSE,
+            gp = gpar(fill =  viridis(3, direction = -1, alpha = 0.5)[2:3], lwd = 3),
+            width = unit(7, "cm"),
+            add_numbers = T),
+            annotation_name_gp = gpar(fontsize = 8)),
+    set_order = order(set_size(vulnerability.comb_mat)),
+    row_names_gp = grid::gpar(fontsize = 10),
+    row_labels = c(
+        as.expression(bquote(Vulnerable~at~t[1])), 
+        as.expression(bquote(Vulnerable~at~t[2]))))
 ```
 
 ```{r sankey plot}
 median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
-induced_only_results <-
-	median_melted_results %>% 
-	filter(condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
-	filter(type == "perfect")
+sankey.levels <- c(
+	"Highly Resistant",
+	"Resistant",
+	"No Response",
+	"Vulnerable",
+	"Highly Vulnerable")
 
-induced_only_results %>% 
-	mutate(
+five_pct_vuln <- median_melted_results %>% 
+	filter(condition == "None_0_T2 - None_0_T0" & FDR < 0.05 & medLFC < -1) %>% 
+	pull(medLFC) %>% 
+	quantile(0.05)
+
+sankey.df <- median_melted_results %>%
+	filter(condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
+	filter(type == "perfect") %>%
+		mutate(
 		Response = case_when(
-			medLFC < -8 & FDR < 0.05 ~ "Very Vulnerable (LFC < -8)",
-			medLFC < -1 & FDR < 0.05 ~ "Vulnerable (LFC < -1)",
+			medLFC < five_pct_vuln  & FDR < 0.05 ~ "Highly Vulnerable",
+			medLFC < -1 & FDR < 0.05 ~ "Vulnerable",
 			medLFC > 1 & FDR < 0.05 ~ "Resistant",
 			TRUE ~ "No Response")) %>%
-	select(AB19606, condition, Response) %>% 
+	select(AB19606, condition, Response) %>%
 	mutate(condition = case_when(
 		condition == "None_0_T1 - None_0_T0" ~ "Significant at t1",
 		condition == "None_0_T2 - None_0_T0" ~ "Significant at t2"))	%>%
-	pivot_longer(!c(condition, AB19606)) %>% 
+	pivot_longer(!c(condition, AB19606)) %>%
 	pivot_wider(id_cols = c(AB19606), names_from = condition, values_from = value) %>%
-	make_long(`Significant at t1`, `Significant at t2`) %>% 
+	make_long(`Significant at t1`, `Significant at t2`) %>%
+	  mutate(
+    node = factor(node, levels = sankey.levels),
+    next_node = factor(next_node, levels = sankey.levels))
+
+sankey.tally <- sankey.df %>% group_by(node, x) %>% tally
+
+sankey.df %>% 
+	inner_join(sankey.tally) %>%
 	ggplot(aes(
-		x = x, 
+		x = x,
 		next_x = next_x,
 		node = node,
 		next_node = next_node,
 		fill = factor(node),
-		label = node)) +
+		label = paste(node, n, sep = "\n"))) +
 	geom_sankey(
 		flow.colour = "black",
-		flow.alpha = 0.25, 
+		flow.alpha = 0.25,
 		node.color = "black") +
 	scale_fill_manual(values = c(
-		"grey", "#e53935", "#ffb300")) +
+		 "#e53935", "grey", "#ffb300")) +
 	geom_sankey_label(aes(colour = "node"),
 										size = 3.5, color = 1) +
 	theme_sankey(base_size = 16) +
@@ -132,5 +150,5 @@ induced_only_results %>%
 		fill = guide_legend(title = "Relative Response to Knockdown")) +
 	theme(
 		axis.title.x = element_blank(),
-		legend.position = "bottom")
+		legend.position = "none")
 ```
