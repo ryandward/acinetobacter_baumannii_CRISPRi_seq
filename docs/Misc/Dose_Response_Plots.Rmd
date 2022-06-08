@@ -20,6 +20,7 @@ interested.genes <- c(
 	"murE", #ligase
 	"murF", #ligase
 	"murB", #oxidoreductase
+	"murJ",
 	"dnaB",
 	"psd",
 	"asd",
@@ -609,7 +610,7 @@ print(plot.graphic)
 
 ```{r plot PG ligases vulnerability}
 	
-plot.genes <- c("murC", "murD", "murE", "murF", "murB")
+plot.genes <- c("murC", "murD", "murE", "murF", "murB", "murJ")
 plot.conditions <- c("Imipenem_0.09_T1 - None_0_T0")
 plot.title <- bquote(bold(PG~ligase~and~redox~vulnerability ~ at ~ t[1] ~ 'in Imipenem 0.09,' ~ 'ci = 0.9'))
 
