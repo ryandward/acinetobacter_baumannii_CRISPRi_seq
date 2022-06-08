@@ -12,6 +12,10 @@ Using a new paradigm, we estimate gene vulnerability and/or resistance using CRI
 # https://jgeb.springeropen.com/articles/10.1186/s43141-020-00048-4
 
 interested.genes <- c(
+	"accA",
+	"accB",
+	"accC",
+	"accD",
 	"murA", #transferase
 	"murG", #transferase
 	"mraY", #transferase
@@ -1536,3 +1540,159 @@ plot.graphic <- fit_predictions %>%
 
 print(plot.graphic)
 ```
+
+Manually curated final plot for LOS and nuo story.
+
+```{r}
+
+plot.genes <- c("lpxC", "nuoB")
+plot.conditions <- c("Rifampicin_0.34_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0")
+
+plot.labeller <- as_labeller(
+	c(
+		`Rifampicin_0.34_T2 - None_0_T0` = "Rifampicin",
+		`Colistin_0.44_T2 - None_0_T0` = "Colistin"))
+		
+plot.title <- bquote(bold(Vulnerability ~ at ~ t[2] ~ '(Confidence = 0.90)'))
+
+plot.graphic <- fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+	mutate(label = gsub("", "", Condition)) %>%
+	ggplot() +
+	geom_hline(
+		yintercept = 0, 
+		linetype = "dashed", 
+		color = "black", 
+		size = 0.5) +
+	geom_line(
+		alpha = 1, 
+		size = 2, 
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			color = Gene)) +
+	geom_point(
+		data = fit_points %>% filter(
+			Gene %in% plot.genes & 
+				Condition %in% plot.conditions),
+		shape = 20, 
+		size = 5,
+		aes(
+			x = y_pred, 
+			y = LFC.adj, 
+			color = Gene)) + 
+	geom_ribbon(
+		data = fit_predictions %>% filter(
+			Gene %in% plot.genes &
+				Condition %in% plot.conditions),
+		alpha = 0.30,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Gene)) +
+	scale_fill_brewer(palette = "Set1") +
+	scale_color_brewer(palette = "Set1") +
+	xlab("Predicted Knockdown") +
+	ylab("Log-2 Fitness Foldchange") +
+	xlim(
+		0, 
+		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
+	coord_cartesian(
+		ylim = c(
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
+	doc_theme +
+	theme(legend.position = "bottom") +
+	ggtitle(plot.title) + 
+	facet_wrap(
+		facets = ~ Condition,
+		labeller = plot.labeller)
+
+
+print(plot.graphic)
+
+
+```
+
+
+Manually curated final plot for acc story.
+
+```{r}
+
+plot.genes <- c("accA", "accB", "accC", "accD")
+plot.conditions <- c("Rifampicin_0.34_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0")
+
+plot.labeller <- as_labeller(
+	c(
+		`Rifampicin_0.34_T2 - None_0_T0` = "Rifampicin",
+		`Colistin_0.44_T2 - None_0_T0` = "Colistin"))
+		
+plot.title <- bquote(bold(Vulnerability ~ at ~ t[2] ~ '(Confidence = 0.90)'))
+
+plot.graphic <- fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+	mutate(label = gsub("", "", Condition)) %>%
+	ggplot() +
+	geom_hline(
+		yintercept = 0, 
+		linetype = "dashed", 
+		color = "black", 
+		size = 0.5) +
+	geom_line(
+		alpha = 1, 
+		size = 2, 
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			color = Gene)) +
+	geom_point(
+		data = fit_points %>% filter(
+			Gene %in% plot.genes & 
+				Condition %in% plot.conditions),
+		shape = 20, 
+		size = 5,
+		aes(
+			x = y_pred, 
+			y = LFC.adj, 
+			color = Gene)) + 
+	geom_ribbon(
+		data = fit_predictions %>% filter(
+			Gene %in% plot.genes &
+				Condition %in% plot.conditions),
+		alpha = 0.30,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Gene)) +
+	scale_fill_brewer(palette = "Set1") +
+	scale_color_brewer(palette = "Set1") +
+	xlab("Predicted Knockdown") +
+	ylab("Log-2 Fitness Foldchange") +
+	xlim(
+		0, 
+		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
+	coord_cartesian(
+		ylim = c(
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
+	doc_theme +
+	theme(legend.position = "bottom") +
+	ggtitle(plot.title) + 
+	facet_wrap(
+		facets = ~ Condition,
+		labeller = plot.labeller)
+
+
+print(plot.graphic)
+
+
+```
+

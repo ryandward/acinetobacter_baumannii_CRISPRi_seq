@@ -73,7 +73,7 @@ p <- UpSet(
 			border = FALSE, 
 			height = unit(8, "cm"),
 			add_numbers = T,
-			gp = gpar(fill = c("grey", rep("dark red", 2), rep("grey", 6)), lty = "blank")), 
+			gp = gpar(fill = c("grey", "dark red", "blue", rep("grey", 6)), lty = "blank")), 
 		show_annotation_name = FALSE),
 	right_annotation = rowAnnotation(
 		"Genes Significant Beyond Induction at T2" = anno_barplot(
@@ -91,7 +91,7 @@ p <- UpSet(
 		annotation_name_gp = gpar(fontsize = 8)),
 	set_order = set_name(mixed.matrix),
 	row_names_gp = grid::gpar(fontsize = 10),
-	comb_col = c("black", rep("dark red", 2), rep("black", 6)))
+	comb_col = c("black", "dark red", "blue", rep("black", 6)))
 
 print(p)
 
