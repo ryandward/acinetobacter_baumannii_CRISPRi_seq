@@ -87,7 +87,7 @@ followup.5.depletion.colistin.plot <-
 	scale_fill_brewer(palette = "Dark2") +
 	ggtitle(
 		bquote(bold("Growth Phenotypes for")~bolditalic("Acinetobacter baumannii.")),
-		subtitle = ~"Induced 18 hours before exposure to antibiotics.") +
+		subtitle = "Induced 18 hours before exposure to antibiotics.") +
 	doc_theme
 
 print(followup.5.depletion.colistin.plot)

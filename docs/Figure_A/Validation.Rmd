@@ -330,3 +330,69 @@ aba.cpm %>% select(-plot) %>%
 	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") 
 
 ```
+
+```{r}
+cpm.max <- aba.cpm %>%
+	unnest(data) %>%
+	select(`Replicate 1`, `Replicate 2`) %>% 
+	max
+
+aba.cpm %>% 
+	unnest(data) %>% 
+	inner_join(aba_key) %>% 
+	arrange(desc(type)) %>% 
+	mutate(Type = type) %>%
+	filter(`Sample Name` %like% "No drug") %>%
+	ggplot(aes(x = `Replicate 1`, y = `Replicate 2`)) + 
+	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
+	geom_point(aes(color = Type), shape = 20) + scale_color_viridis(
+		discrete = TRUE,
+		alpha = c(0.15, 0.25, 0.35),
+		direction = -1,
+		option = "viridis") + facet_wrap(facets = c("`Sample Name`")) + theme(
+			legend.position = "bottom",
+			legend.key = element_rect(fill = "#ECECEC")) +
+	guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) + 
+	scale_x_continuous(
+        trans = scales::pseudo_log_trans(base = 10),
+        breaks = c(0, 10^(1:6)),
+        labels = label_number(scale_cut = cut_short_scale()),
+        limits = c(0, cpm.max)) +
+		scale_y_continuous(
+        trans = scales::pseudo_log_trans(base = 10),
+        breaks = c(0, 10^(1:6)),
+        labels = label_number(scale_cut = cut_short_scale()),
+        limits = c(0, cpm.max)) +
+	facet_wrap(facets = c("`Sample Name`")) +
+	doc_theme
+
+aba.cpm %>% 
+	unnest(data) %>% 
+	inner_join(aba_key) %>% 
+	arrange(desc(type)) %>% 
+	mutate(Type = type) %>%
+	filter(!`Sample Name` %like% "No drug") %>%
+	ggplot(aes(x = `Replicate 1`, y = `Replicate 2`)) + 
+	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
+	geom_point(aes(color = Type), shape = 20) + scale_color_viridis(
+		discrete = TRUE,
+		alpha = c(0.15, 0.25, 0.35),
+		direction = -1,
+		option = "viridis") + facet_wrap(facets = c("`Sample Name`")) + theme(
+			legend.position = "bottom",
+			legend.key = element_rect(fill = "#ECECEC")) +
+	guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) + 
+	scale_x_continuous(
+        trans = scales::pseudo_log_trans(base = 10),
+        breaks = c(0, 10^(1:6)),
+        labels = label_number(scale_cut = cut_short_scale()),
+        limits = c(0, cpm.max)) +
+		scale_y_continuous(
+        trans = scales::pseudo_log_trans(base = 10),
+        breaks = c(0, 10^(1:6)),
+        labels = label_number(scale_cut = cut_short_scale()),
+        limits = c(0, cpm.max)) +
+	facet_wrap(facets = c("`Sample Name`")) +
+	doc_theme
+
+```
