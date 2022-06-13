@@ -58,7 +58,10 @@ interested.genes <- c(
 	"nphR_2",
 	"argS",
 	"ispG",
-	"ppa")
+	"ppa",
+	"lolB",
+	"ihfB",
+	"tsaD")
 
 interested.conditions <- c(
 	"None_0_T1 - None_0_T0",
@@ -293,11 +296,11 @@ plot.graphic <- fit_predictions %>%
 print(plot.graphic)
 ```
 
-```{r Very vulnerable at T2}
+```{r Highly vulnerable at T2}
 	
 plot.genes <- c("aroC", "murA", "ftsI")
 plot.conditions <- c("None_0_T2 - None_0_T0")
-plot.title <- bquote(bold("Very vulnerable" ~ at ~ t[2] ~ 'after Induction,' ~ 'CI = 0.9'))
+plot.title <- bquote(bold("Highly vulnerable" ~ at ~ t[2] ~ 'after Induction,' ~ 'CI = 0.9'))
 
 plot.graphic <- fit_predictions %>% 
 	filter(
@@ -339,6 +342,69 @@ plot.graphic <- fit_predictions %>%
 			fill = Gene)) +
     scale_fill_brewer(palette = "Set1") +
     scale_color_brewer(palette = "Set1") +
+	xlab("Predicted Knockdown") +
+	ylab("Log-2 Fitness Foldchange") +
+	xlim(
+		0, 
+		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
+	coord_cartesian(
+		ylim = c(
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
+	doc_theme +
+	theme(legend.position = "bottom") +
+	ggtitle(plot.title)
+
+
+print(plot.graphic)
+```
+
+```{r NO response at T2}
+	
+plot.genes <- c("lolB", "ihfB", "tsaD")
+plot.conditions <- c("None_0_T2 - None_0_T0")
+plot.title <- bquote(bold("No response" ~ at ~ t[2] ~ 'after Induction,' ~ 'CI = 0.9'))
+
+plot.graphic <- fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+		ggplot() +
+	geom_hline(
+		yintercept = 0, 
+		linetype = "dashed", 
+		color = "black", 
+		size = 0.5) +
+			geom_line(
+			alpha = 0.65, 
+			size = 1.5, 
+			aes(
+				x = y_pred, 
+				y = .fitted, 
+				color = Gene)) +
+	geom_point(
+		data = fit_points %>% filter(
+			Gene %in% plot.genes & 
+				Condition %in% plot.conditions),
+		shape = 20, 
+		size = 3.5,
+			aes(
+				x = y_pred, 
+				y = LFC.adj, 
+				color = Gene)) + 
+	geom_ribbon(
+		data = fit_predictions %>% filter(
+			Gene %in% plot.genes &
+				Condition %in% plot.conditions),
+		alpha = 0.25,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Gene)) +
+    scale_fill_brewer(palette = "Set2") +
+    scale_color_brewer(palette = "Set2") +
 	xlab("Predicted Knockdown") +
 	ylab("Log-2 Fitness Foldchange") +
 	xlim(
@@ -548,11 +614,11 @@ print(plot.graphic)
 ```
 
 
-```{r plot PG transferase vulnerability}
+```{r plot Some mur vulnerability}
 	
-plot.genes <- c("murG", "murA", "mraY")
+plot.genes <- c("murF", "murA", "mraY")
 plot.conditions <- c("Imipenem_0.09_T1 - None_0_T0")
-plot.title <- bquote(bold(PG~transferase~vulnerability ~ at ~ t[1] ~ 'in Imipenem 0.09,' ~ 'ci = 0.9'))
+plot.title <- bquote(bold(PG~vulnerability ~ at ~ t[1] ~ 'in Imipenem,' ~ 'CI = 0.9'))
 
 plot.graphic <- fit_predictions %>% 
 	filter(
