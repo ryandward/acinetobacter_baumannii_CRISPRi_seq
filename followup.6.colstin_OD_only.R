@@ -98,26 +98,26 @@ followup.6.all <- followup.6.all[, SummarizeGrowth(
 
 ##########################################################################################
 # 
-# followup.6.all.plot <- 
-# 	followup.6.all %>%
-# 	mutate(hour = time/60/60) %>%
-# 	filter(!is.na(strain)) %>%
-# 	ggplot(aes(x = hour, y = OD600, fill = strain, colour = strain)) + 
-# 	stat_smooth(
-# 		fullrange = TRUE, 
-# 		level = 0.99999,
-# 		method = "gam",
-# 		formula = y ~ s(x, bs = "cs")) +
-# 	# geom_hline(yintercept = 0.5, linetype="dashed", color = "red") +
-# 	facet_wrap(facets = c("drug", "dose"), ncol = 4) +
-# 	scale_colour_brewer(palette = "Dark2") +
-# 	scale_fill_brewer(palette = "Dark2") +
-# 	ggtitle(
-# 		bquote(bold("Growth Phenotypes for")~bolditalic("Acinetobacter baumannii.")),
-# 		subtitle = "Induced 18 hours before exposure to antibiotics.") +
-# 	doc_theme
-# 
-# print(followup.6.all.plot)
+followup.6.all.plot <-
+	followup.6.all %>%
+	mutate(hour = time/60/60) %>%
+	filter(!is.na(strain)) %>%
+	ggplot(aes(x = hour, y = OD600, fill = strain, colour = strain)) +
+	stat_smooth(
+		fullrange = TRUE,
+		level = 0.99999,
+		method = "gam",
+		formula = y ~ s(x, bs = "cs")) +
+	# geom_hline(yintercept = 0.5, linetype="dashed", color = "red") +
+	facet_wrap(facets = c("drug", "dose"), ncol = 4) +
+	scale_colour_brewer(palette = "Dark2") +
+	scale_fill_brewer(palette = "Dark2") +
+	ggtitle(
+		bquote(bold("Growth Phenotypes for")~bolditalic("Acinetobacter baumannii.")),
+		subtitle = "Induced 18 hours before exposure to antibiotics.") +
+	doc_theme
+
+print(followup.6.all.plot)
 # 
 # 
 # #########################################################################
