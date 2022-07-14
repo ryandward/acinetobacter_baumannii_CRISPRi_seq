@@ -38,7 +38,14 @@ median_melted_results %>%
 	doc_theme +
 	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	scale_colour_manual(values = c("dark red"), na.value = "grey") +
-	theme(legend.position = "bottom") -> to_plot
+	theme(legend.position = "bottom") +
+	geom_text_repel(
+		data = . %>% filter(Pathway == "Ribosome" & FDR < 0.05),
+		aes(label = gene_name_stylized),
+		min.segment.length = 0,
+		parse = TRUE,
+		max.overlaps = Inf,
+		colour = "black") -> to_plot
 
 print(to_plot)
 
@@ -65,7 +72,14 @@ median_melted_results %>%
 	doc_theme +
 	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	scale_colour_manual(values = c("dark cyan"), na.value = "grey") +
-	theme(legend.position = "bottom") -> to_plot
+	theme(legend.position = "bottom") +
+	geom_text_repel(
+		data = . %>% filter(Pathway == "NADH" & FDR < 0.05),
+		aes(label = gene_name_stylized),
+		min.segment.length = 0,
+		parse = TRUE,
+		max.overlaps = Inf,
+		colour = "black") -> to_plot
 
 print(to_plot)
 
