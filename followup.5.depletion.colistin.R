@@ -71,20 +71,23 @@ followup.5.depletion.colistin <- followup.5.depletion.colistin[,
 
 followup.5.depletion.colistin.plot <- 
 	followup.5.depletion.colistin %>%
+	filter(dose %in% c(0, 2, 4)) %>%
+	mutate(dose = paste(dose, "ng/uL")) %>%
+	filter(strain %in% c("control.2", "lpxC", "nuoB")) %>%
 	mutate(hour = time/60/60) %>%
 	filter(!is.na(strain)) %>%
-	filter(note != "cannot fit data") %>%
+	# filter(note != "cannot fit data") %>%
 	filter(induced == "on") %>%
 	ggplot(aes(x = hour, y = OD600, fill = strain, colour = strain)) + 
 	stat_smooth(
 		fullrange = TRUE, 
-		level = 0.99999,
+		# level = 0.99999,
 		method = "gam",
 		formula = y ~ s(x, bs = "cs")) +
 	# geom_hline(yintercept = 0.5, linetype="dashed", color = "red") +
 	facet_wrap(facets = c("drug", "dose"), ncol = 4) +
-	scale_colour_brewer(palette = "Dark2") +
-	scale_fill_brewer(palette = "Dark2") +
+	scale_fill_ipsum()+
+	scale_colour_ipsum() +
 	ggtitle(
 		bquote(bold("Growth Phenotypes for")~bolditalic("Acinetobacter baumannii.")),
 		subtitle = "Induced 18 hours before exposure to antibiotics.") +

@@ -168,14 +168,14 @@ aba.cpm <- aba.edgeR %>%
 		cpm.fit = map(cpm.fit, ~.x %>% select(Condition, spacer, `Fitted CPM`)),
 		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = case_when(
 			Condition == "None_0_T0" ~ "Uninduced",
-			Condition == "None_0_T1" ~ "Induced at t1",
-			Condition == "None_0_T2" ~ "Induced at t2"))),
+			Condition == "None_0_T1" ~ "Induced for 18 hours",
+			Condition == "None_0_T2" ~ "Induced for 36 hours"))),
 		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = factor(
 			Condition,
 			levels = c(
 				"Uninduced",
-				"Induced at t1",
-				"Induced at t2")))),
+				"Induced for 18 hours",
+				"Induced for 36 hours")))),
 		Type = case_when(
 			type == "control" ~ "Non-targeting Guides",
 			type == "mismatch" ~ "Mismatched Guides",
@@ -224,12 +224,12 @@ aba.cpm %>%
 	unnest(cpm.fit) %>% 
 	select(Type, Condition, `Fitted CPM`) %>% 
 	ggplot(aes(x = `Fitted CPM`, fill = `Condition`)) + 
-	geom_density() + 	
+	geom_density(lwd = 1) + 	
 	scale_fill_viridis(
     discrete = TRUE, 
-    alpha = 0.35, 
-    direction = -1, 
-    option = "cividis") + scale_x_continuous(
+    alpha = 0.7, 
+    direction = 1, 
+    option = "inferno") + scale_x_continuous(
         trans = scales::pseudo_log_trans(base = 10),
         breaks = c(0, 10^(1:6)),
         labels = label_number(scale_cut = cut_short_scale())) + 
@@ -267,9 +267,9 @@ aba.cpm.t <- aba.cpm %>%
 				doc_theme +	
 				scale_fill_viridis(
 		discrete = TRUE, 
-		alpha = 0.3, 
-		direction = -1, 
-		option = "cividis") +
+		alpha = 0.75, 
+		direction = 1, 
+		option = "inferno") +
 	scale_x_continuous(
 		trans = scales::pseudo_log_trans(base = 10),
 		breaks = c(0, 10^(1:6)),

@@ -30,7 +30,7 @@ CellWall <- fread("../../CL704.tsv")
 map03010 <- fread("../../map03010.tsv") 
 
 # Lipopolysaccharide Genes
-LPS <- fread("../../LPS.tsv") 
+LOS <- fread("../../LOS.tsv") 
 
 # NADH Genes
 NADH <- fread("../../NADH.tsv") 
@@ -157,7 +157,7 @@ aba.genome <- curated_names[
 # classify genes as belonging to one pathway
 aba.genome[AB030 %in% CellWall$AB030, Pathway := "Cell Wall/PG"]
 aba.genome[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
-aba.genome[AB030 %in% LPS$AB030, Pathway := "LOS"]
+aba.genome[AB030 %in% LOS$AB030, Pathway := "LOS"]
 aba.genome[AB030 %in% NADH$AB030, Pathway := "NADH"]
 aba.genome[AB030 %in% GO0004812$AB030, Pathway := "tRNA Ligase"]
 aba.genome[is.na(Pathway), Pathway := "Other"]
@@ -279,10 +279,10 @@ to_plot <- pheatmap(
 	fontsize = 12,
 	silent = T)
 	
-to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial"
 to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
-to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial"
 	
 print(to_plot)
 ```
@@ -362,10 +362,10 @@ to_plot <- pheatmap(
 	fontsize = 12,
 	silent = T)
 	
-to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial"
 to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
-to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial"
 	
 print(to_plot)
 ```
@@ -445,10 +445,10 @@ to_plot <- pheatmap(
 	fontsize = 12,
 	silent = T)
 	
-to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial"
 to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
-to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial Narrow"
-to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial Narrow"
+to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial"
+to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial"
 	
 print(to_plot)
 ```
@@ -614,8 +614,8 @@ to_plot <- pheatmap(
 	labels_col = as.expression(conditions.formatted),
 	gaps_col = 2,
 	cutree_rows = 2,
-	# cellheight = 15,
-	# cellwidth = 60,
+	cellheight = 15,
+	cellwidth = 25,
 	fontsize = 12,
 	silent = T)
 	

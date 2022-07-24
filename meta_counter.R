@@ -298,7 +298,7 @@ CellWall <- fread('CL704.tsv') #Cell wall biogenesis/degradation, and Cell Wall/
 
 map03010 <- fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
 
-LPS <- fread('LPS.tsv')
+LOS <- fread('LOS.tsv')
 # CL:3059; Glycolipid metabolic process, and lipopolysaccharide transport
 
 NADH <- fread('NADH.tsv')
@@ -310,7 +310,7 @@ melted_results[AB030 %in% CellWall$AB030, Pathway := "Cell Wall/PG"]
 
 melted_results[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 
-melted_results[AB030 %in% LPS$AB030, Pathway := "LPS"]
+melted_results[AB030 %in% LOS$AB030, Pathway := "LOS"]
 
 melted_results[AB030 %in% NADH$AB030, Pathway := "NADH"]
 
@@ -338,7 +338,7 @@ median_melted_results[AB030 %in% CellWall$AB030, Pathway := "Cell Wall/PG"]
 
 median_melted_results[AB030 %in% map03010$AB030, Pathway := "Ribosome"]
 
-median_melted_results[AB030 %in% LPS$AB030, Pathway := "LPS"]
+median_melted_results[AB030 %in% LOS$AB030, Pathway := "LOS"]
 
 median_melted_results[AB030 %in% NADH$AB030, Pathway := "NADH"]
 

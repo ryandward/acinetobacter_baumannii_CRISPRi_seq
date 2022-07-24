@@ -171,6 +171,8 @@ conditions.full <- c(
 	"Meropenem_0.17_T1 - None_0_T0",
 	"Meropenem_0.17_T2 - None_0_T0")
 
+conditions.full <- contrast_levels
+
 # aba.contrasts <- CJ(
 # 	level2 = colnames(aba.permutations), 
 # 	level1 = colnames(aba.permutations))[
