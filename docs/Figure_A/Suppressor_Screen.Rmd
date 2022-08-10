@@ -15,7 +15,7 @@ library(pacman)
 
 p_load_current_gh("hrbrmstr/hrbrthemes")
 
-p_load(data.table, growthcurver, ggplot2, viridis)
+p_load(data.table, growthcurver, ggplot2, viridis, tidyverse)
 
 
 doc_theme <- theme_ipsum(
@@ -163,7 +163,7 @@ find_bimodal[Strain %like% "s$", second_type := maxRFP > mean(maxRFP), by = .(St
 
 suppressors[, second_type := find_bimodal[.SD, on = .(Well)]$second_type]
 
-suppressors[second_type == TRUE, `New Strain` := paste0(Strain, "R")]
+suppressors[second_type == TRUE, `New Strain` := paste(Strain, "Red")]
 
 suppressors[is.na(`New Strain`), `New Strain` := Strain]
 
@@ -262,12 +262,14 @@ suppressors[Strain != "empty" & Hour == 18] %>%
 this_title <- expression(bold(paste("Normalized RFP to" ~ OD[600] ~ "at" ~ hour[18])))
 
 suppressors[Strain != "empty" & Hour == 18] %>%
-	ggplot( aes( x = `New Strain`, y = RFP_norm / OD600, fill = `New Strain`)) +
+	mutate(Strain = `New Strain`) %>%
+	ggplot( aes( x = `Strain`, y = RFP_norm / OD600, fill = `Strain`)) +
 	geom_boxplot( outlier.colour = NA ) +
 	scale_fill_viridis( discrete = TRUE, alpha = 0.5) +
 	geom_jitter() +
 	ggtitle(this_title) +
 	xlab("") +
-	doc_theme
+	doc_theme +
+	theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 ```
