@@ -24,29 +24,31 @@ bins <- bins[condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")]
 bins <-
 	dcast(bins, unique_name + type ~ condition, value.var = "significant")
 
-bins[`None_0_T1 - None_0_T0` == FALSE & `None_0_T2 - None_0_T0` == FALSE, `Never Vulnerable` := TRUE]
-bins[is.na(`Never Vulnerable`), `Never Vulnerable` := FALSE]
+# bins[`None_0_T1 - None_0_T0` == FALSE & `None_0_T2 - None_0_T0` == FALSE, `Never Vulnerable` := TRUE]
+bins[`None_0_T1 - None_0_T0` == FALSE & `None_0_T2 - None_0_T0` == FALSE, `All Genes` := TRUE]
+
+bins[is.na(`All Genes`), `All Genes` := TRUE]
 ```
 ```{r venn diagram, fig.width=8, fig.height=8}
 
-p.euler <- bins[type == "perfect"] %>% select (-c(unique_name, type)) %>% euler
+p.euler <- bins[type == "perfect"] %>% dplyr::select (-c(unique_name, type)) %>% euler
 
 p <- plot(
 	p.euler,
-	fill = viridis(3, option = "cividis", direction = -1, alpha = 0.25), 
+	fill = viridis(3, option = "magma", direction = -1, alpha = 0.45), 
 	quantities = T,
-	lwd = 0.5)
+	lwd = 5)
 
 oldGrob <- getGrob(p, "tag.label.1")
-newGrob <- editGrob(oldGrob, label = bquote(Vulnerable~by~t[1]))
+newGrob <- editGrob(oldGrob, label = bquote(bold(18)~Hours))
 p <- setGrob(p, "tag.label.1", newGrob)
 
 oldGrob <- getGrob(p, "tag.label.2")
-newGrob <- editGrob(oldGrob, label = bquote(Vulnerable~between~t[1]~and~t[2]))
+newGrob <- editGrob(oldGrob, label = bquote(bold(36)~Hours))
 p <- setGrob(p, "tag.label.2", newGrob)
 
 oldGrob <- getGrob(p, "tag.label.3")
-newGrob <- editGrob(oldGrob, label = bquote(Not~vulnerable))
+newGrob <- editGrob(oldGrob, label = bquote(bold(The~Rest)))
 p <- setGrob(p, "tag.label.3", newGrob)
 
 print(p)
@@ -61,7 +63,7 @@ vulnerability.comb_mat <-
     pivot_wider(
         id_cols = unique_name, 
         names_from = condition, values_from = depleted) %>% 
-    select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
+    dplyr::select(`None_0_T1 - None_0_T0`, `None_0_T2 - None_0_T0`) %>% 
     make_comb_mat() 
 
 UpSet(

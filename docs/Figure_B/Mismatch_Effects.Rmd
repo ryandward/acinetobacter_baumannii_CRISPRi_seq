@@ -218,6 +218,7 @@ results.all.comparison[!is.na(y_pred)] %>%
 		limits = c(0, 1),
 		oob = squish) +
 	theme_ipsum() +
+	theme_bw()+
 	theme(legend.position = "bottom") +
 	ggtitle("Fitness LogFC in Mismatch Guides versus Perfect Guides")
 ```

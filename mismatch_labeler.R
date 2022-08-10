@@ -33,6 +33,7 @@ lpxC.stuff <- data.table(lpxC.stuff)
 lpxC.stuff[, index := .I]
 
 lpxC.stuff %>% 
+	filter (target == "CCAGCACTACCATCCATAAT") %>%
 	ggplot(aes(
 		y = reorder(spacer, index), 
 		x = y_pred)) + 
@@ -40,17 +41,12 @@ lpxC.stuff %>%
 		aes(fill = target),
 		colour = "black") +
 	doc_theme +
-	scale_fill_viridis(discrete = T) +
+	scale_fill_viridis(discrete = T, option = "cividis", alpha = 0.5) +
 	scale_y_discrete(labels = function(L) parse(text = L)) +
+	xlim(-1, 0.5)
 	# scale_linetype_manual(values = c("dashed", "solid")) +
 	theme_bw() +
 	theme(axis.text.y = element_text(size = 16, family = "Courier"),
 		legend.position = "none") +
 	xlab("Predicted Knockdown") + 
-	ylab("Guide Sequence") +
-	
-
-
-# mutate(
-# 	y_pred = case_when(is.na(y_pred) ~ 1, TRUE ~ y_pred), 
-# 	spacer = fct_reorder(spacer, y_pred)) %>% 
+	ylab("Guide Sequence")

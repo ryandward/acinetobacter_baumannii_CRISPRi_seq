@@ -18,6 +18,13 @@ p_load_current_gh("hrbrmstr/hrbrthemes")
 p_load(data.table, growthcurver, ggplot2, viridis)
 
 
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
+
 suppressor_layout <- fread("../../Suppressor/layout.tsv", header = T)
 suppressor_OD600  <- fread("../../Suppressor/OD600.tsv")
 suppressor_RFP    <- fread("../../Suppressor/RFP.tsv")
@@ -181,7 +188,7 @@ this.plot <-
     stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.99) +
 		scale_fill_ipsum() +
 		scale_color_ipsum() +
-		theme_ipsum() +
+		doc_theme +
     ggtitle("Suppressor Growth Stats (OD600), 99% CI")
   
 plot(this.plot)
@@ -196,7 +203,7 @@ this.plot <-
     stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.99) +
 		scale_fill_ipsum() +
 		scale_color_ipsum() +
-		theme_ipsum() +
+		doc_theme +
     ggtitle("Suppressor Growth Stats (OD600 fit), 99% CI")
   
 plot(this.plot)
@@ -216,7 +223,7 @@ this.plot <-
     stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.50) +
 		scale_fill_ipsum() +
 		scale_color_ipsum() +
-		theme_ipsum() +
+		doc_theme +
     ggtitle("Suppressor Growth Stats (normalized RFP), 50% CI")
   
   plot(this.plot)
@@ -231,7 +238,7 @@ this.plot <-
     stat_smooth(formula = y ~ s(x, bs = "cs"), method = "gam", level = 0.50) +
 		scale_fill_ipsum() +
 		scale_color_ipsum() +
-		theme_ipsum() +
+		doc_theme +
     ggtitle("Suppressor Growth Stats (normalized RFP / OD600), 50% CI")
   
   plot(this.plot)
@@ -248,7 +255,7 @@ suppressors[Strain != "empty" & Hour == 18] %>%
 	geom_boxplot( outlier.colour = NA ) +
 	scale_fill_viridis( discrete = TRUE, alpha = 0.5) +
 	geom_jitter() +
-	theme_ipsum() +
+	doc_theme +
 	ggtitle(this_title) +
 	xlab("Strain")
 
@@ -261,6 +268,6 @@ suppressors[Strain != "empty" & Hour == 18] %>%
 	geom_jitter() +
 	ggtitle(this_title) +
 	xlab("") +
-	theme_ipsum()
+	doc_theme
 
 ```

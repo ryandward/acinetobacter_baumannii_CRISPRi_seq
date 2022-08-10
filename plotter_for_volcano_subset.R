@@ -15,11 +15,41 @@ doc_theme <- theme_ipsum(
 	axis_title_size = 12,
 	axis_col = "black")
 
+median_melted_results %>%
+	filter(condition ==  "None_0_T2 - None_0_T0" & type == "perfect") %>%
+	mutate(Depleted = case_when(medLFC < -1 & FDR < 0.05 ~ TRUE)) %>%
+	ggplot(
+		aes(x = medLFC,
+				y = FDR,
+				colour = Depleted)) +
+	geom_point() +
+	geom_point(data = . %>% filter(Depleted == TRUE), size = 3) +
+	geom_hline(yintercept = 0.05,
+						 linetype = "dashed",
+						 color = "red",
+						 lwd = 1) +
+	geom_vline(xintercept = -1,
+						 linetype = "dashed",
+						 color = "red", 
+						 lwd = 1) +
+	geom_vline(xintercept = 0,
+						 linetype = "solid",
+						 color = "black",
+						 lwd = 1) +
+	doc_theme +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
+	scale_colour_manual(values = c("red"), na.value = "grey") +
+	theme(legend.position = "bottom") +
+	theme(legend.position="none")-> to_plot
+
+print(to_plot)
+
+
 #T1 Ribosomes
 
 
 median_melted_results %>%
-	filter(condition ==  "None_0_T1 - None_0_T0" & type == "perfect") %>%
+	filter(condition ==  "None_0_T2 - None_0_T0" & type == "perfect") %>%
 	mutate(Pathway = case_when(
 		Pathway == "Ribosome" ~ "Ribosome",
 		TRUE ~ NA_character_)) %>%
@@ -31,21 +61,28 @@ median_melted_results %>%
 	geom_point(data = . %>% filter(Pathway == "Ribosome"), size = 3) +
 	geom_hline(yintercept = 0.05,
 						 linetype = "dashed",
-						 color = "red") +
+						 color = "red",
+						 lwd = 1) +
+	geom_vline(xintercept = -1,
+						 linetype = "dashed",
+						 color = "red", 
+						 lwd = 1) +
 	geom_vline(xintercept = 0,
-						 linetype = "dotted",
-						 color = "black") +
+						 linetype = "solid",
+						 color = "black",
+						 lwd = 1) +
 	doc_theme +
 	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	scale_colour_manual(values = c("dark red"), na.value = "grey") +
 	theme(legend.position = "bottom") +
 	geom_text_repel(
-		data = . %>% filter(Pathway == "Ribosome" & FDR < 0.05),
+		data = . %>% filter(Pathway == "Ribosome" & FDR < 0.05 & medLFC < -1),
 		aes(label = gene_name_stylized),
 		min.segment.length = 0,
 		parse = TRUE,
 		max.overlaps = Inf,
-		colour = "black") -> to_plot
+		colour = "black") +
+	theme(legend.position="none")-> to_plot
 
 print(to_plot)
 
@@ -53,7 +90,7 @@ print(to_plot)
 	#T1 nuo
 	
 median_melted_results %>%
-	filter(condition ==  "None_0_T1 - None_0_T0" & type == "perfect") %>%
+	filter(condition ==  "None_0_T2 - None_0_T0" & type == "perfect") %>%
 	mutate(Pathway = case_when(
 		Pathway == "NADH" ~ "NADH",
 		TRUE ~ NA_character_)) %>%
@@ -65,10 +102,16 @@ median_melted_results %>%
 	geom_point(data = . %>% filter(Pathway == "NADH"), size = 3) +
 	geom_hline(yintercept = 0.05,
 						 linetype = "dashed",
-						 color = "red") +
+						 color = "red",
+						 lwd = 1) +
+	geom_vline(xintercept = -1,
+						 linetype = "dashed",
+						 color = "red", 
+						 lwd = 1) +
 	geom_vline(xintercept = 0,
-						 linetype = "dotted",
-						 color = "black") +
+						 linetype = "solid",
+						 color = "black",
+						 lwd = 1) +
 	doc_theme +
 	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 	scale_colour_manual(values = c("dark cyan"), na.value = "grey") +
@@ -79,7 +122,8 @@ median_melted_results %>%
 		min.segment.length = 0,
 		parse = TRUE,
 		max.overlaps = Inf,
-		colour = "black") -> to_plot
+		colour = "black")+
+	theme(legend.position="none") -> to_plot
 
 print(to_plot)
 
