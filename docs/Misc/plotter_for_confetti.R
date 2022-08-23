@@ -1,8 +1,14 @@
 library(pacman)
 
-source("meta_counter.R")
+# source("meta_counter.R")
 
 p_load(ggplot2, data.table, pheatmap, ggrepel, hrbrthemes, viridis)
+
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 
@@ -90,7 +96,7 @@ for (exp_shift in chemicals$condition) {
 		scale_fill_viridis(discrete = TRUE, alpha = 0.5, direction = -1) +
 		scale_color_viridis(discrete = TRUE, alpha = 0.7, direction = -1) +
 		ggtitle(paste(exp_shift, "vs", comp_shift)) +
-		theme_ipsum()
+		doc_theme
 		
 	print(hw_sp)
 	

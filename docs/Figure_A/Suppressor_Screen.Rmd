@@ -164,6 +164,8 @@ find_bimodal[Strain %like% "s$", second_type := maxRFP > mean(maxRFP), by = .(St
 suppressors[, second_type := find_bimodal[.SD, on = .(Well)]$second_type]
 
 suppressors[second_type == TRUE, `New Strain` := paste(Strain, "Red")]
+suppressors[second_type == FALSE, `New Strain` := paste(Strain, "White")]
+
 
 suppressors[is.na(`New Strain`), `New Strain` := Strain]
 
@@ -272,5 +274,40 @@ suppressors[Strain != "empty" & Hour == 18] %>%
 	xlab("") +
 	doc_theme +
 	theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+suppressors[Strain != "empty" & Hour == 18] %>%
+	mutate(Strain = `New Strain`) %>%
+	mutate(Strain = case_when(
+		Strain == "s245" ~ "Parent",
+		Strain == "s245s Red" ~ "Suppressor (Red)",
+		Strain == "s245s White" ~ "Suppressor (White)",
+		Strain == "s246" ~ "No guide",
+		Strain == "s272" ~ "WT (No RFP)"
+	),
+	Strain = factor(
+		Strain,
+		levels = c(
+			"WT (No RFP)",
+			"No guide",
+			"Parent",
+			"Suppressor (Red)",
+			"Suppressor (White)"))) %>%
+	filter(!is.na(Strain)) %>%
+	ggplot( aes( x = `Strain`, y = RFP_norm / OD600, fill = `Strain`)) +
+	geom_jitter(alpha = 0.5) +
+	geom_boxplot( outlier.colour = NA, alpha = 0.5 ) +
+scale_fill_manual(
+  values =
+    c("WT (No RFP)" = alpha("black", 0.50), 
+      "No guide" = alpha("grey", 0.50),
+      "Parent" = alpha("#6A3D9A", 0.5),
+      "Suppressor (Red)" = alpha("#E31A1C", 0.50))) +
+	xlab("") +
+	doc_theme +
+	theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+	theme(legend.position = "none") +
+	xlab("") +
+	ylab("OD600-normalized RFP")
+	
 
 ```

@@ -5,6 +5,10 @@ library(ggallin)
 library(hrbrthemes)
 library(broom)
 library(ggtext)
+library(conflicted)
+
+conflict_prefer("rename", "dplyr")
+conflict_prefer("filter", "dplyr")
 
 growth_means_inhibition <- 0.15
 colistin.max <- 3
@@ -57,10 +61,11 @@ growth <- rbind(
 	inner_join(colistin.dose) %>%
 	filter(colistin < 3 & rifampicin < 1.28) 
 
+
 growth$gene <- factor(
 	growth$gene,
-	levels=c("lpxC","nt","nuoB"),
-	labels=c("bolditalic(lpxC)","non-targeting","bolditalic(nuoB)"))
+	levels=c("nt","lpxC","nuoB"),
+	labels=c("non-targeting", "bolditalic(lpxC)","bolditalic(nuoB)"))
 
 # growth %>% filter(
 #   growth.prop < 0.1 & rifampicin == 0) %>% 
@@ -143,6 +148,7 @@ growth <- growth %>%
 	inner_join(synergy_tally)
 
 
+
 growth %>% 
 	left_join(mic.rifampicin) %>% 
 	left_join(mic.colistin) %>%
@@ -166,7 +172,7 @@ growth %>%
 	geom_point(
 		pch = 21, 
 		cex = 5,
-		alpha = 0.5,
+		alpha = 0.75,
 		aes(fill = Interaction)) +
 	# geom_point(
 	#   # alpha = 1,
@@ -222,12 +228,14 @@ growth %>%
 geom_richtext(
 	data = . %>% filter(colistin == mic.colistin & rifampicin == min.rifampicin/2),
 	aes(label = str_wrap(paste("MIC:",colistin), 12), y = colistin, hjust = 0),
-	fill = "cornsilk") +
+	fill = "cornsilk",
+	size = 3) +
 	geom_richtext(
 		data = . %>% filter(rifampicin == mic.rifampicin & colistin == min.colistin/2),
 		aes(label = str_wrap(paste("MIC:",rifampicin), 12), x = rifampicin, hjust = 0), 
 		angle = 90,
-		fill = "cornsilk") +
+		fill = "cornsilk",
+		size = 3) +
 	theme(
 		legend.position = 'bottom', legend.direction = "horizontal",
 		plot.background = element_blank(),
@@ -243,8 +251,8 @@ geom_richtext(
 		facets = c("gene"),
 		labeller = label_parsed) +
 	coord_cartesian(
-		xlim=c(min.rifampicin/2.5, max.rifampicin*2),
-		ylim=c(min.colistin/2.5, max.colistin*2))
+		xlim = c(min.rifampicin/2.5, max.rifampicin*2),
+		ylim = c(min.colistin/2.5, max.colistin*2))
 
 
 

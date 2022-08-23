@@ -57,7 +57,7 @@ aba_design <- aba_design[experiment == "tube"]
 
 publication_design <- copy(aba_design)
 
-publication_design[, timing := gsub("T", "t", timing)]
+# publication_design[, timing := gsub("T", "t", timing)]
 
 publication_design[, rep := paste0("(", rep, ")")]
 
@@ -106,7 +106,7 @@ plot_object <- d_scale %>%
 		shape = Timing)) +
 	geom_point(size = 5) +
 	doc_theme +
-	ggtitle(this_title) +
+	# ggtitle(this_title) +
 	scale_fill_manual(
 		values = alpha(
 			c(
@@ -118,7 +118,7 @@ plot_object <- d_scale %>%
 				"#e31a1c", # Rifampicin 0.34 
 				"#ff7f00"  # Colistin 0.44 
 				),
-			0.35)) +
+			0.50)) +
 	scale_shape_manual(
 		name = "Timing", 
 		values = c(21, 22, 23)) +
@@ -344,12 +344,15 @@ aba.cpm %>%
 	mutate(Type = type) %>%
 	filter(`Sample Name` %like% "No drug") %>%
 	ggplot(aes(x = `Replicate 1`, y = `Replicate 2`)) + 
-	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
-	geom_point(aes(color = Type), shape = 20) + scale_color_viridis(
-		discrete = TRUE,
-		alpha = c(0.15, 0.25, 0.35),
-		direction = -1,
-		option = "viridis") + facet_wrap(facets = c("`Sample Name`")) + theme(
+	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "black") +
+	geom_point(aes(color = Type)) + 
+	scale_colour_manual(
+		values =
+			c("control" = alpha("grey", 0.10), 
+				"mismatch" = alpha("#1F78B4", 0.10),
+				"perfect" = alpha("#E31A1C", 0.5))) +
+	facet_wrap(facets = c("`Sample Name`")) + 
+	theme(
 			legend.position = "bottom",
 			legend.key = element_rect(fill = "#ECECEC")) +
 	guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) + 
@@ -373,12 +376,15 @@ aba.cpm %>%
 	mutate(Type = type) %>%
 	filter(!`Sample Name` %like% "No drug") %>%
 	ggplot(aes(x = `Replicate 1`, y = `Replicate 2`)) + 
-	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "red") +
-	geom_point(aes(color = Type), shape = 20) + scale_color_viridis(
-		discrete = TRUE,
-		alpha = c(0.15, 0.25, 0.35),
-		direction = -1,
-		option = "viridis") + facet_wrap(facets = c("`Sample Name`")) + theme(
+	geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "black") +
+	geom_point(aes(color = Type)) + 
+	scale_colour_manual(
+		values =
+			c("control" = alpha("grey", 0.15), 
+				"mismatch" = alpha("#1F78B4", 0.15),
+				"perfect" = alpha("#E31A1C", 0.5))) +
+	facet_wrap(facets = c("`Sample Name`")) + 
+	theme(
 			legend.position = "bottom",
 			legend.key = element_rect(fill = "#ECECEC")) +
 	guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) + 

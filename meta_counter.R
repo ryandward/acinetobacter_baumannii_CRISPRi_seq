@@ -356,7 +356,7 @@ setorder(median_melted_results, FDR)
 
 median_melted_results[!unique_name %like% "GO593", gene_name_stylized := paste0("italic('", unique_name, "')")]
 
-median_melted_results[unique_name %like% "GO593", gene_name_stylized := paste0("bold('", unique_name, "')")]
+median_melted_results[unique_name %like% "GO593", gene_name_stylized := paste0(unique_name)]
 
 
 ##########################################################################################

@@ -93,18 +93,19 @@ followup.5.depletion.rifampicin.plot <-
 	filter(induced == "on") %>%
 	ggplot(aes(x = hour, y = OD600, fill = strain, colour = strain)) + 
 	stat_smooth(
-		alpha = 1,
+		# alpha = 1,
 		fullrange = TRUE, 
 		level = 0.95,
 		method = "gam",
 		formula = y ~ s(x, bs = "cs")) +
 	# geom_hline(yintercept = 0.5, linetype="dashed", color = "red") +
-	facet_wrap(facets = c("dose"), ncol = 4) +
+	facet_wrap(facets = c("drug", "dose"), ncol = 4) +
 	scale_fill_ipsum()+
 	scale_colour_ipsum() +
+	# scale_y_continuous(trans = 'log10') +
 	# ggtitle(
-	# 	bquote(bold("Growth Phenotypes for")~bolditalic("Acinetobacter baumannii.")),
-	# 	subtitle = ~"Induced 18 hours before exposure to antibiotics.") +
+	# bquote(bold("Growth Phenotypes for")~bolditalic("Acinetobacter baumannii.")),
+	# subtitle = "Induced 18 hours before exposure to antibiotics.") +
 	doc_theme
 
 print(followup.5.depletion.rifampicin.plot)

@@ -10,6 +10,12 @@ library(pacman)
 
 p_load(data.table, edgeR, pheatmap, viridis, tidyverse, hrbrthemes, statmod, scales)
 
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
 # reads
 aba.counts <- fread(
 	"../../all_counts_seal.tsv.gz",
@@ -171,7 +177,7 @@ conditions.full <- c(
 	"Meropenem_0.17_T1 - None_0_T0",
 	"Meropenem_0.17_T2 - None_0_T0")
 
-conditions.full <- contrast_levels
+conditions.full <- conditions.full
 
 # aba.contrasts <- CJ(
 # 	level2 = colnames(aba.permutations), 
@@ -206,19 +212,32 @@ results.all.comparison[, `Predicted Knockdown` := y_pred]
 
 results.all.comparison[!is.na(y_pred)] %>% 
 	arrange(LFC.adj.mismatch) %>%
+	mutate(`Predicted knockdown` = `Predicted Knockdown`) %>%
 	ggplot(aes(
 		x = LFC.adj.perfect, 
 		y = LFC.adj.mismatch, 
-		color = `Predicted Knockdown`)) + 
-	geom_point(alpha = 0.25, pch = 20, size = 2, stroke = 0) + 
-	scale_color_viridis(
-		option = "inferno",
-		discrete = FALSE, 
-		direction = 1,
-		limits = c(0, 1),
-		oob = squish) +
-	theme_ipsum() +
+		color = `Predicted knockdown`)) + 
+	geom_point(alpha = 0.05, pch = 20, size = 2, stroke = 0) + 
+	# scale_color_viridis(
+	# 	option = "magma",
+	# 	discrete = FALSE, 
+	# 	direction = 1,
+	# 	limits = c(0, 1),
+	# 	oob = squish) +
+	scale_colour_gradient2(
+  low = "#1F78B4",
+  mid = "#6A3D9A",
+  midpoint = 0.5,
+  high = "#E31A1C",
+  space = "Lab",
+  na.value = "grey50",
+  guide = "colourbar",
+  aesthetics = "colour",
+  limits = c(0, 1),
+  oob = squish) +
+	doc_theme +
 	theme_bw()+
-	theme(legend.position = "bottom") +
-	ggtitle("Fitness LogFC in Mismatch Guides versus Perfect Guides")
+	xlab("Log2 fold-change (Perfect)") +
+	ylab("Log2 fold-change (Mismatch)") +
+	theme(legend.position = "bottom")
 ```

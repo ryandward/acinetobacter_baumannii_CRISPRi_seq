@@ -91,9 +91,9 @@ aba.design <- aba.design %>%
 aba.counts.verbose <- aba.counts %>%
 	inner_join(aba.design) %>% 
 	inner_join(aba.key) %>%
-	unite("Condition", drug, dose, timing, sep = "_") %>% 
-	unite("Sample",    Condition, rep, sep = "_", remove = FALSE) %>% 
-	select(type, spacer, count, Condition, Sample, generations) %>%
+	unite("Sample", drug, dose, timing, sep = "_") %>% 
+	unite("Sample",    Sample, rep, sep = "_", remove = FALSE) %>% 
+	select(type, spacer, count, Sample, Sample, generations) %>%
 	group_by(type) %>%
 	nest %>% 
 	mutate(
@@ -109,8 +109,8 @@ aba.counts.verbose <- aba.counts %>%
 
 aba.group <- aba.design %>%
 	as_tibble %>%
-	unite("Condition", drug, dose, timing, sep = "_") %>% 
-	pull(Condition) %>% 
+	unite("Sample", drug, dose, timing, sep = "_") %>% 
+	pull(Sample) %>% 
 	factor
 
 aba.permut <- model.matrix( ~ 0 + aba.group)
@@ -151,41 +151,43 @@ aba.cpm <- aba.edgeR %>%
 		cpm.fit = map2(
 			fit, 
 			y, 
+			#~cpm(y = .x$fitted.values)),
 			~cpm(y = .x$fitted.values, lib.size = exp(getOffset(.y)))),
 		cpm.fit = map(
 			cpm.fit, 
 			~as_tibble(., rownames = "spacer")),
 		cpm.fit = map(
 			cpm.fit,
-			~pivot_longer(.x, !spacer, names_to = "Sample", values_to = "Fitted CPM")),
+			~pivot_longer(.x, !spacer, names_to = "Sample", values_to = "Counts per Million (Fitted)")),
 		cpm.fit = map(
 			cpm.fit,
 			~filter(.x, Sample %in% c(
 				"None_0_T0_1",
 				"None_0_T1_1",
 				"None_0_T2_1"))),
-		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = gsub("_[0-9]$", "", Sample))),
-		cpm.fit = map(cpm.fit, ~.x %>% select(Condition, spacer, `Fitted CPM`)),
-		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = case_when(
-			Condition == "None_0_T0" ~ "Uninduced",
-			Condition == "None_0_T1" ~ "Induced for 18 hours",
-			Condition == "None_0_T2" ~ "Induced for 36 hours"))),
-		cpm.fit = map(cpm.fit, ~.x %>% mutate(Condition = factor(
-			Condition,
+		cpm.fit = map(cpm.fit, ~.x %>% mutate(Sample = gsub("_[0-9]$", "", Sample))),
+		cpm.fit = map(cpm.fit, ~.x %>% select(Sample, spacer, `Counts per Million (Fitted)`)),
+		cpm.fit = map(cpm.fit, ~.x %>% mutate(Sample = case_when(
+			Sample == "None_0_T0" ~ "Uninduced",
+			Sample == "None_0_T1" ~ "Induced for 18 hours",
+			Sample == "None_0_T2" ~ "Induced for 36 hours"))),
+		cpm.fit = map(cpm.fit, ~.x %>% mutate(Sample = factor(
+			Sample,
 			levels = c(
 				"Uninduced",
 				"Induced for 18 hours",
 				"Induced for 36 hours")))),
-		Type = case_when(
-			type == "control" ~ "Non-targeting Guides",
-			type == "mismatch" ~ "Mismatched Guides",
-			type == "perfect" ~ "Perfect Guides"),
+		Type = type,
+		# Type = case_when(
+		# 	type == "control" ~ "Non-targeting Guides",
+		# 	type == "mismatch" ~ "Mismatched Guides",
+		# 	type == "perfect" ~ "Perfect Guides"),
 		Type = factor(
 			Type,
 			levels = c(
-				"Non-targeting Guides",
-				"Mismatched Guides",
-				"Perfect Guides")))
+				"control",
+				"mismatch",
+				"perfect")))
 ```
 
 Do stats to normalize by z-score and change to distribution of controls. https://stats.stackexchange.com/questions/46429/transform-data-to-desired-mean-and-standard-deviation
@@ -195,17 +197,17 @@ Do stats to normalize by z-score and change to distribution of controls. https:/
 # 	mutate(
 # 		summary = map(
 # 		  cpm.fit, 
-# 		  ~.x %>% group_by(Condition) %>% 
+# 		  ~.x %>% group_by(Sample) %>% 
 # 		      summarise(
-# 		          mean = mean(`Fitted CPM`) %>% round(3),
-# 		          med = median(`Fitted CPM`) %>% round(3),
-# 		          min = min(`Fitted CPM`) %>% round(3),
-# 		          max = max(`Fitted CPM`) %>% round(3),
-# 		          sd = sd(`Fitted CPM`) %>% round(3))),
+# 		          mean = mean(`Counts per Million (Fitted)`) %>% round(3),
+# 		          med = median(`Counts per Million (Fitted)`) %>% round(3),
+# 		          min = min(`Counts per Million (Fitted)`) %>% round(3),
+# 		          max = max(`Counts per Million (Fitted)`) %>% round(3),
+# 		          sd = sd(`Counts per Million (Fitted)`) %>% round(3))),
 # 		cpm.fit = map2(
 # 			cpm.fit,
 # 			summary,
-# 			~inner_join(.x, .y) %>% mutate(z = (`Fitted CPM` - mean) / sd )))
+# 			~inner_join(.x, .y) %>% mutate(z = (`Counts per Million (Fitted)` - mean) / sd )))
 # 
 # aba.cpm <- aba.cpm %>%
 # 	mutate(
@@ -214,25 +216,27 @@ Do stats to normalize by z-score and change to distribution of controls. https:/
 # 			~inner_join(
 # 				.x, 
 # 				aba.cpm %>% ungroup %>% filter(type == "control") %>% select(summary) %>% unnest(c(summary)), 
-# 				by = "Condition")))
+# 				by = "Sample")))
 # 
-# aba.cpm <- aba.cpm %>% mutate(cpm.fit = map(cpm.fit, ~.x %>% mutate(`Normalized Fitted CPM` = z * sd.y + mean.y)))
+# aba.cpm <- aba.cpm %>% mutate(cpm.fit = map(cpm.fit, ~.x %>% mutate(`Normalized Counts per Million (Fitted)` = z * sd.y + mean.y)))
 ```
 
 ```{r fig.height=3, fig.width=12}
 aba.cpm %>% 
 	unnest(cpm.fit) %>% 
-	select(Type, Condition, `Fitted CPM`) %>% 
-	ggplot(aes(x = `Fitted CPM`, fill = `Condition`)) + 
-	geom_density(lwd = 1) + 	
-	scale_fill_viridis(
-    discrete = TRUE, 
-    alpha = 0.7, 
-    direction = 1, 
-    option = "inferno") + scale_x_continuous(
+	select(Type, Sample, `Counts per Million (Fitted)`) %>% 
+	ggplot(aes(x = `Counts per Million (Fitted)`, fill = `Sample`)) + 
+	geom_density(lwd = 1, alpha = 0.5) + 
+	scale_fill_manual(values = RColorBrewer::brewer.pal(6,"Paired")[c(TRUE, FALSE)]) +
+# 	scale_fill_viridis(
+#     discrete = TRUE, 
+#     alpha = 0.7, 
+#     direction = 1, 
+#     option = "inferno") + 
+	scale_x_continuous(
         trans = scales::pseudo_log_trans(base = 10),
         breaks = c(0, 10^(1:6)),
-        labels = label_number(scale_cut = cut_short_scale())) + 
+        labels = label_number(scale_cut = cut_short_scale())) +
 	facet_wrap(~ Type) + 
 	doc_theme
 
@@ -252,7 +256,7 @@ cpm.max <- aba.cpm %>%
 	ungroup %>% 
 	select(cpm.fit) %>% 
 	unnest(cols = "cpm.fit") %>% 
-	select(`Fitted CPM`) %>% max
+	select(`Counts per Million (Fitted)`) %>% max
 
 aba.cpm.t <- aba.cpm %>%
 	mutate(
@@ -261,7 +265,7 @@ aba.cpm.t <- aba.cpm %>%
 			Type,
 			~ggplot(
 				.x,
-				aes(x = `Fitted CPM`, fill = `Condition`)) +
+				aes(x = `Counts per Million (Fitted)`, fill = `Sample`)) +
 				geom_density() +
 				ggtitle(.y) +
 				doc_theme +	
@@ -285,21 +289,21 @@ cpm.max <- aba.cpm %>%
 	ungroup %>% 
 	select(cpm.fit) %>% 
 	unnest(cols = "cpm.fit") %>% 
-	select(`Fitted CPM`) %>% max
+	select(`Counts per Million (Fitted)`) %>% max
 
 aba.cpm.t <- aba.cpm %>%
     unnest(cols = c(cpm.fit)) %>%
-    group_by(Condition) %>% 
-	select(`Type`, `Condition`, spacer, `Fitted CPM`) %>% 
-	group_by(Condition) %>% 
+    group_by(Sample) %>% 
+	select(`Type`, `Sample`, spacer, `Counts per Million (Fitted)`) %>% 
+	group_by(Sample) %>% 
 	nest %>%
 	mutate(
 		plot = map2(
 			data,
-			`Condition`,
+			`Sample`,
 			~ggplot(
 				.x,
-				aes(x = `Fitted CPM`, fill = `Type`)) +
+				aes(x = `Counts per Million (Fitted)`, fill = `Type`)) +
 				geom_density() +
 				ggtitle(.y) +
 				doc_theme +
@@ -317,7 +321,7 @@ aba.cpm.t <- aba.cpm %>%
 print(aba.cpm.t$plot)
 ```
 
-Conditions that we're interested in measuring the differences between
+Samples that we're interested in measuring the differences between
 
 ```{r}
 conditions.full <- c(
@@ -494,8 +498,8 @@ aba.counts.stats <- aba.counts.stats %>%
 	mutate(rep = paste("Rep", rep)) %>%
 	mutate(dose.with_units = paste0(dose,"ng/μL")) %>%
 	unite(
-		"Condition", drug, dose.with_units, timing, remove = F) %>% 
-	group_by(Condition)
+		"Sample", drug, dose.with_units, timing, remove = F) %>% 
+	group_by(Sample)
 
 logFC.range <- aba.counts.stats %>% filter(!is.infinite(logFC.adj)) %>% pull(logFC.adj) %>% range
 
@@ -509,13 +513,13 @@ aba.counts.stats.reps <- aba.counts.stats %>%
 			id_cols = c(Type, spacer), 
 			names_from = rep, 
 			values_from = logFC.adj))) %>%
-	filter(Condition != "None_0ng/μL_T0") %>% 
+	filter(Sample != "None_0ng/μL_T0") %>% 
 	mutate(
 		data.finite = map(
 			data, ~.x %>% filter(is.finite(`Rep 1`) & is.finite(`Rep 2`))), 
 		correlation = map_dbl(data.finite, ~cor(.x$`Rep 1`, .x$`Rep 2`)),
 		Title = paste0(
-			"LogFC: ", gsub("_", " ", Condition), 
+			"Log2FC: ", gsub("_", " ", Sample), 
 			"(Cor=", round(correlation, 3), ")"))
 	
 
@@ -544,32 +548,80 @@ aba.counts.stats.reps <- aba.counts.stats.reps %>%
 			guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))))) 
 
 aba.counts.stats.reps %>% pull(plot) %>% print
+
+########
+
+aba.counts.stats.reps %>% 
+	filter(Sample %like% "None") %>% 
+	mutate(Title = gsub("Log2FC: None 0ng/μL ", "", Title)) %>%
+	mutate(Title = gsub("Cor=", "", Title)) %>%
+	mutate(Title = gsub("\\(", "~(R^2~", Title)) %>%
+    unnest(data) %>% 
+    ggplot(
+        aes(x = `Rep 1`, y = `Rep 2`)) +
+    geom_abline(intercept = 0, slope = 1, size = 0.5, colour = "black") +
+    geom_point(aes(color = Type), cex = 2) +
+    facet_wrap(~Title, labeller = label_parsed) +
+    scale_colour_manual(
+        values =
+            c("control" = alpha("grey", 0.5), 
+              "mismatch" = alpha("#1F78B4", 0.5),
+              "perfect" = alpha("#E31A1C", 0.5)))  + 
+	doc_theme +
+	theme(legend.position = "none")
+
 ```
 
 Violin Plots
 
 ```{r}
 aba.counts.violin <- aba.counts.stats %>% 
+	mutate(Log2FC = logFC.adj) %>%
 	mutate(rep = paste("Rep", rep)) %>%
 	mutate(dose.with_units = paste0(dose,"ng/μL")) %>%
 	unite(
-		"Condition", drug, dose.with_units, timing, remove = F, sep = " ") %>% 
-	filter((Condition %like% "None") & timing != "T0") %>% 
+		"Sample", drug, dose.with_units, timing, remove = F, sep = " ") %>% 
+	filter((Sample %like% "None") & timing != "T0") %>% 
 		mutate(
-			Condition = gsub("^", "Induction + ", Condition),
-			Condition = gsub(" \\+ None 0ng/μL", "", Condition),
-			Condition = gsub("(T[1,2])", "at \\1", Condition),
-			Condition = factor(Condition, levels = unique(Condition)),
-			Condition = factor(Condition, levels = rev(levels(Condition))),
+			Sample = gsub("^", "Induction + ", Sample),
+			Sample = gsub(" \\+ None 0ng/μL", "", Sample),
+			Sample = gsub("(T[1,2])", "at \\1", Sample),
+			Sample = factor(Sample, levels = unique(Sample)),
+			Sample = factor(Sample, levels = rev(levels(Sample))),
 			Type = factor(type),
 			Type = factor(Type, levels = rev(levels(Type)))) %>%
-	ggplot(aes(x = Condition, y = `logFC.adj`, fill = Type)) + 
-	geom_violin(alpha = 0.5, width = 0.65) + 
+	ggplot(aes(x = Sample, y = Log2FC, fill = Type)) + 
+	geom_violin(alpha = 1, width = 0.5) + 
 	doc_theme + 
-	scale_fill_viridis(discrete = T, direction = 1, option = "viridis") + 
+	scale_fill_manual(values = rev(RColorBrewer::brewer.pal(6,"Paired")[c(TRUE, FALSE)])) +
 		coord_flip() +
 	  guides(fill = guide_legend(reverse = TRUE)) +
 	ggtitle("Distribution of Guide Depletion")
 
 print(aba.counts.violin)
+```
+
+```{r}
+melted_results <- fread("../../Results/melted_results.tsv.gz")
+interest <- fread("../../interest.tsv", sep = "\t")
+
+melted_results %>% 
+	filter(condition %in% interest$condition) %>% 
+	filter(shift %like% "None") %>% 
+	mutate(
+		`Fold-change` = 2^LFC.adj, 
+		Type = type, condition = case_when(
+			condition %like% "T1" ~ "T1", 
+			condition %like% "T2" ~ "T2")) %>%  
+	ggplot(aes(x = `Fold-change`)) + 
+	geom_density(
+		aes(fill = Type), 
+		alpha = 0.5) + 
+	facet_wrap(facets = c("condition"), ncol = 2) + 
+	doc_theme +
+	scale_fill_manual(
+		values =
+			c("control" = "grey", 
+				"mismatch" = "#1F78B4",
+				"perfect" = "#E31A1C"))
 ```

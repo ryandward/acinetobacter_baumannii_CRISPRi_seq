@@ -32,7 +32,6 @@ interested.genes <- c(
 	"nuoB",
 	"nuoC",
 	"nuoE",
-	"nuoB",
 	"nuoF",
 	"lpxC",
 	"nuoH",
@@ -46,7 +45,6 @@ interested.genes <- c(
 	"aroA",
 	"aroC",
 	"aroQ",
-	"nuoB",
 	"thiD",
 	"GO593_00515",
 	"folB", 
@@ -1300,6 +1298,62 @@ print(plot.graphic)
 ```{r}
 
 plot.genes <- c("nuoB")
+plot.conditions <- c("None_0_T1 - None_0_T0", "Rifampicin_0.34_T1 - None_0_T0", "Colistin_0.44_T1 - None_0_T0")
+plot.title <- bquote(bold(Gene ~ bolditalic(nuoB) ~ vulnerability ~ at ~ t[1] ~ '(CI = 90%)'))
+plot.graphic <- fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+		ggplot() +
+	geom_hline(
+		yintercept = 0, 
+		linetype = "dashed", 
+		color = "black", 
+		size = 0.5) +
+			geom_line(
+			alpha = 1, 
+			size = 2, 
+			aes(
+				x = y_pred, 
+				y = .fitted, 
+				color = Condition)) +
+	geom_point(
+		data = fit_points %>% filter(
+			Gene %in% plot.genes & 
+				Condition %in% plot.conditions),
+		shape = 20, 
+		size = 5,
+			aes(
+				x = y_pred, 
+				y = LFC.adj, 
+				color = Condition)) + 
+	geom_ribbon(
+		data = fit_predictions %>% filter(
+			Gene %in% plot.genes &
+				Condition %in% plot.conditions),
+		alpha = 0.30,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Condition)) +
+	scale_fill_viridis(discrete = TRUE, direction = -1) +
+	scale_color_viridis(discrete = TRUE, direction = -1) +
+	xlab("Predicted Knockdown") +
+	ylab("Log-2 Fitness Foldchange") +
+	xlim(
+		0, 
+		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
+	doc_theme +
+	theme(legend.position = "bottom") +
+	ggtitle(plot.title)
+
+
+print(plot.graphic)
+
+
+plot.genes <- c("nuoB")
 plot.conditions <- c("None_0_T2 - None_0_T0", "Rifampicin_0.34_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0")
 plot.title <- bquote(bold(Gene ~ bolditalic(nuoB) ~ vulnerability ~ at ~ t[2] ~ '(CI = 90%)'))
 plot.graphic <- fit_predictions %>% 
@@ -1612,7 +1666,10 @@ Manually curated final plot for LOS and nuo story.
 ```{r}
 
 plot.genes <- c("lpxC", "nuoB")
-plot.conditions <- c("None_0_T2 - None_0_T0", "Rifampicin_0.34_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0")
+plot.conditions <- c(
+	"None_0_T2 - None_0_T0", 
+	"Rifampicin_0.34_T2 - None_0_T0", 
+	"Colistin_0.44_T2 - None_0_T0")
 
 plot.labeller <- as_labeller(
 	c(
@@ -1681,8 +1738,6 @@ plot.graphic <- fit_predictions %>%
 
 
 print(plot.graphic)
-
-
 ```
 
 
@@ -1690,17 +1745,19 @@ Manually curated final plot for acc story.
 
 ```{r}
 
-plot.genes <- c("accA", "accB", "accC", "accD")
-plot.conditions <- c("Rifampicin_0.34_T2 - None_0_T0", "Colistin_0.44_T2 - None_0_T0")
+plot.genes <- c("nuoB")
 
-plot.labeller <- as_labeller(
-	c(
-		`Rifampicin_0.34_T2 - None_0_T0` = "Rifampicin",
-		`Colistin_0.44_T2 - None_0_T0` = "Colistin"))
-		
-plot.title <- bquote(bold(Vulnerability ~ at ~ t[2] ~ '(Confidence = 0.90)'))
+# plot.conditions <- c("Induction Only", "Rifampicin", "Colistin")
+plot.conditions <- c("Induction Only")
+
+
+plot.title <- bquote(bold("Gene dose effect on drug activity" ~ at ~ hour[36] ~ '(Confidence = 0.90)'))
 
 plot.graphic <- fit_predictions %>% 
+	mutate(Condition = case_when(
+		Condition == 'None_0_T2 - None_0_T0' ~ "Induction Only",
+		Condition == 'Rifampicin_0.34_T2 - None_0_T0' ~ "Rifampicin",
+		Condition == 'Colistin_0.44_T2 - None_0_T0' ~ "Colistin")) %>%
 	filter(
 		Gene %in% plot.genes &
 			Condition %in% plot.conditions) %>%
@@ -1717,49 +1774,164 @@ plot.graphic <- fit_predictions %>%
 		aes(
 			x = y_pred, 
 			y = .fitted, 
-			color = Gene)) +
+			color = Condition)) +
 	geom_point(
-		data = fit_points %>% filter(
+		data = fit_points %>% 
+				mutate(Condition = case_when(
+		Condition == 'None_0_T2 - None_0_T0' ~ "Induction Only",
+		Condition == 'Rifampicin_0.34_T2 - None_0_T0' ~ "Rifampicin",
+		Condition == 'Colistin_0.44_T2 - None_0_T0' ~ "Colistin"),
+		mutate(Condition = Condition)) %>%
+			filter(
 			Gene %in% plot.genes & 
 				Condition %in% plot.conditions),
 		shape = 20, 
-		size = 5,
+		size = 7.5,
 		aes(
 			x = y_pred, 
 			y = LFC.adj, 
-			color = Gene)) + 
-	geom_ribbon(
-		data = fit_predictions %>% filter(
-			Gene %in% plot.genes &
-				Condition %in% plot.conditions),
-		alpha = 0.30,
-		aes(
-			x = y_pred, 
-			y = .fitted, 
-			ymin = .lower, 
-			ymax = .upper, 
-			fill = Gene)) +
-	scale_fill_brewer(palette = "Set1") +
-	scale_color_brewer(palette = "Set1") +
-	xlab("Predicted Knockdown") +
-	ylab("Log-2 Fitness Foldchange") +
+			color = Condition)) + 
+	# geom_ribbon(
+	# 	data = fit_predictions %>% 
+	# 		mutate(Condition = case_when(
+	# 	Condition == 'None_0_T2 - None_0_T0' ~ "Induction Only",
+	# 	Condition == 'Rifampicin_0.34_T2 - None_0_T0' ~ "Rifampicin",
+	# 	Condition == 'Colistin_0.44_T2 - None_0_T0' ~ "Colistin")) %>%
+	# 		filter(
+	# 		Gene %in% plot.genes &
+	# 			Condition %in% plot.conditions),
+	# 	alpha = 0.5,
+	# 	aes(
+	# 		x = y_pred,
+	# 		y = .fitted,
+	# 		ymin = .lower,
+	# 		ymax = .upper,
+	# 		fill = Condition)) +
+	scale_fill_manual(values = rev(ipsum_pal()(3)[1:3])) +
+	scale_colour_manual(values = rev(ipsum_pal()(3)[1:3])) +
+	xlab("Knockdown") +
+	ylab("Fitness (Log2)") +
 	xlim(
 		0, 
 		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
 	coord_cartesian(
 		ylim = c(
 			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
-			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max())) +
-	doc_theme +
-	theme(legend.position = "bottom") +
-	ggtitle(plot.title) + 
-	facet_wrap(
-		facets = ~ Condition,
-		labeller = plot.labeller)
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max() + 1)) +
+	doc_theme
 
 
 print(plot.graphic)
-
-
 ```
+```{r}
+plot.genes <- c("lpxC", "nuoB")
 
+plot.conditions <- c(
+	"None_0_T1 - None_0_T0", 
+	"None_0_T2 - None_0_T0", 
+	"Colistin_0.44_T1 - None_0_T0",
+	"Colistin_0.44_T2 - None_0_T0")
+
+plot.fit_predictions <-
+	fit_predictions %>% 
+    mutate(
+        Timing = case_when(
+            Condition %like% "T1" ~ "T1",
+            Condition %like% "T2" ~ "T2"),
+        Drug = case_when(
+            Condition %like% "^None_0" ~ "No drug",
+            Condition %like% "Rifampicin" ~ "Rifampicin",
+            Condition %like% "Colistin" ~ "Colistin"),
+        Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin")))
+
+plot.fit_points <-
+	fit_points %>% 
+				mutate(
+		Timing = case_when(
+			Condition %like% "T1" ~ "T1",
+			Condition %like% "T2" ~ "T2"),
+		Drug = case_when(
+			Condition %like% "^None_0" ~ "No drug",
+			Condition %like% "Rifampicin" ~ "Rifampicin",
+			Condition %like% "Colistin" ~ "Colistin"),
+        Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin")))
+
+plot.labeller <- as_labeller(
+	c(
+		`None_0_T1 - None_0_T0` = "Induction Only (T1)",
+		`None_0_T2 - None_0_T0` = "Induction Only (T2)",
+		`Rifampicin_0.34_T1 - None_0_T0` = "Rifampicin (T1)",
+		`Rifampicin_0.34_T2 - None_0_T0` = "Rifampicin (T2)",
+		`Colistin_0.44_T1 - None_0_T0` = "Colistin (T1)",
+		`Colistin_0.44_T2 - None_0_T0` = "Colistin (T2)"))
+		
+plot.title <- bquote(bold("Gene dose effect on drug activity" ~ at ~ hour[36] ~ '(Confidence = 0.90)'))
+
+plot.graphic <- plot.fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+	mutate(label = gsub("", "", Condition)) %>%
+	ggplot() +
+	geom_hline(
+		yintercept = 0, 
+		linetype = "dashed", 
+		color = "black", 
+		size = 0.5) +
+	geom_line(
+		alpha = 1, 
+		size = 2, 
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			color = Timing)) +
+	geom_point(
+		data = plot.fit_points %>%
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+		filter(
+			Gene %in% plot.genes & 
+				Condition %in% plot.conditions),
+		shape = 20, 
+		size = 7.5,
+		aes(
+			x = y_pred, 
+			y = LFC.adj, 
+			color = Timing)) + 
+	geom_ribbon(
+		data = plot.fit_predictions %>% 
+	filter(
+		Gene %in% plot.genes &
+			Condition %in% plot.conditions) %>%
+		filter(
+			Gene %in% plot.genes &
+				Condition %in% plot.conditions),
+		alpha = 0.5,
+		aes(
+			x = y_pred, 
+			y = .fitted, 
+			ymin = .lower, 
+			ymax = .upper, 
+			fill = Timing)) +
+	scale_fill_manual(values = c("#CAB2D6", "#6A3D9A")) +
+	scale_colour_manual(values = c("#CAB2D6", "#6A3D9A")) +
+	
+	xlab("Knockdown") +
+	ylab("Fitness (Log2)") +
+	xlim(
+		0, 
+		mismatches %>% unnest(data) %>% select(y_pred) %>% max()) +
+	coord_cartesian(
+		ylim = c(
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% min(),
+			mismatches %>% unnest(data) %>% select(LFC.adj) %>% max() + 1)) +
+	doc_theme +
+	theme(legend.position = "bottom") +
+	# ggtitle(plot.title) + 
+	facet_wrap	(
+		facets = c("Gene", "Drug"),
+		ncol = 4)
+
+print(plot.graphic)
+```

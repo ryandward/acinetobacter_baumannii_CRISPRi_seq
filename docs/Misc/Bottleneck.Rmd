@@ -20,6 +20,12 @@ aba.counts <- fread(
 
 glimpse(aba.counts)
 
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
 # guide design key
 aba.key <- fread("../../aba_key.tsv")
 
@@ -146,7 +152,7 @@ aba.botneck <- aba.botneck %>%
 		data = map(
 			data, ~.x %>% 
 				mutate(
-					ratio = ( (fis - fi0)^2) / ( fi0 * (1 - fi0)^2 ) )	) )
+					ratio = ( (fis - fi0)^2) / ( fi0 * (1 - fi0)^2 ) ) ) )
 
 aba.botneck <- aba.botneck %>% 
 	mutate(
@@ -258,10 +264,10 @@ aba.botneck.plot <- aba.botneck %>%
 		stat = "identity", 
 		position = position_dodge(),
 		colour = "black") +
-	theme_ipsum() + 
+	doc_theme + 
 	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis') +
 	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-	ggtitle("Population Complexity: Bottleneck Metric") +
+	ggtitle("Population Complexity") +
 	scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
 	theme(axis.title.x = element_blank())
 
@@ -276,10 +282,10 @@ aba.botneck.plot <- aba.botneck %>%
 		stat = "identity", 
 		position = position_dodge(),
 		colour = "black") +
-	theme_ipsum() + 
+	doc_theme + 
 	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis') +
 	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-	ggtitle("Population Complexity: Bottleneck Metric") +
+	ggtitle("Population Complexity") +
 	scale_y_continuous(
 					trans = "log10",
 					breaks = c(0, 10^seq(0,7)),
@@ -304,40 +310,94 @@ aba.botneck.stats.plot <- aba.botneck.stats %>%
 		ymax = Nb.mean + Nb.sd),
 		width = 0.2,
 		position = position_dodge(0.95, preserve = "single")) +
-	theme_ipsum() + 
-	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis', alpha = 0.5) +
+	doc_theme + 
+	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis', alpha = 0.75) +
 	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-	ggtitle("Population Complexity: Bottleneck Metric") +
+	ggtitle("Population Complexity") +
 	scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
-	theme(axis.title.x = element_blank())
+	theme(
+		axis.title.x = element_blank())
 
 print(aba.botneck.stats.plot)
 
 aba.botneck.stats.plot <- aba.botneck.stats %>%
+	separate(Condition, c("Drug", "Dose", "Timing"), sep = " ", remove = F) %>%
+	filter(Drug == "None") %>%
+	mutate(Drug = "No drug") %>%
+	mutate(Dose = paste(Dose, "ng/μL")) %>%
 	ggplot(aes(
-		x = Condition, 
+		x = Timing, 
 		y = Nb.mean, 
 		fill = Type)) +
-	geom_bar(
-		stat = "identity", 
+	geom_col(
 		position = position_dodge(),
-		colour = "black") +
+		colour = "black",
+		alpha = 0.75) +
 	geom_errorbar(aes(
-		x = Condition,
+		x = Timing,
 		y = Nb.mean,
 		ymin = Nb.mean - Nb.sd,
 		ymax = Nb.mean + Nb.sd),
 		width = 0.2,
 		position = position_dodge(0.95, preserve = "single")) +
-	theme_ipsum() + 
-	scale_fill_viridis(discrete = T, direction = -1, option = 'viridis', alpha = 0.5) +
-	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-	ggtitle("Population Complexity: Bottleneck Metric") +
+	doc_theme + 
+	scale_fill_manual(
+		values =
+			c("control" = "grey", 
+				"mismatch" = "#1F78B4",
+				"perfect" = "#E31A1C")) +
+	theme(
+		axis.text.x = element_text(angle = 0, vjust = 1, hjust = 1, colour = "black"),
+		axis.text.y = element_text(colour = "black")) +
+	scale_y_continuous(
+					trans = "log10",
+					breaks = c(10^seq(0,7)),
+					labels = label_number(scale_cut = cut_short_scale())) +
+	theme(axis.title.x = element_blank()) +
+	theme(legend.position="bottom", legend.box = "horizontal") +
+	labs(y = bquote(italic(N)[b])) +
+	guides(fill = guide_legend(nrow = 3, byrow = TRUE))
+	
+print(aba.botneck.stats.plot)
+
+aba.botneck.stats.plot <- aba.botneck.stats %>%
+	separate(Condition, c("Drug", "Dose", "Timing"), sep = " ", remove = F) %>%
+	filter(Drug != "None") %>%
+	mutate(Dose = paste(Dose, "ng/μL")) %>%
+	ggplot(aes(
+		x = Timing, 
+		y = Nb.mean, 
+		fill = Type)) +
+	geom_col(
+		position = position_dodge(),
+		colour = "black",
+		alpha = 0.75) +
+	geom_errorbar(aes(
+		x = Timing,
+		y = Nb.mean,
+		ymin = Nb.mean - Nb.sd,
+		ymax = Nb.mean + Nb.sd),
+		width = 0.2,
+		position = position_dodge(0.95, preserve = "single")) +
+	doc_theme + 
+	scale_fill_manual(
+		values =
+			c("control" = "grey", 
+				"mismatch" = "#1F78B4",
+				"perfect" = "#E31A1C")) +
+	theme(
+		axis.text.x = element_text(angle = 0, vjust = 1, hjust = 1, colour = "black"),
+		axis.text.y = element_text(colour = "black")) +
 	scale_y_continuous(
 					trans = "log10",
 					breaks = c(0, 10^seq(0,7)),
 					labels = label_number(scale_cut = cut_short_scale())) +
-	theme(axis.title.x = element_blank())
+	theme(axis.title.x = element_blank()) +
+	labs(y = bquote(italic(N)[b])) +
+	facet_wrap(facets = c("Drug", "Dose"), scales='free') + 
+	theme(legend.position = "bottom", legend.box = "horizontal")
+
+
 
 print(aba.botneck.stats.plot)
 ```
