@@ -549,80 +549,81 @@ print(to_plot)
 
 
 
-```{r Perform edgeR for Rifampicin and Colistin Samples}
-aba.contrasts <- c(
-	"Rifampicin_0.34_T1 - None_0_T1",
-	"Rifampicin_0.34_T2 - None_0_T2",
-	"Colistin_0.44_T1 - None_0_T1",
-	"Colistin_0.44_T2 - None_0_T2") 
-
-results <- extract_edgeR(
-	y.fit = aba.fit, 
-	y.contrasts = aba.contrasts, 
-	y.permutations = aba.permutations)
-
-results <- clean_edgeR(results)
-
-melted_results <- melt_and_stack(results)
-```
 
 ```{r Cell Wall activity in Rif and Col, fig.width=10, fig.height=12}
-median_LFC <- dcast(
-	melted_results[(Pathway == "LOS" | Pathway == "NADH")  & type == "perfect"], 
-	unique_name + Pathway ~ condition, 
-	value.var = "LFC.adj", 
-	fun.aggregate = median)
 
-print(colnames(median_LFC))
+aba.contrasts <- c(
+	"Rifampicin_0.34_T2 - None_0_T2",
+	"Colistin_0.44_T2 - None_0_T2") 
 
-to_plot_title <- "Fitness Change in Knockdown Strains"
+
+CL3076 <- fread("../../CL3076_by_name.tsv")
+CL849 <- fread("../../CL849_by_name.tsv")
+
+median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
+
+median_LFC <- median_melted_results %>% 
+	filter(condition %in% aba.contrasts) %>% 
+	filter(type == "perfect") %>%
+	# mutate(Pathway = case_when(
+	# 	unique_name %in% CL3076$unique_name ~ "Lipid A",
+	# 	unique_name %like% "nuo" ~ "NDH-1",
+	# 	TRUE ~ NA_character_)) %>%
+	filter(Pathway %in% c("LOS", "NADH")) %>%
+	pivot_wider(id_cols = condition, names_from = c(unique_name, Pathway), names_sep = " ", values_from = medLFC)
+
+
+gene_pathway_labels <-
+	median_melted_results %>% 
+	filter(condition %in% aba.contrasts) %>% 
+	filter(type == "perfect") %>%
+	filter(Pathway %in% c("LOS", "NADH")) %>%
+	pivot_wider(id_cols = condition, names_from = c(unique_name, Pathway), names_sep = " ", values_from = medLFC) %>%
+	colnames() %>% 
+	as_tibble() %>% 
+	separate(value, c("unique_name", "Pathway"), sep = " ") %>% 
+	filter(!is.na(Pathway)) %>%
+	as.data.table()
 
 # convert to matrix
-LFC_grid <- data.matrix(median_LFC[, c(-1:-2)])
+LFC_grid <- data.matrix(median_LFC[, c(-1)])
 
 # name rows in matrix
-rownames(LFC_grid) <- median_LFC[, paste(unique_name)]
+rownames(LFC_grid) <- median_LFC %>% pull(condition)
 
 # format genes (rows): Pathway + italic(Gene Name)
+# format genes (rows): Pathway + italic(Gene Name)
 genes.formatted <- lapply(
-	median_LFC[, .I],
+	gene_pathway_labels[, .I],
 	function(x) {
-		bquote(.(median_LFC[x]$Pathway) ~ italic(.(median_LFC[x]$unique_name)))})
-
-# format conditions (columns)
-conditions.formatted <- c(
-	bquote(Rifampicin ~ (hour[9])),
-	bquote(Rifampicin ~ (hour[18])),
-	bquote(Colistin ~ (hour[9])),
-	bquote(Colistin ~ (hour[18])))
+		bquote(italic(.(gene_pathway_labels[x]$unique_name)) ~ (.(gene_pathway_labels[x]$Pathway)))})
 
 plot_matrix <- LFC_grid
 
 breaks <- generate_breaks(plot_matrix, n = 286, center = T)
+
+# format conditions (columns)
+conditions.formatted <- c(
+	bquote(Colistin ~ (T2)),
+	bquote(Rifampicin ~ (T2)))
 
 to_plot <- pheatmap(
 	plot_matrix,
 	col = plot_colors,
 	breaks = breaks,
 	border_color = NA,
-	main = to_plot_title,
-	cluster_cols = F,
-	angle_col = 45,
+	cluster_row = F,
+	angle_col = 315,
 	clustering_method = "ward.D2",
-	clustering_distance_rows = "canberra",
-	labels_row = as.expression(genes.formatted),
-	labels_col = as.expression(conditions.formatted),
-	gaps_col = 2,
-	cutree_rows = 2,
-	cellheight = 15,
-	cellwidth = 25,
-	fontsize = 12,
-	silent = T)
-	
-to_plot$gtable$grobs[[1]]$gp$fontfamily <- "Arial"
-to_plot$gtable$grobs[[1]]$gp$fontsize <- 18
-to_plot$gtable$grobs[[4]]$gp$fontfamily <- "Arial"
-to_plot$gtable$grobs[[5]]$gp$fontfamily <- "Arial"
+	clustering_distance_cols = "canberra",
+	labels_row = as.expression(conditions.formatted),
+	labels_col = as.expression(genes.formatted),
+	# gaps_rows = 2,
+	cutree_cols = 2,
+	# cellheight = 15,
+	# cellwidth = 30,
+	fontsize = 12)
+
 	
 print(to_plot)
 ```
