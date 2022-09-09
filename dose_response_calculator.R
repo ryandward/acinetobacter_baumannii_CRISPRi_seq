@@ -1,4 +1,5 @@
-require(conflicted, pacman)
+require(conflicted)
+require(pacman)
 
 p_load(
 	"data.table", 
