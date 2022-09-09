@@ -113,9 +113,9 @@ print(followup.5.depletion.rifampicin.plot)
 #########################################################################
 
 followup.5.depletion.rifampicin %>% 
-	filter(dose != 0.96) %>% 
-	ggplot(aes(x = dose, y = t_mid, fill = strain)) + 
-	geom_boxplot(position = "dodge") +
+	# filter(dose != 0.96) %>% 
+	ggplot(aes(x = dose, y = auc_e, fill = strain)) + 
+	geom_boxplot(position = "dodge", alpha = 0.5) +
 	ggtitle(
 		bquote(bold("Hours to reach half capacity")~bolditalic("Acinetobacter baumannii."))) +
 	doc_theme +

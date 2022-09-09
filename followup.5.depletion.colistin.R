@@ -110,3 +110,15 @@ print(followup.5.depletion.colistin.plot)
 # 	facet_wrap(facets = c("drug", "induced"), ncol = 2) %>%
 # 	print
 # 
+#########################################################################
+
+followup.5.depletion.colistin %>% 
+	filter(dose != 6) %>%
+	ggplot(aes(x = dose, y = auc_e, fill = strain)) + 
+	geom_boxplot(position = "dodge", alpha = 0.35, lwd = 1) +
+	ggtitle(
+		bquote(bold("Hours to reach half capacity")~bolditalic("Acinetobacter baumannii."))) +
+	doc_theme +
+	ylim(0, NA) +
+	facet_wrap(facets = c("drug", "induced"), ncol = 2)
+

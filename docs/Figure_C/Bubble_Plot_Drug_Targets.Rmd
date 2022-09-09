@@ -34,15 +34,17 @@ CL273 <- fread ("../../CL273.tsv")
 
 
 median_melted_results %>% 
-	filter(condition == "Imipenem_0.06_T1 - None_0_T1" & type == "perfect") %>% 
-	mutate(
-		Pathway = NA_character_,
-		Pathway = case_when(
-			AB030 %in% CL707$AB030 ~ "Cell Shape/Lipid Glyc.",
-			AB030 %in% CL273$AB030 ~ "tRNA Aminoacylation"
-		)) %>%
-	
+	# filter(condition %in% c("Imipenem_0.06_T1 - None_0_T1", "Meropenem_0.17_T1 - None_0_T1") & type == "perfect") %>%
+	filter(condition %in% c("Meropenem_0.17_T1 - None_0_T1") & type == "perfect") %>%
 	arrange(AB19606) %>% 
+	mutate(gene_name_stylized = case_when(
+		unique_name == "GO593_05760_advA" ~ bquote("italic(advA)"),
+		TRUE ~ gene_name_stylized
+	)) %>%
+	mutate(Pathway = case_when(
+		! (Pathway %in% c("Cell Wall/PG", "tRNA Ligase")) ~ NA_character_,
+		TRUE ~ Pathway
+	)) %>%
 	mutate(`Locus Tag Position` = factor(AB19606, levels = unique(AB19606))) %>% 
 	mutate(`Locus Tag Position` = 1:n()) %>% 
 	arrange(type) %>% 
@@ -63,22 +65,96 @@ median_melted_results %>%
 		colour = "black") + 
 	doc_theme + 
 	geom_label_repel(
-		data = . %>% filter(Pathway %in% c("Cell Shape/Lipid Glyc.", "tRNA Aminoacylation")), 
+		data = . %>% filter(Pathway %in% c("Cell Wall/PG", "tRNA Ligase") & FDR < 0.05), 
 		aes(label = gene_name_stylized), 
 		parse = TRUE,
 		max.overlaps = 25) + 
-	scale_fill_viridis(
-		discrete = T,
-		alpha = 0.35,
-		na.value = "grey", 
-		direction = -1) +
-	labs(
-		title = bquote(bolditalic("Acinetobacter baumannii") ~ bold("Gene Sensitivity by Pathway")), 
-		subtitle = bquote("Fitness defects beyond induction in Imipenem (0.09) at"~t[1]),
-		parse = TRUE) +
+	scale_fill_manual(values = c("#FDBF6F", "#A6CEE3")) +
+	# labs(
+	# 	title = bquote(bolditalic("Acinetobacter baumannii") ~ bold("Gene Sensitivity by Pathway")), 
+	# 	subtitle = bquote("Fitness defects beyond induction in Mero/Imi (High) at"~t[1]),
+	# 	parse = TRUE) +
+	guides(
+		# size = "none",
+		fill = guide_legend(override.aes = list(size = 5))) +
+	facet_wrap(~condition)-> p
+
+print(p)
+
+```
+
+```{r fig.width=10}
+library(pacman)
+
+p_load(data.table, viridis, tidyverse, ggrepel)
+
+p_load_gh("hrbrmstr/hrbrthemes")
+
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
+interest <- fread("../../interest.tsv", sep = "\t")
+
+aba.bed <- fread("../../CP046654.1.bed")
+
+median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
+
+median_melted_results[Pathway == "Other", Pathway := NA_character_]
+
+median_melted_results[Pathway == "LPS", Pathway := "LOS"]
+
+# https://version-11-5.string-db.org/cgi/globalenrichment?networkId=b1Fd534fBhzJ
+CL707 <- fread ("../../CL707.tsv")
+CL273 <- fread ("../../CL273.tsv")
+
+
+median_melted_results %>% 
+filter(condition %in% c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2")) %>%
+	arrange(AB19606) %>% 
+	mutate(gene_name_stylized = case_when(
+		unique_name == "GO593_05760_advA" ~ bquote("italic(advA)"),
+		TRUE ~ gene_name_stylized
+	)) %>%
+	mutate(Pathway = case_when(
+		! (Pathway %in% c("NADH", "LOS")) ~ NA_character_,
+		TRUE ~ Pathway
+	)) %>%
+	mutate(`Locus Tag Position` = factor(AB19606, levels = unique(AB19606))) %>% 
+	mutate(`Locus Tag Position` = 1:n()) %>% 
+	arrange(type) %>% 
+	ggplot(aes(x = `Locus Tag Position`, y = medLFC)) +
+	geom_hline(yintercept = 0,
+		colour = "red",
+		lty = "dashed") +
+	geom_point(
+		data = . %>% filter(is.na(Pathway)), 
+		aes(fill = Pathway, size = -log10(FDR)),
+		shape = 21,
+		colour = "black",
+		alpha = 0.5) + 
+	geom_point(
+		data = . %>% filter(!is.na(Pathway)), 
+		aes(fill = Pathway, size = -log10(FDR)),
+		shape = 21,
+		colour = "black") + 
+	doc_theme + 
+	geom_label_repel(
+		data = . %>% filter(Pathway %in% c("NADH", "LOS") & FDR < 0.05), 
+		aes(label = gene_name_stylized), 
+		parse = TRUE,
+		max.overlaps = 25) + 
+	scale_fill_manual(values = c("#33A02C", "#6A3D9A")) +
+	# labs(
+	# 	title = bquote(bolditalic("Acinetobacter baumannii") ~ bold("Gene Sensitivity by Pathway")), 
+	# 	subtitle = bquote("Fitness defects beyond induction in Mero/Imi (High) at"~t[1]),
+	# 	parse = TRUE) +
 	guides(
 		size = "none",
-		fill = guide_legend(override.aes = list(size = 10, alpha = 0.35))) -> p
+		fill = guide_legend(override.aes = list(size = 10, alpha = 0.35))) +
+	facet_wrap(~condition)-> p
 
 print(p)
 

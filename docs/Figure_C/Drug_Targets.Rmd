@@ -596,7 +596,7 @@ rownames(LFC_grid) <- median_LFC %>% pull(condition)
 genes.formatted <- lapply(
 	gene_pathway_labels[, .I],
 	function(x) {
-		bquote(italic(.(gene_pathway_labels[x]$unique_name)) ~ (.(gene_pathway_labels[x]$Pathway)))})
+		bquote(italic(.(gene_pathway_labels[x]$unique_name)))})
 
 plot_matrix <- LFC_grid
 

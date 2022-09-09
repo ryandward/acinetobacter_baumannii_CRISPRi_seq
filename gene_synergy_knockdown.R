@@ -10,9 +10,9 @@ library(conflicted)
 conflict_prefer("rename", "dplyr")
 conflict_prefer("filter", "dplyr")
 
-growth_means_inhibition <- 0.15
-colistin.max <- 3
-rifampicin.max <- 1.28
+growth_means_inhibition <- 0.1
+colistin.max <- 3 * 2
+rifampicin.max <- 1.28 * 2
 
 
 doc_theme <- theme_ipsum(
@@ -22,14 +22,24 @@ doc_theme <- theme_ipsum(
 	axis_col = "black")
 
 
+# growth.nt <- fread(
+# 	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.nt.tsv",
+# 	header = T)
+# growth.lpxC <- fread(
+# 	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.lpxC.tsv",
+# 	header = T)
+# growth.nuoH <- fread(
+# 	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.nuoH.tsv",
+# 	header = T)
+
 growth.nt <- fread(
-	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.nt.tsv",
+	"Synergy/Triplicate_2/growth.nt.tsv",
 	header = T)
 growth.lpxC <- fread(
-	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.lpxC.tsv",
+	"Synergy/Triplicate_2/growth.lpxC.tsv",
 	header = T)
-growth.nuoB <- fread(
-	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.nuoB.tsv",
+growth.nuoH <- fread(
+	"Synergy/Triplicate_2/growth.nuoH.tsv",
 	header = T)
 
 colistin.dose <- data.table(
@@ -37,8 +47,8 @@ colistin.dose <- data.table(
 	colistin = c(colistin.max/2^(0:6), 0))
 
 rifampicin.dose <- data.table(
-	col = 3:12, 
-	rifampicin = c(rifampicin.max/2^(0:8), 0))
+	col = 1:12, 
+	rifampicin = c(rifampicin.max/2^(0:10), 0))
 
 
 growth <- rbind(
@@ -48,9 +58,9 @@ growth <- rbind(
 	growth.lpxC %>% 
 		pivot_longer(cols = -`<>`, names_to = "col", values_to = "growth") %>% 
 		mutate(gene = "lpxC"),
-	growth.nuoB %>% 
+	growth.nuoH %>% 
 		pivot_longer(cols = -`<>`, names_to = "col", values_to = "growth") %>% 
-		mutate(gene = "nuoB")) %>%
+		mutate(gene = "nuoH")) %>%
 	rename(row = `<>`) %>%
 	group_by(gene) %>% 
 	mutate(
@@ -58,20 +68,19 @@ growth <- rbind(
 		growth.prop = growth.adj/max(growth)) %>%
 	mutate(col = as.numeric(col)) %>%
 	inner_join(rifampicin.dose) %>%
-	inner_join(colistin.dose) %>%
-	filter(colistin < 3 & rifampicin < 1.28) 
+	inner_join(colistin.dose) 
 
 
 growth$gene <- factor(
 	growth$gene,
-	levels=c("nt","lpxC","nuoB"),
-	labels=c("non-targeting", "bolditalic(lpxC)","bolditalic(nuoB)"))
+	levels=c("nt","lpxC","nuoH"),
+	labels=c("non-targeting", "bolditalic(lpxC)","bolditalic(nuoH)"))
 
 # growth %>% filter(
 #   growth.prop < 0.1 & rifampicin == 0) %>% 
 #   summarise(mic.colistin = min(colistin))
 
-# growth %>% arrange(desc(colistin), desc(rifampicin)) %>% filter(gene == "nuoB") %>% pivot_wider(id_cols = colistin, names_from = rifampicin, values_from = growth.prop)
+# growth %>% arrange(desc(colistin), desc(rifampicin)) %>% filter(gene == "nuoH") %>% pivot_wider(id_cols = colistin, names_from = rifampicin, values_from = growth.prop)
 
 mic <- growth %>% 
 	filter(growth.prop < growth_means_inhibition) %>% {
@@ -145,7 +154,7 @@ synergy_tally <-
 	mutate(synergy_count = paste(n, "wells"))
 
 growth <- growth %>%
-	inner_join(synergy_tally)
+	left_join(synergy_tally)
 
 
 
