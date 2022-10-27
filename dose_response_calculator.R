@@ -144,7 +144,7 @@ vuln.summary <- mismatches %>% select(
 	hill.p, 
 	logLik)
 
-vuln.summary %>% fwrite("../../Results/vulnerability_summary.tsv.gz", sep = "\t")
+vuln.summary %>% fwrite("Results/vulnerability_summary.tsv.gz", sep = "\t")
 
 # add 90% confidence interval predictions to the dose-response curves
 

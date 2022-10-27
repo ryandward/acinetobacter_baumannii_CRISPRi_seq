@@ -249,10 +249,10 @@ this.plot <-
 
 # Barplots to demonstrate RFP knockdown.
 
-```{r RFP at t18}
-this_title <- expression(bold(paste("Normalized RFP to" ~ OD[600] ~ "at" ~ hour[18])))
+```{r RFP at t15}
+this_title <- expression(bold(paste("Normalized RFP to" ~ OD[600] ~ "at" ~ hour[15])))
 
-suppressors[Strain != "empty" & Hour == 18] %>%
+suppressors[Strain != "empty" & Hour == 15] %>%
 	ggplot( aes( x = Strain, y = RFP_norm / OD600, fill = Strain)) +
 	geom_boxplot( outlier.colour = NA ) +
 	scale_fill_viridis( discrete = TRUE, alpha = 0.5) +
@@ -261,9 +261,9 @@ suppressors[Strain != "empty" & Hour == 18] %>%
 	ggtitle(this_title) +
 	xlab("Strain")
 
-this_title <- expression(bold(paste("Normalized RFP to" ~ OD[600] ~ "at" ~ hour[18])))
+this_title <- expression(bold(paste("Normalized RFP to" ~ OD[600] ~ "at" ~ hour[15])))
 
-suppressors[Strain != "empty" & Hour == 18] %>%
+suppressors[Strain != "empty" & Hour == 15] %>%
 	mutate(Strain = `New Strain`) %>%
 	ggplot( aes( x = `Strain`, y = RFP_norm / OD600, fill = `Strain`)) +
 	geom_jitter(aes(colour = `Strain`)) +
@@ -275,7 +275,7 @@ suppressors[Strain != "empty" & Hour == 18] %>%
 	doc_theme +
 	theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
-suppressors[Strain != "empty" & Hour == 18] %>%
+suppressors[Strain != "empty" & Hour == 15] %>%
 	mutate(Strain = `New Strain`) %>%
 	mutate(Strain = case_when(
 		Strain == "s245" ~ "Parent",
@@ -310,4 +310,51 @@ scale_fill_manual(
 	ylab("OD600-normalized RFP")
 	
 
+```
+```{r}
+
+
+suppressors[Strain != "empty"] %>%
+	mutate(Strain = `New Strain`) %>%
+	mutate(Strain = case_when(
+		Strain == "s245" ~ "Parent",
+		Strain == "s245s Red" ~ "Suppressor (Red)",
+		Strain == "s245s White" ~ "Suppressor (White)",
+		Strain == "s246" ~ "No guide",
+		Strain == "s272" ~ "WT (No RFP)"
+	),
+	Strain = factor(
+		Strain,
+		levels = c(
+			"WT (No RFP)",
+			"No guide",
+			"Parent",
+			"Suppressor (Red)",
+			"Suppressor (White)"))) %>%
+	filter(!is.na(Strain)) %>%
+	ggplot() +
+	geom_smooth(aes(
+		colour = Strain, 
+		fill = Strain, 
+		 x = Time/60/60, 
+		y = OD600)) +
+	doc_theme +
+	theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+	scale_fill_manual(
+  values =
+    c("WT (No RFP)" = alpha("black", 0.50), 
+      "No guide" = alpha("grey", 0.90),
+      "Parent" = alpha("#6A3D9A", 0.5),
+      "Suppressor (Red)" = alpha("#E31A1C", 0.50),
+      "Suppressor (White)" = alpha("#FB9A99", 0.50))) +
+	scale_colour_manual(
+  values =
+    c("WT (No RFP)" = alpha("black", 0.50), 
+      "No guide" = alpha("grey"),
+      "Parent" = alpha("#6A3D9A", 0.5),
+      "Suppressor (Red)" = alpha("#E31A1C", 0.50),
+      "Suppressor (White)" = alpha("#FB9A99", 0.50))) +
+	theme(legend.position = "bottom") + 
+	guides(colour = guide_legend(nrow = 3), fill = guide_legend(nrow = 3)) +
+	geom_vline(xintercept = 15, lty = "dashed") 
 ```

@@ -28,8 +28,8 @@ doc_theme <- theme_ipsum(
 # growth.lpxC <- fread(
 # 	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.lpxC.tsv",
 # 	header = T)
-# growth.nuoH <- fread(
-# 	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.nuoH.tsv",
+# growth.nuoB <- fread(
+# 	"/Users/ryandward/R/acinetobacter_baumannii_CRISPRi_seq/synergy/growth.nuoB.tsv",
 # 	header = T)
 
 growth.nt <- fread(

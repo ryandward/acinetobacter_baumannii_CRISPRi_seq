@@ -666,64 +666,6 @@ plot.graphic <- annotated_fit_predictions %>%
 print(plot.graphic)
 ```
 
-```{r Phage}
-
-plot.genes <- c("GO593_00515")
-plot.conditions <- c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")
-plot.title <- bquote(bold("Jennifer's phage"))
-
-plot.graphic <- fit_predictions %>% 
-	filter(
-		Gene %in% plot.genes &
-			Condition %in% plot.conditions) %>%
-		ggplot() +
-	geom_hline(
-		yintercept = 0, 
-		linetype = "dashed", 
-		color = "black", 
-		size = 0.5) +
-			geom_line(
-			alpha = 0.65, 
-			size = 1.5, 
-			aes(
-				x = y_pred, 
-				y = .fitted, 
-				color = Condition)) +
-	geom_point(
-		data = fit_points %>% filter(
-			Gene %in% plot.genes & 
-				Condition %in% plot.conditions),
-		shape = 20, 
-		size = 3.5,
-			aes(
-				x = y_pred, 
-				y = LFC.adj, 
-				color = Condition)) + 
-	geom_ribbon(
-		data = fit_predictions %>% filter(
-			Gene %in% plot.genes &
-				Condition %in% plot.conditions),
-		alpha = 0.25,
-		aes(
-			x = y_pred, 
-			y = .fitted, 
-			ymin = .lower, 
-			ymax = .upper, 
-			fill = Condition)) +
-    scale_fill_brewer(palette = "Set2") +
-    scale_color_brewer(palette = "Set2") +
-	xlab("Predicted Knockdown") +
-	ylab("Log-2 Fitness Foldchange") +
-	xlim(0, 1) + 
-	doc_theme +
-	theme(legend.position = "bottom") +
-	ggtitle(plot.title)
-
-
-print(plot.graphic)
-```
-
-
 ```{r lpxC, nupB, colistin, rifampicin}
 plot.genes <- c("lpxC", "nuoB")
 
