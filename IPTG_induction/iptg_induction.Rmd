@@ -99,4 +99,11 @@ scale_fill_manual(
 	doc_theme +
 	theme(legend.position = "bottom")
 
+iptg %>%
+    filter(strain != "blank" & conc == 1000) %>%
+	group_by(strain) %>% 
+	summarise(mean_value = mean(GFP.weighted))
+	
+	
+
 ```

@@ -217,7 +217,7 @@ results.all.comparison[!is.na(y_pred)] %>%
 		x = LFC.adj.perfect, 
 		y = LFC.adj.mismatch, 
 		color = `Predicted knockdown`)) + 
-	geom_point(alpha = 0.05, pch = 20, size = 2, stroke = 0) + 
+	geom_point(alpha = 0.15, pch = 20, size = 2, stroke = 0) + 
 	# scale_color_viridis(
 	# 	option = "magma",
 	# 	discrete = FALSE, 

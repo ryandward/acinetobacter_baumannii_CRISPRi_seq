@@ -35,7 +35,7 @@ CL273 <- fread ("../../CL273.tsv")
 
 median_melted_results %>% 
 	# filter(condition %in% c("Imipenem_0.06_T1 - None_0_T1", "Meropenem_0.17_T1 - None_0_T1") & type == "perfect") %>%
-	filter(condition %in% c("Meropenem_0.17_T1 - None_0_T1") & type == "perfect") %>%
+	filter(condition %in% c("Imipenem_0.09_T1 - None_0_T1") & type == "perfect") %>%
 	arrange(AB19606) %>% 
 	mutate(gene_name_stylized = case_when(
 		unique_name == "GO593_05760_advA" ~ bquote("italic(advA)"),

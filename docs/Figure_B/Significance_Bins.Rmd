@@ -162,7 +162,7 @@ sankey.df %>%
         axis.ticks =  element_blank())
 ```
 
-```{r sankey plot}
+```{r sankey plot 2}
 median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
 sankey.levels <- c(
@@ -249,6 +249,7 @@ sankey.df %>%
 ```{r}
 sankey.combined.df <- 
 	median_melted_results %>% 
+	arrange(medLFC)	%>% 
 	filter(base == "None_0_T0") %>% 
 	filter(type == "perfect") %>% 
 	separate(shift, c("Drug", "Dose", "Timing"), sep = "_") %>% 
@@ -264,8 +265,8 @@ sankey.combined.df <-
 	pivot_wider(id_cols = c(AB19606), names_from = Timing, values_from = Response) %>% 
 	make_long(`T1`, `T2`) %>% 	 
 	mutate(
-		node = factor(node, levels = c("Responsive", "No Response")),
-		next_node = factor(next_node, levels = c("Responsive", "No Response")))
+		node = factor(node, levels = c("No Response", "Responsive")),
+		next_node = factor(next_node, levels = c("No Response", "Responsive")))
 
 sankey.combined.tally <- 
 	sankey.combined.df %>% 
@@ -287,7 +288,7 @@ sankey.combined.df %>%
 		flow.alpha = 0.25,
 		node.color = "black") +
 	scale_fill_manual(values = c(
-		"#80e27e", "grey")) +
+		"grey", "#80e27e")) +
 	geom_sankey_label(
 		aes(colour = "node"),
 		size = 3.5, color = 1) +
