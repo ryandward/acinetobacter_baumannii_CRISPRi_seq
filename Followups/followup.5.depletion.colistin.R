@@ -122,3 +122,32 @@ followup.5.depletion.colistin %>%
 	ylim(0, NA) +
 	facet_wrap(facets = c("drug", "induced"), ncol = 2)
 
+########################################################################
+
+p_load(Rtsne)
+
+followup.5.depletion.colistin.tSNE <- 
+	followup.5.depletion.colistin %>% 
+	select(well, OD600, time) %>% 
+	pivot_wider(id_cols = well, names_from = time, values_from = OD600) %>% 
+	column_to_rownames("well") %>% 
+	Rtsne 
+
+followup.5.depletion.colistin.tSNE <-
+	followup.5.depletion.colistin.tSNE$Y %>% 
+	data.table
+
+followup.5.depletion.colistin %>% 
+	select(well, OD600, time) %>% 
+	pivot_wider(id_cols = well, names_from = time, values_from = OD600) %>%
+	select(well) %>%
+	inner_join(followup.5.depletion.colistin.wells) %>%
+	cbind(followup.5.depletion.colistin.tSNE) %>%
+	mutate(rep = as.character(rep)) %>%
+	ggplot(aes(x = V1, y = V2, fill = strain, shape = rep)) +
+	geom_point(size = 3) +
+	facet_grid(facets = c("dose", "induced")) +
+	scale_shape_manual(values = c(21, 22, 24)) +
+	guides(fill = guide_legend(
+		override.aes = list(shape = 23)))
+

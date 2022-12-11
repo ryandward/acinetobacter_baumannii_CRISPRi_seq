@@ -124,3 +124,34 @@ CJ(well.row = toupper(letters[1:8]),
 	replace_na(list(id = "---")) %>% 
 	pivot_wider(id_cols = well.row, names_from = well.col, values_from = id) %>% 
 	print
+
+################################################################################
+
+
+followup.5.depletion.tSNE <- 
+	followup.5.depletion %>%
+	filter(!is.na(rep)) %>% 
+	select(well, OD600, time) %>% 
+	pivot_wider(id_cols = well, names_from = time, values_from = OD600) %>% 
+	column_to_rownames("well") %>% 
+	Rtsne(perplexity = 10)
+
+followup.5.depletion.tSNE <-
+	followup.5.depletion.tSNE$Y %>% 
+	data.table
+
+followup.5.depletion %>%
+	filter(!is.na(rep)) %>% 
+	select(well, OD600, time) %>% 
+	pivot_wider(id_cols = well, names_from = time, values_from = OD600) %>%
+	select(well) %>%
+	inner_join(followup.5.depletion.wells) %>%
+	cbind(followup.5.depletion.tSNE) %>%
+	mutate(rep = as.character(rep)) %>%
+	ggplot(aes(x = V1, y = V2, fill = strain, shape = rep)) +
+	geom_point(size = 3, alpha = 0.5) +
+	facet_grid(facets = c("induced")) +
+	scale_shape_manual(values = c(21, 22, 24)) +
+	guides(fill = guide_legend(
+		override.aes = list(shape = 23)))
+
