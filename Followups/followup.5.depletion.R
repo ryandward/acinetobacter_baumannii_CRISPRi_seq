@@ -9,10 +9,8 @@ followup.5.depletion <- fread(
 ##########################################################################################
 # wrangle the data from the infinite machine... 
 
-setnames(followup.5.depletion, t(followup.5.depletion)[,1])
 followup.5.depletion <- followup.5.depletion[-1:-2,]
-followup.5.depletion <- followup.5.depletion %>% rename(well = `Time [s]`)
-
+followup.5.depletion <- followup.5.depletion %>% rename(well = `Cycle Nr.`)
 
 followup.5.depletion <- 
 	melt(
@@ -25,6 +23,9 @@ followup.5.depletion <-
 followup.5.depletion[, OD600 := as.numeric(OD600)]
 followup.5.depletion[, time := as.numeric(levels(time))[time]]
 
+followup.5.depletion[, time := (time - 1) * 300]
+
+followup.5.depletion <- followup.5.depletion[OD600 != "NA"]
 ##########################################################################################
 # declare a pattern that corresponds to the wells that actually have cells in them
 
@@ -154,4 +155,3 @@ followup.5.depletion %>%
 	scale_shape_manual(values = c(21, 22, 24)) +
 	guides(fill = guide_legend(
 		override.aes = list(shape = 23)))
-
