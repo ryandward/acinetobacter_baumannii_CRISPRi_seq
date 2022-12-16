@@ -37,4 +37,5 @@ for i in Seal_Stats/*tsv; do
 done |
 # Sort the output by the third column in reverse numerical order and the second column in reverse numerical order
 sort -k3,3V -k2,2nr |
-# Write the output to a gzip-compressed file called
+# Write the output to a gzip-compressed file  
+pigz --best > ../all_counts_seal.tsv.gz
