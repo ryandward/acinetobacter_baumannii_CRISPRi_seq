@@ -115,8 +115,7 @@ aba_CPM <- cpm(aba_y, prior.count = 0) %>%
 # "aba_permut" data table where the two levels are different from each other
 contrast_levels <-
 	CJ(level2 = colnames(aba_permut),
-		 level1 = colnames(aba_permut))[level2 != level1,
-		 															 paste(level2, level1, sep = " - ")]
+		 level1 = colnames(aba_permut))[level2 != level1, paste(level2, level1, sep = " - ")]
 
 # Create a contrast matrix called "aba_contrast" for the "aba_permut" data table using the
 # pairs of levels contained in the "contrast_levels" data table
@@ -370,9 +369,10 @@ setorder(median_melted_results, FDR)
 
 ##########################################################################################
 
-median_melted_results[, gene_name_stylized := ifelse(unique_name %like% "GO593",
-																										 unique_name,
-																										 paste0("italic('", unique_name, "')"))]
+median_melted_results[, gene_name_stylized := ifelse(
+	unique_name %like% "GO593",
+	unique_name,
+	paste0("italic('", unique_name, "')"))]
 
 ##########################################################################################
 
