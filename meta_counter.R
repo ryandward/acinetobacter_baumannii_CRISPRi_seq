@@ -304,12 +304,10 @@ fwrite(median_results_FDR, "Results/median_results_FDR.tsv.gz", sep = "\t")
 
 ############################################################################################################
 
-CellWall <-	fread('CL704.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
-map03010 <-	fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
-LOS <- fread('LOS.tsv')
-# CL:3059; Glycolipid metabolic process, and lipopolysaccharide transport
-NADH <- fread('NADH.tsv')
-# CL:852; NADH dehydrogenase activity
+CellWall <- fread('CL704.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
+map03010 <- fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
+LOS <- fread('LOS.tsv') # CL:3059; Glycolipid metabolic process, and lipopolysaccharide transport
+NADH <- fread('NADH.tsv') # CL:852; NADH dehydrogenase activity
 GO0004812 <- fread('GO0004812.tsv') #Aminoacyl-tRNA synthetase, GO
 
 ############################################################################################################
