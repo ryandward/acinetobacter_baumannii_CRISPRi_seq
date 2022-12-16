@@ -91,11 +91,15 @@ aba_y <- DGEList(
 	genes = row.names(aba_grid_matrix))
 
 # Filter the DGEList object using the design matrix and group labels
+# filterByExpr is part of the SummarizedExperiment package
 aba_keep <-	aba_y %>% filterByExpr(design = aba_permut, group = aba_group)
 
 # Subset the DGEList object, normalize, and estimate dispersion
-aba_y <- aba_y %>% extract(aba_keep, , keep.lib.sizes = FALSE) %>%
-calcNormFactors %>% estimateDisp(aba_permut)
+aba_y <- aba_y %>% 
+	extract(aba_keep, 1:nrow(.$samples), keep.lib.sizes = FALSE) %>%
+	calcNormFactors %>% estimateDisp(aba_permut)
+
+##########################################################################################
 
 # Fit a generalized linear model to the data
 aba_fit <- aba_y %>% glmQLFit(aba_permut, robust = TRUE)
@@ -104,7 +108,7 @@ aba_fit <- aba_y %>% glmQLFit(aba_permut, robust = TRUE)
 aba_CPM <- cpm(aba_y, prior.count = 0) %>%
 	set_colnames(factor(aba_design[,  paste(drug, dose, timing, sep = "_")]))
 
-########################
+##########################################################################################
 
 # Create a data table called "contrast_levels" containing all pairs of levels for the
 # "aba_permut" data table where the two levels are different from each other
@@ -117,7 +121,7 @@ contrast_levels <- CJ(
 aba_contrast <- makeContrasts(contrasts = contrast_levels, levels = aba_permut)
 
 
-########################
+##########################################################################################
 
 # Calculate preliminary results to discard ineffective reads
 results_prelim <- glmQLFTest(aba_fit, contrast = aba_contrast) %>% topTags(n = Inf) %>% show %>% data.table
@@ -246,7 +250,7 @@ melted_results[, LFC.adj := LFC - median(LFC[type == "control"]), by = condition
 # "AB030", "unique_name", "type", and "condition" columns
 median_melted_results <- melted_results[, .(medLFC = median(LFC.adj), FDR = stouffer(FDR)$p), by = .(AB19606, AB030, unique_name, type, condition)]
 
-############################################################################################################
+##########################################################################################
 
 # Create a character vector containing a list of conditions
 conditions <-
@@ -270,7 +274,7 @@ conditions <-
 # Create a data table with a single column called "condition" and assign the list of conditions to this column
 interest <- data.table(condition = conditions)
 
-############################################################################################################
+##########################################################################################
 
 # Create results_LFC and results_FDR data.tables
 results_LFC <-
@@ -302,7 +306,7 @@ fwrite(results_FDR, "Results/results_FDR.tsv.gz", sep = "\t")
 fwrite(median_results_LFC, "Results/median_results_LFC.tsv.gz", sep = "\t")
 fwrite(median_results_FDR, "Results/median_results_FDR.tsv.gz", sep = "\t")
 
-############################################################################################################
+##########################################################################################
 
 CellWall <- fread('CL704.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
 map03010 <- fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
@@ -310,7 +314,7 @@ LOS <- fread('LOS.tsv') # CL:3059; Glycolipid metabolic process, and lipopolysac
 NADH <- fread('NADH.tsv') # CL:852; NADH dehydrogenase activity
 GO0004812 <- fread('GO0004812.tsv') #Aminoacyl-tRNA synthetase, GO
 
-############################################################################################################
+##########################################################################################
 
 melted_results[, Pathway := case_when(
 	AB030 %in% CellWall$AB030 ~ "Cell Wall/PG",
