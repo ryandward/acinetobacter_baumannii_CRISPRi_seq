@@ -90,9 +90,10 @@ aba_permut <- model.matrix(~ 0 + aba_group) %>%
 	set_colnames(levels(aba_group))
 
 # Create a DGEList object with the count data and group labels
-aba_y <- DGEList(counts = aba_grid_matrix,
-								 group = aba_group,
-								 genes = row.names(aba_grid_matrix))
+aba_y <- DGEList(
+	counts = aba_grid_matrix,
+	group = aba_group,
+	genes = row.names(aba_grid_matrix))
 
 # Filter the DGEList object using the design matrix and group labels
 aba_keep <-
