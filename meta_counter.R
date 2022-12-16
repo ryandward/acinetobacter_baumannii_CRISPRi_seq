@@ -48,20 +48,16 @@ aba <- fread(
 aba_key <- fread("aba_key.tsv")
 
 # Read in a file with experimental design information
-aba_design <-
-	fread("ABA1_experimental_design.tsv", na.strings = "NA")
+aba_design <- fread("ABA1_experimental_design.tsv", na.strings = "NA")
 
 # Merge aba_bed and aba_key data frames
-aba_genome <-
-	aba_bed[aba_key[, .(spacer, type, locus_tag, y_pred, target, offset)],
-					on = .(locus_tag)]
+aba_genome <- aba_bed[aba_key[, .(spacer, type, locus_tag, y_pred, target, offset)], on = .(locus_tag)]
 
 # define the experimental design space to only take into consideration "tubes"
 aba_design <- aba_design[experiment == "tube"]
 
 # Replace T with t and put parentheses around reps
-publication_design <-
-	copy(aba_design)[, c("timing", "rep") := .(gsub("T", "t", timing), paste0("(", rep, ")"))]
+publication_design <- copy(aba_design)[, c("timing", "rep") := .(gsub("T", "t", timing), paste0("(", rep, ")"))]
 
 
 # keep only the counts that are in the experimental design space
@@ -82,8 +78,7 @@ aba_grid_matrix <- data.matrix(aba_grid[,-c("spacer")]) %>%
 	set_rownames(aba_grid$spacer)
 
 # Create a factor variable for the group labels
-aba_group <-
-	factor(aba_design[,  paste(drug, dose, timing, sep = "_")])
+aba_group <-	factor(aba_design[,  paste(drug, dose, timing, sep = "_")])
 
 # Create a design matrix for the groups
 aba_permut <- model.matrix(~ 0 + aba_group) %>%
@@ -96,12 +91,11 @@ aba_y <- DGEList(
 	genes = row.names(aba_grid_matrix))
 
 # Filter the DGEList object using the design matrix and group labels
-aba_keep <-
-	aba_y %>% filterByExpr(design = aba_permut, group = aba_group)
+aba_keep <-	aba_y %>% filterByExpr(design = aba_permut, group = aba_group)
 
 # Subset the DGEList object, normalize, and estimate dispersion
 aba_y <- aba_y %>% extract(aba_keep, , keep.lib.sizes = FALSE) %>%
-	calcNormFactors %>% estimateDisp(aba_permut)
+calcNormFactors %>% estimateDisp(aba_permut)
 
 # Fit a generalized linear model to the data
 aba_fit <- aba_y %>% glmQLFit(aba_permut, robust = TRUE)
@@ -114,28 +108,25 @@ aba_CPM <- cpm(aba_y, prior.count = 0) %>%
 
 # Create a data table called "contrast_levels" containing all pairs of levels for the
 # "aba_permut" data table where the two levels are different from each other
-contrast_levels <-
-	CJ(level2 = colnames(aba_permut),
-		 level1 = colnames(aba_permut))[level2 != level1, paste(level2, level1, sep = " - ")]
+contrast_levels <- CJ(
+	level2 = colnames(aba_permut),
+	level1 = colnames(aba_permut))[level2 != level1, paste(level2, level1, sep = " - ")]
 
 # Create a contrast matrix called "aba_contrast" for the "aba_permut" data table using the
 # pairs of levels contained in the "contrast_levels" data table
-aba_contrast <-
-	makeContrasts(contrasts = contrast_levels, levels = aba_permut)
+aba_contrast <- makeContrasts(contrasts = contrast_levels, levels = aba_permut)
 
 
 ########################
 
 # Calculate preliminary results to discard ineffective reads
-results_prelim <-
-	glmQLFTest(aba_fit, contrast = aba_contrast) %>% topTags(n = Inf) %>% show %>% data.table
+results_prelim <- glmQLFTest(aba_fit, contrast = aba_contrast) %>% topTags(n = Inf) %>% show %>% data.table
 
 # Join the results_prelim table with the aba_key table
 results_prelim <- aba_key[results_prelim, on = .(spacer == genes)]
 
 # Find guides that are ineffective in any condition
-ineffective_guides <-
-	results_prelim[type == "perfect" & FDR > 0.05, .(target)]
+ineffective_guides <- results_prelim[type == "perfect" & FDR > 0.05, .(target)]
 
 ##########################################################################################
 
@@ -145,6 +136,7 @@ results_LFC <- aba_key[, .(genes = unique(spacer))]
 
 # Loop through each column in aba_contrast
 for (i in 1:ncol(aba_contrast)) {
+	
 	# Perform a generalized linear model test using the contrast in aba_contrast[,i]
 	results <- glmQLFTest(aba_fit, contrast = aba_contrast[, i])
 	
@@ -174,17 +166,14 @@ results_FDR <- aba_genome[results_FDR, on = .(spacer == genes)]
 
 # Join the curated_names data frame with the results_FDR data frame on the AB19606 and locus_tag columns
 # Then select the AB19606, AB030, and unique_name columns from the resulting data frame
-results_FDR <-
-	curated_names[, .(AB19606, AB030, unique_name)][results_FDR, on = .(AB19606 == locus_tag)]
+results_FDR <- curated_names[, .(AB19606, AB030, unique_name)][results_FDR, on = .(AB19606 == locus_tag)]
 
 # Join the results_LFC data frame with the aba_genome data frame on the spacer and genes columns
 results_LFC <- aba_genome[results_LFC, on = .(spacer == genes)]
 
 # Join the curated_names data frame with the results_LFC data frame on the AB19606 and locus_tag columns
 # Then select the AB19606, AB030, and unique_name columns from the resulting data frame
-results_LFC <-
-	curated_names[, .(AB19606, AB030, unique_name)][results_LFC, on = .(AB19606 == locus_tag)]
-
+results_LFC <- curated_names[, .(AB19606, AB030, unique_name)][results_LFC, on = .(AB19606 == locus_tag)]
 
 ##########################################################################################
 
@@ -255,8 +244,7 @@ melted_results[, LFC.adj := LFC - median(LFC[type == "control"]), by = condition
 
 # Calculate the "medLFC" and "FDR" columns in a new data.table object using the "AB19606",
 # "AB030", "unique_name", "type", and "condition" columns
-median_melted_results <-
-	melted_results[, .(medLFC = median(LFC.adj), FDR = stouffer(FDR)$p), by = .(AB19606, AB030, unique_name, type, condition)]
+median_melted_results <- melted_results[, .(medLFC = median(LFC.adj), FDR = stouffer(FDR)$p), by = .(AB19606, AB030, unique_name, type, condition)]
 
 ############################################################################################################
 
@@ -311,19 +299,13 @@ median_results_FDR <-
 # Write data.tables to files
 fwrite(results_LFC, "Results/results_LFC.tsv.gz", sep = "\t")
 fwrite(results_FDR, "Results/results_FDR.tsv.gz", sep = "\t")
-fwrite(median_results_LFC,
-			 "Results/median_results_LFC.tsv.gz",
-			 sep = "\t")
-fwrite(median_results_FDR,
-			 "Results/median_results_FDR.tsv.gz",
-			 sep = "\t")
+fwrite(median_results_LFC, "Results/median_results_LFC.tsv.gz", sep = "\t")
+fwrite(median_results_FDR, "Results/median_results_FDR.tsv.gz", sep = "\t")
 
 ############################################################################################################
 
-CellWall <-
-	fread('CL704.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
-map03010 <-
-	fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
+CellWall <-	fread('CL704.tsv') #Cell wall biogenesis/degradation, and Cell Wall/PG
+map03010 <-	fread('map03010.tsv') #Ribosome, why is rplY and rpmB not being painted in plots?
 LOS <- fread('LOS.tsv')
 # CL:3059; Glycolipid metabolic process, and lipopolysaccharide transport
 NADH <- fread('NADH.tsv')
@@ -378,7 +360,5 @@ median_melted_results[, gene_name_stylized := ifelse(
 ##########################################################################################
 
 fwrite(melted_results, "Results/melted_results.tsv.gz", sep = "\t")
-fwrite(median_melted_results,
-			 "Results/median_melted_results.tsv.gz",
-			 sep = "\t")
+fwrite(median_melted_results, "Results/median_melted_results.tsv.gz", sep = "\t")
 fwrite(interest, "interest.tsv", sep = "\t")
