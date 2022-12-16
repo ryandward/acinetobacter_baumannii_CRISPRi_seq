@@ -124,7 +124,8 @@ aba_contrast <- makeContrasts(contrasts = contrast_levels, levels = aba_permut)
 ##########################################################################################
 
 # Calculate preliminary results to discard ineffective reads
-results_prelim <- glmQLFTest(aba_fit, contrast = aba_contrast) %>% topTags(n = Inf) %>% show %>% data.table
+results_prelim <- glmQLFTest(aba_fit, contrast = aba_contrast) %>% topTags(n = Inf) %>% 
+	`$`(table) %>% data.table
 
 # Join the results_prelim table with the aba_key table
 results_prelim <- aba_key[results_prelim, on = .(spacer == genes)]
