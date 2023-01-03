@@ -86,7 +86,7 @@ curated_list_full <- curated_list_full %>%
 		string_info %>% rename("string_protein_id" = "#string_protein_id") %>% 
 			mutate(string_protein_id = gsub("^470.", "", string_protein_id)), 
 		by = c("AB030" = "string_protein_id")) %>% 
-	select(HOG, AB19606, AB030, preferred_name, unique_name, annotation, citation) %>% 
+	select(HOG, genes, AB19606, AB030, preferred_name, unique_name, annotation, citation) %>% 
 	unique %>% 
 	mutate(unique_name = case_when(is.na(unique_name) ~ preferred_name, !is.na(unique_name) ~ unique_name)) %>% 
 	rename(
