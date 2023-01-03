@@ -40,7 +40,6 @@ orthos <- melt(
 	id.vars = c("HOG", "OG", "Gene Tree Parent Clade"), 
 	variable.name = "genome", 
 	value.name = "orthologs") %>%
-	filter(!genome == "Caulobacter_vibrioides") %>%
 	mutate(orthologs = strsplit(as.character(orthologs), ", ")) %>% 
 	unnest(cols = "orthologs") %>%
 	data.table %>%
@@ -90,8 +89,23 @@ curated_list_full <- curated_list_full %>%
 	unique %>% 
 	mutate(unique_name = case_when(is.na(unique_name) ~ preferred_name, !is.na(unique_name) ~ unique_name)) %>% 
 	rename(
-		curated_name = unique_name,
 		AB030_annotation = annotation) 
+
+ortho_gene_names <- curated_list_full %>% 
+	select(genes, AB030, AB19606) %>% 
+	mutate(genes = strsplit(as.character(genes), ", ")) %>% 
+	unnest(cols = "genes") %>% 
+	unique %>% 
+	group_by(AB030, AB19606) %>% 
+	arrange(genes) %>% 
+	summarise(genes = paste(genes, collapse = ", "))
+
+curated_list_full <-
+	curated_list_full %>% 
+	select(-genes) %>% 
+	unique %>% 
+	left_join(ortho_gene_names) %>% 
+	na_if("NA") %>% na_if("") 
 
 curated_list_full %>% fwrite("curated_list_full.tsv", sep = "\t")
 
