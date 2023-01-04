@@ -4,6 +4,19 @@ p_load_current_gh("hrbrmstr/hrbrthemes")
 
 operon_conversion <- fread("Operons/AB19606_operon_conversion.tsv")
 
+conflict_prefer("extract", "magrittr")
+
+operon_details <- 
+	curated_names %>% 
+	inner_join(
+		operon_conversion, by = c("AB19606" = "locus_tag")) %>% 
+	group_by(operon) %>% 
+	arrange(AB19606) %>%
+	summarise(
+		operon_genes = paste(unique_name, collapse = ", "),
+		operon_AB19606 = paste(AB19606, collapse = ", "),
+		operon_AB030 = paste(AB030, collapse = ", ")) 
+
 aba_genome_operons <-
 	aba_genome %>% 
 	full_join(operon_conversion) 
@@ -108,57 +121,24 @@ melted_results %>%
 
 ########################
 
-melted_results %>% 
-	filter(base == "None_0_T0") %>%
-	filter(shift %in% c("None_0_T1", "None_0_T2")) %>%
-	filter(type == "perfect") %>%
+melted_results %>%
+	filter(base == "None_0_T0" & shift == "None_0_T1" & type == "perfect") %>%
+	inner_join(operon_conversion, by = c("AB19606" = "locus_tag")) %>%
+	inner_join(operon_details) %>%
+	filter(operon %in% c("TU286Y-1151", "TU286Y-1734", "TU286Y-1537", "TU286Y-1969", "TU286Y-846")) %>%
+	arrange(operon, AB19606, offset) %>%
+	mutate(operon_genes = stringr::str_wrap(operon_genes, 40)) %>%
 	inner_join(
-		operon_conversion %>% 
-			group_by(operon) %>% 
-			tally %>% 
-			arrange(desc(n)) %>% 
-			inner_join(operon_conversion), 
-		by = c("AB19606" = "locus_tag")) %>% 
-	filter(operon == "TU286Y-1151") %>% 
-	arrange(operon, AB19606, offset) %>% 
-	inner_join(
-		aba_genome %>% 
-			select(
-				locus_tag, left, right) %>%
-			rename(
-				"AB19606" = locus_tag,
-				"left gene coordinate" = left) %>% unique) %>%
-	mutate(macro_offset = `left gene coordinate` + offset) %>%
-	ggplot(aes(x = `left gene coordinate`, y = LFC.adj, fill = unique_name)) + 
+		aba_genome %>%
+			select(locus_tag, left, right) %>%
+			rename("AB19606" = locus_tag, "left gene coordinate" = left) %>% unique) %>%
+	ggplot(aes(x = `left gene coordinate`, y = LFC.adj, fill = unique_name)) +
+	geom_hline(yintercept = 0, colour = "gray", linewidth = 1) +
 	geom_boxplot() +
-	facet_grid(facets = c("type", "shift")) +
-	doc_theme
+	facet_grid(facets = c("shift", "operon_genes"), scales = "free_x") +
+	doc_theme +
+	theme(
+		axis.text.x = element_text(angle = 45),
+		legend.position = "none",
+		strip.text.x = element_text(face = "italic"))
 
-########################
-
-melted_results %>% 
-	filter(
-		condition == "Colistin_0.44_T1 - None_0_T1" |
-		condition == "Colistin_0.44_T2 - None_0_T2") %>%
-	filter(type == "perfect") %>%
-	inner_join(
-		operon_conversion %>% 
-			group_by(operon) %>% 
-			tally %>% 
-			arrange(desc(n)) %>% 
-			inner_join(operon_conversion), 
-		by = c("AB19606" = "locus_tag")) %>% 
-	filter(operon == "TU286Y-1151") %>% 
-	arrange(operon, AB19606, offset) %>% 
-	inner_join(
-		aba_genome %>% 
-			select(
-				locus_tag, left, right) %>%
-			rename(
-				"AB19606" = locus_tag,
-				"left gene coordinate" = left) %>% unique) %>%
-	mutate(macro_offset = `left gene coordinate` + offset) %>%
-	ggplot(aes(x = `left gene coordinate`, y = LFC.adj, fill = unique_name)) + 
-	geom_boxplot() +
-	facet_grid(facets = c("type", "condition")) +
-	doc_theme
