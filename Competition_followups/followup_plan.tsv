@@ -1,0 +1,42 @@
+sample	strains	IPTG	antibiotic	timepoint	OD_initial	OD_final
+AC1	NT+murA	0	none	T0A	0.009	0.16
+AC2	NT+murA	0	none	T0B	0.009	0.16
+AC3	NT+murA	1	none	T1A-	0.016	2.42
+AC4	NT+murA	1	none	T1B-	0.016	2.55
+AC5	NT+murA	1	imipenem 0.09	T1A+	0.016	2.15
+AC6	NT+murA	1	imipenem 0.09	T1B+	0.016	1.76
+AC7	NT+murA	1	none	T2A-	0.015	2.65
+AC8	NT+murA	1	none	T2B-	0.015	2.98
+AC9	NT+murA	1	imipenem 0.09	T2A+	0.015	2.16
+AC10	NT+murA	1	imipenem 0.09	T2B+	0.015	2.12
+AC11	NT+glnS	1	none	T0A	0.011	0.16
+AC12	NT+glnS	1	none	T0B	0.011	0.16
+AC13	NT+glnS	1	none	T1A-	0.016	2.55
+AC14	NT+glnS	1	none	T1B-	0.016	2.87
+AC15	NT+glnS	1	imipenem 0.09	T1A+	0.016	1.89
+AC16	NT+glnS	1	imipenem 0.09	T1B+	0.016	1.46
+AC17	NT+glnS	1	none	T2A-	0.015	2.87
+AC18	NT+glnS	1	none	T2B-	0.015	2.68
+AC19	NT+glnS	1	imipenem 0.09	T2A+	0.015	1.91
+AC20	NT+glnS	1	imipenem 0.09	T2B+	0.015	2.00
+AC21	NT+nuoB	0	none	T0A	0.015	0.20
+AC22	NT+nuoB	0	none	T0B	0.015	0.20
+AC23	NT+nuoB	1	none	T1A-	0.015	2.98
+AC24	NT+nuoB	1	none	T1B-	0.015	2.52
+AC25	NT+nuoB	1	colistin 0.4	T1A+	0.015	2.05
+AC26	NT+nuoB	1	colistin 0.4	T1B+	0.015	2.06
+AC27	NT+nuoB	1	none	T2A-	0.015	2.93
+AC28	NT+nuoB	1	none	T2B-	0.015	2.60
+AC29	NT+nuoB	1	colistin 0.4	T2A+	0.015	2.90
+AC30	NT+nuoB	1	colistin 0.4	T2B+	0.015	2.75
+AC31	NT+lpxC	1	none	T0A	0.015	0.22
+AC32	NT+lpxC	1	none	T0B	0.015	0.22
+AC33	NT+lpxC	1	none	T1A-	0.016	2.52
+AC34	NT+lpxC	1	none	T1B-	0.016	2.51
+AC35	NT+lpxC	1	colistin 0.4	T1A+	0.016	2.60
+AC36	NT+lpxC	1	colistin 0.4	T1B+	0.016	2.22
+AC37	NT+lpxC	1	none	T2A-	0.015	2.87
+AC38	NT+lpxC	1	none	T2B-	0.015	2.78
+AC39	NT+lpxC	1	colistin 0.4	T2A+	0.015	2.62
+AC40	NT+lpxC	1	colistin 0.4	T2B+	0.015	2.68
+
