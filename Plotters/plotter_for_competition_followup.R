@@ -71,14 +71,14 @@ competition_raw %>%
 		size = 2.5,
 		position = position_dodge(width = 0.15)
 	) +
-	stat_summary(
-		data = . %>% filter(timing != "T0" | treatment != "drug"),
-		fun.data = "mean_sdl",
-		geom = "errorbar",
-		position = position_dodge2(width = 1),
-		lwd = 1,
-		mapping = aes(colour = `unique name`, alpha = treatment)
-	) +
+	# stat_summary(
+	# 	data = . %>% filter(timing != "T0" | treatment != "drug"),
+	# 	fun.data = "mean_sdl",
+	# 	geom = "errorbar",
+	# 	position = position_dodge2(width = 1),
+	# 	lwd = 1,
+	# 	mapping = aes(colour = `unique name`, alpha = treatment)
+	# ) +
 	scale_colour_manual(
 		values = c(
 			"control" = "dark grey",
@@ -96,8 +96,8 @@ competition_raw %>%
 	) +
 	scale_alpha_manual(
 		values = c(
-			"drug" = 0.5,
-			"none" = 1
+			"drug" = 1,
+			"none" = 0.25
 		)
 	) +
 	doc_theme +
