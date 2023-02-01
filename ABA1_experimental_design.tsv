@@ -28,8 +28,7 @@ ABA1-30	R	T1	tube	1	Rifampicin 0.34	Rifampicin	0.34
 ABA1-31	R	T2	tube	1	Rifampicin 0.34	Rifampicin	0.34
 ABA1-32	R	T1	tube	2	Rifampicin 0.34	Rifampicin	0.34
 ABA1-33	R	T2	tube	2	Rifampicin 0.34	Rifampicin	0.34
-ABA1-34A	LB	T0	flask	1		None	
-ABA1-34B	LB	T0	flask	2		None	
+ABA1-34	LB	T0	flask	1		None	
 ABA1-35	LB	T2	flask	1		None	
 ABA1-36	LB	T2	flask	2		None	
 ABA1-37	Col	T1	flask	1		Colistin	
