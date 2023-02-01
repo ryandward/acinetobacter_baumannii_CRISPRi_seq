@@ -34,31 +34,49 @@ competition_raw %>%
 		timing = factor(timing, levels = c("T0", "T1", "T2")),
 		treatment = factor(treatment, c("none", "drug"))
 	) %>%
+	filter(`unique name` != "control") %>%
 	ggplot(aes(x = timing, y = value, group = interaction(`unique name`, treatment))) +
-	geom_point(aes(colour = `unique name`), position = position_dodge(width = 0.15)) +
 	stat_summary(
-		fun.data = "mean_sdl", 
-		geom = 'line', 
-		aes(colour = `unique name`), 
-		lwd = 2, 
-		alpha = 0.25
+		aes(linetype = treatment, alpha = treatment),
+		fun.data = "mean_sdl",
+		geom = "line",
+		lwd = 0.75
+	) +
+	geom_point(
+		data = . %>% filter(timing != "T0" | treatment != "drug"),
+		aes(colour = `unique name`, alpha = treatment),
+		size = 2.5,
+		position = position_dodge(width = 0.15)
 	) +
 	stat_summary(
-		fun.data = "mean_sdl", 
-		geom = 'errorbar', 
-		position = position_dodge(width = 0.75), 
-		mapping = aes(colour = `unique name`)
+		data = . %>% filter(timing != "T0" | treatment != "drug"),
+		fun.data = "mean_sdl",
+		geom = "errorbar",
+		position = position_dodge2(width = 1),
+		lwd = 1,
+		mapping = aes(colour = `unique name`, alpha = treatment)
 	) +
 	scale_colour_manual(
 		values = c(
-			"control" = "dark grey", 
+			"control" = "dark grey",
 			"nuoB" = "#6A3D9A",
 			"lpxC" = "#33A02C",
 			"murA" = "#FF7F00",
 			"glnS" = "#1F78B4"
 		)
 	) +
+	scale_linetype_manual(
+		values = c(
+			"none" = "solid",
+			"drug" = "twodash"
+		)
+	) +
+	scale_alpha_manual(
+		values = c(
+			"drug" = 0.5,
+			"none" = 1
+		)
+	) +
 	doc_theme +
-	facet_grid(treatment ~ set + antibiotic)
-
+	facet_grid(~set + antibiotic)
 
