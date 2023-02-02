@@ -78,7 +78,9 @@ aba_grid_matrix <- data.matrix(aba_grid[,-c("spacer")]) %>%
 	set_rownames(aba_grid$spacer)
 
 # Create a factor variable for the group labels
-aba_group <-	factor(aba_design[,  paste(drug, dose, timing, sep = "_")])
+aba_group <-	factor(
+	aba_design[,  paste(drug, dose, timing, sep = "_")],
+	levels = unique(aba_design[,  paste(drug, dose, timing, sep = "_")]))
 
 # Create a design matrix for the groups
 aba_permut <- model.matrix(~ 0 + aba_group) %>%
