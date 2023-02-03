@@ -34,22 +34,51 @@ aba_multi_normalized <- aba_all %>%
 		fc.adj = 2^logfc.adj,
 		treatment = case_when(drug == "None" ~ "none", TRUE ~ "drug"),
 		treatment = factor(treatment, levels = c("none", "drug"))
-	)
+	) %>% 
+	select(drug, dose, spacer, timing, rep, type, unique_name, treatment, fc.adj)
 
-crossing(
-	aba_multi_normalized %>% ungroup %>% select(drug, dose) %>% unique, 
-	aba_multi_normalized %>% ungroup %>% filter(timing == "T0") %>% select(-drug, -dose) %>% unique
-) %>%
-	rbind(aba_multi_normalized) %>%
-	filter(unique_name %like% "nuoB" & spacer == "ACAATTTGACGATCTTGCAA") %>%
-	ggplot(aes(x = timing, y = fc.adj, group = interaction(unique_name, drug))) +
-	geom_point(aes(colour = unique_name)) +
+# Add T0 data to all combinations of drug, dose, and treatment
+# T0 data serves as the baseline for comparison in subsequent plots
+aba_multi_normalized <- crossing(
+	aba_multi_normalized %>% ungroup %>% select(drug, dose, treatment) %>% unique,
+	aba_multi_normalized %>% ungroup %>% filter(timing == "T0") %>% select(-drug, -dose, -treatment) %>% unique) %>%
+	rbind(aba_multi_normalized) %>% unique
+
+# Add data for "None" treatment to all combinations of drug and dose
+# This allows for comparison with the "None" treatment in every plot
+aba_multi_normalized <- crossing(
+	aba_multi_normalized %>% ungroup %>% select(drug, dose) %>% unique,
+	aba_multi_normalized %>% ungroup %>% filter(drug == "None") %>% select(-drug, -dose) %>% unique) %>%
+	rbind(aba_multi_normalized) %>% unique
+
+# Remove the "None" drug, as it is now represented in every plot
+aba_multi_normalized <- aba_multi_normalized %>% filter(drug != "None")
+
+# Reshape the data for easier handling of missing values
+# Reshaping the data into a more manageable format makes it easier to fill in any missing values
+aba_multi_normalized <- aba_multi_normalized %>% 
+	data.table %>%
+	dcast(drug + dose + treatment + spacer + unique_name ~ timing + rep, value.var = "fc.adj", fill = 0) %>%
+	melt(id.vars = c("drug", "dose", "treatment", "spacer", "unique_name"), variable.name = "rep", value.name = "fc.adj") %>%
+	separate(rep, c("timing", "rep"))
+
+
+aba_multi_normalized %>%	
+	filter(
+		spacer %in% c(
+			"ACAATTTGACGATCTTGCAA", 
+			"AGAATCATTGCCGCAAGTAA", 
+			"CCAGCACTACCATCCATAAT", 
+			"TTGCTGCGCAGAATCGACAG")) %>%
+	ggplot(aes(x = timing, y = fc.adj, group = interaction(unique_name, treatment))) +
+	geom_point(aes(colour = unique_name, alpha = treatment)) +
 	stat_summary(
-		fun.data = "mean_sdl",
+		aes(linetype = treatment, alpha = treatment),
+		fun.data = "mean_cl_boot",
 		geom = "line",
 		lwd = 0.75
 	) +
-	facet_grid(unique_name ~ drug + dose) +
+	facet_grid(unique_name ~ drug + dose, scales = "free_y") +
 	scale_colour_manual(
 		values = c(
 			"control" = "dark grey",
@@ -57,6 +86,18 @@ crossing(
 			"lpxC" = "#33A02C",
 			"murA" = "#FF7F00",
 			"glnS" = "#1F78B4"
+		)
+	) +
+	scale_linetype_manual(
+		values = c(
+			"none" = "solid",
+			"drug" = "twodash"
+		)
+	) +
+	scale_alpha_manual(
+		values = c(
+			"drug" = 1,
+			"none" = 0.25
 		)
 	)
 
