@@ -99,5 +99,6 @@ aba_multi_normalized %>%
 			"drug" = 1,
 			"none" = 0.25
 		)
-	)
+	) + 
+	doc_theme
 
