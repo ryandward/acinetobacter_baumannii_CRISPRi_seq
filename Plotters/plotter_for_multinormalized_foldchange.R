@@ -69,7 +69,10 @@ aba_multi_normalized %>%
 			"ACAATTTGACGATCTTGCAA", 
 			"AGAATCATTGCCGCAAGTAA", 
 			"CCAGCACTACCATCCATAAT", 
-			"TTGCTGCGCAGAATCGACAG")) %>%
+			"TTGCTGCGCAGAATCGACAG", 
+			"AGCTTGAAAGTTTGCATGTA",
+			"GCATATTATCGGCATACGGA",
+			"ATAACAGCAGCTTTTAAAAT")) %>%
 	ggplot(aes(x = timing, y = fc.adj, group = interaction(unique_name, treatment))) +
 	geom_point(aes(colour = unique_name, alpha = treatment)) +
 	stat_summary(
@@ -85,7 +88,10 @@ aba_multi_normalized %>%
 			"nuoB" = "#6A3D9A",
 			"lpxC" = "#33A02C",
 			"murA" = "#FF7F00",
-			"glnS" = "#1F78B4"
+			"glnS" = "#1F78B4",
+			"sdhB" = "#12dfda",
+			"atpG" = "#ffaffa",
+			"psd" =  "#5555ff"
 		)
 	) +
 	scale_linetype_manual(
