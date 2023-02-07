@@ -92,7 +92,7 @@ col_CCCP_ThT_data <-
 col_CCCP_ThT_data <- col_CCCP_ThT %>% mutate(Well = paste0(row, column)) %>% inner_join(col_CCCP_ThT_data) 
 
 col_CCCP_OD <- fread(
-	"ThT/NT_nuoHB_OD.tsv",
+	"ThT/colistin_CCCP_OD.tsv",
 	header = T) %>%
 	rename("row" = "<>") %>% 
 	melt(id.vars = "row", variable.name = "column", value.name = "OD") %>%
@@ -111,5 +111,7 @@ col_CCCP_ThT_data %>% filter(!is.na(strain)) %>%
 	mutate(ThT_OD = ThT/OD) %>%
 	ggplot(aes(x = cycle, y = ThT_OD)) +
 	geom_boxplot(aes(colour = as.character(dose))) +
-	facet_grid(~drug)
+	facet_wrap(~drug) +
+	doc_theme
+
 
