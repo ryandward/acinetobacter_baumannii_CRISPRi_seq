@@ -61,6 +61,8 @@ nuoBH_summarised %>%
 	scale_x_discrete(limits = levels(nuoBH_summarised$cycle)) +
 	theme_minimal()
 
+nuoBH_ThT_data %>% filter(!is.na(strain)) %>% ggplot(aes(x = cycle, y = ThT_OD, color = strain)) + geom_boxplot() + facet_grid(~induced)
+
 ##########################################################################################
 
 col_CCCP_ThT <- fread(
