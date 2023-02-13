@@ -137,4 +137,15 @@ col_CCCP_ThT_data %>% filter(!is.na(strain)) %>%
 
 # this is a mess
 col_CCCP_ThT_data %>% filter(!is.na(strain)) %>%
-	mutate(ThT_OD = ThT/OD) %>% mutate(strain = "WT") %>% rbind(nuoBH_ThT_data, fill = TRUE) %>% mutate(induced = case_when(induced == "induced" ~ "induced", TRUE ~ "uninduced")) %>% mutate(drug = case_when(!is.na(drug) ~ drug, TRUE ~ "none")) %>% mutate(dose = case_when(!is.na(dose) ~ dose, TRUE ~ 0)) %>% filter(!is.na(strain)) %>% ggplot(aes(x = interaction(induced, dose), y = ThT_OD, fill = strain)) + geom_boxplot() + 	theme_minimal() + facet_wrap(~drug, scales = "free_x")
+	mutate(ThT_OD = ThT/OD) %>% mutate(strain = "WT") %>% rbind(nuoBH_ThT_data, fill = TRUE) %>% mutate(induced = case_when(induced == "induced" ~ "induced", TRUE ~ "uninduced")) %>% mutate(drug = case_when(!is.na(drug) ~ drug, TRUE ~ "none")) %>% mutate(dose = case_when(!is.na(dose) ~ dose, TRUE ~ 0)) %>% filter(!is.na(strain)) %>% ggplot(aes(x = interaction(induced, dose, sep = "\n"), y = ThT_OD, fill = strain)) + geom_boxplot() + 	theme_minimal() + facet_wrap(~drug, scales = "free_x") +
+	theme(axis.text.x = element_text(angle = 45))
+
+# t-test
+col_CCCP_ThT_data %>% mutate(cycle = as.numeric(cycle)) %>% filter(!is.na(strain) & cycle == 10)  %>%
+	mutate(ThT_OD = ThT/OD) %>% group_by(drug) %>% 
+	filter(dose == 0 | dose == max(dose)) %>% do(tidy(t.test(ThT_OD ~ dose, data = .)))
+
+
+nuoBH_ThT_data %>% mutate(cycle = as.numeric(cycle)) %>% filter(strain %in% c("control", "nuoB") & cycle == 10) %>%
+	mutate(ThT_OD = ThT/OD) %>% group_by(induced) %>% do(tidy(t.test(ThT_OD ~ strain, data = .)))
+
