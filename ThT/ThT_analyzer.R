@@ -42,9 +42,12 @@ nuoBH_ThT_data <- nuoBH_ThT_data %>% select(-row, -column ) %>%
 	inner_join(nuoBH_OD %>% mutate(Well = paste0(row, column)) %>% select(-row, -column)) %>%
 	mutate(ThT_OD = ThT/OD) 
 
+nuoBH_ThT_data[OD < as.numeric(0.05), strain := NA_character_]
+
+
 nuoBH_summarised <- nuoBH_ThT_data %>%
 	filter(!is.na(strain)) %>%
-	group_by(induced, cycle, strain) %>%
+	group_by(induced, cycle, strain) %>%http://127.0.0.1:38831/graphics/plot_zoom_png?width=1443&height=740
 	summarise(mean = mean(ThT_OD), sd = sd(ThT_OD), se = sd/sqrt(n())) %>%
 	arrange(cycle, strain, induced)
 
@@ -61,7 +64,11 @@ nuoBH_summarised %>%
 	scale_x_discrete(limits = levels(nuoBH_summarised$cycle)) +
 	theme_minimal()
 
-nuoBH_ThT_data %>% filter(!is.na(strain)) %>% ggplot(aes(x = cycle, y = ThT_OD, color = strain)) + geom_boxplot() + facet_grid(~induced)
+
+nuoBH_ThT_data %>% filter(!is.na(strain)) %>% ggplot(aes(x = cycle, y = ThT_OD, color = strain)) + geom_boxplot() + facet_grid(~induced) + 	theme_minimal()
+
+nuoBH_ThT_data %>% filter(!is.na(strain) & strain != "nuoH") %>% ggplot(aes(x = induced, y = ThT_OD, fill = strain)) + geom_boxplot() + 	theme_minimal()
+
 
 ##########################################################################################
 
