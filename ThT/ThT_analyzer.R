@@ -1,3 +1,7 @@
+library(pacman)
+p_load_current_gh("DoseResponse/drcData", "ryandward/drc", "hrbrmstr/hrbrthemes")
+doc_theme <- theme_ipsum(base_family = "Arial", caption_margin = 12, axis_title_size = 12, axis_col = "black")
+
 nuoBH_ThT <- fread(
 	"ThT/NT_nuoHB.tsv",
 	header = T) %>%
@@ -47,7 +51,7 @@ nuoBH_ThT_data[OD < as.numeric(0.05), strain := NA_character_]
 
 nuoBH_summarised <- nuoBH_ThT_data %>%
 	filter(!is.na(strain)) %>%
-	group_by(induced, cycle, strain) %>%http://127.0.0.1:38831/graphics/plot_zoom_png?width=1443&height=740
+	group_by(induced, cycle, strain) %>%
 	summarise(mean = mean(ThT_OD), sd = sd(ThT_OD), se = sd/sqrt(n())) %>%
 	arrange(cycle, strain, induced)
 
@@ -123,4 +127,14 @@ col_CCCP_ThT_data %>% filter(!is.na(strain)) %>%
 	facet_wrap(~drug) +
 	doc_theme
 
+col_CCCP_ThT_data %>% filter(!is.na(strain)) %>%
+	mutate(ThT_OD = ThT/OD) %>%
+	ggplot(aes(x = dose, y = ThT_OD)) +
+	geom_boxplot(aes(fill = as.character(dose))) +
+	facet_wrap(~drug, scales = "free_x") +
+	doc_theme
 
+
+# this is a mess
+col_CCCP_ThT_data %>% filter(!is.na(strain)) %>%
+	mutate(ThT_OD = ThT/OD) %>% mutate(strain = "WT") %>% rbind(nuoBH_ThT_data, fill = TRUE) %>% mutate(induced = case_when(induced == "induced" ~ "induced", TRUE ~ "uninduced")) %>% mutate(drug = case_when(!is.na(drug) ~ drug, TRUE ~ "none")) %>% mutate(dose = case_when(!is.na(dose) ~ dose, TRUE ~ 0)) %>% filter(!is.na(strain)) %>% ggplot(aes(x = interaction(induced, dose), y = ThT_OD, fill = strain)) + geom_boxplot() + 	theme_minimal() + facet_wrap(~drug, scales = "free_x")
