@@ -69,27 +69,51 @@ aba_genome_operons_summary <- melted_results %>%
 		strand == "-" ~ max(right))) %>% unique %>% 
 	inner_join(aba_genome_operons_summary)
 
-
+imipenem_operons <- melted_results %>% 
+	filter(type == "perfect") %>% 
+	filter(condition %in% interest$condition) %>%
+	left_join(aba_genome_operons_summary) %>% 
+	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & (Pathway %like% "tRNA" | Pathway %like% "PG") & unique_name != "ftsN") %>% 
+	select(operon) %>% 
+	unique 
 
 melted_results %>% 
 	filter(type == "perfect") %>% 
 	filter(condition %in% interest$condition) %>%
 	left_join(aba_genome_operons_summary) %>% 
-	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & (Pathway %like% "tRNA" | Pathway %like% "PG") & unique_name != "ftsN" & FDR < 0.05) %>%
-	inner_join(operon_details %>% mutate(operon_genes = gsub(", ", ",\n", operon_genes))) %>%
-	ggplot(aes(x = tss, y = LFC, group = tss, fill = Pathway)) + 
-	geom_boxplot(width = 50000) + 
+	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & operon %in% imipenem_operons$operon & unique_name != "ftsN") %>%
+	inner_join(operon_details %>% mutate(operon_genes = gsub(", ", "\n", operon_genes))) %>%
+	ggplot(aes(x = tss, y = LFC, group = tss)) + 
+	geom_boxplot(width = 50000, aes(fill = Pathway, colour = Pathway), outlier.shape = NA) + 
 	geom_abline(slope = 0) + 
-	geom_text_repel(
+	geom_jitter(aes(colour = Pathway), size = 2, alpha = 0.5, height = 0, width = 25000) +
+	geom_label_repel(
+		force = 5,
 		aes(label = operon_genes),
-		# nudge_x = -300000,
+		box.padding = 1.0,
+		point.padding = 1.5,
 		stat = "summary",
-		max.iter = 100000000,
-		max.overlaps = 5,
-		fun = median,
-		point.padding = 0.5,
-		box.padding = 1.5)  + 
-	doc_theme
+		max.iter = 1000000000,
+		min.segment.length = 0,
+		segment.curvature = -0.25,
+		segment.angle = 90,
+		fun = median)  + 
+	doc_theme +
+	scale_colour_manual(
+		values = c(
+			"Other" = "black",
+			"NADH" = "#6A3D9A",
+			"LOS" = "#33A02C",
+			"Cell Wall/PG" = "#FF7F00",
+			"tRNA Ligase" = "#1F78B4")) +
+	scale_fill_manual(
+		values = c(
+			"Other" = "gray",
+			"NADH" = "#CAB2D6",
+			"LOS" = "#B2DF8A",
+			"Cell Wall/PG" = "#FDBF6F",
+			"tRNA Ligase" = "#A6CEE3")) 
+
 
 # 
 # 
