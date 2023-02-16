@@ -114,113 +114,59 @@ melted_results %>%
 			"Cell Wall/PG" = "#FDBF6F",
 			"tRNA Ligase" = "#A6CEE3")) 
 
+##########################################################################################
 
-# 
-# 
-# highly_vulnerable <- -7.851051
-# 
-# old_vulnerability_classifications <-
-# 	median_melted_results %>% 
-# 	filter(base == "None_0_T0") %>%
-# 	filter(type == "perfect") %>%
-# 	mutate(
-# 		Response = case_when(
-# 			medLFC < highly_vulnerable  & FDR < 0.05 ~ "Highly Vulnerable",
-# 			medLFC < -1 & FDR < 0.05 ~ "Vulnerable",
-# 			medLFC > 1 & FDR < 0.05 ~ "Resistant",
-# 			TRUE ~ "No Response")) %>%
-# 	select(AB19606, condition, Response) %>%
-# 	mutate(condition = case_when(
-# 		condition == "None_0_T1 - None_0_T0" ~ "T1",
-# 		condition == "None_0_T2 - None_0_T0" ~ "T2"))	%>%
-# 	filter(!is.na(condition)) 
-# 
-# operon_analysis_vulnerability <- 
-# 	old_vulnerability_classifications %>% 
-# 	inner_join(
-# 		aba_genome_operons_summary, 
-# 		by = c("AB19606" = "locus_tag"))
-# 
-# doc_theme <- theme_ipsum(
-# 	base_family = "Arial", 
-# 	caption_margin = 12,
-# 	axis_title_size = 12,
-# 	axis_col = "black")
-# 
-# #######################
-# # all operon
-# 
-# melted_results %>% 
-# 	filter(base == "None_0_T0") %>%
-# 	filter(shift %in% c("None_0_T1", "None_0_T2")) %>%
-# 	filter(type == "perfect") %>%
-# 	inner_join(
-# 		operon_conversion %>% 
-# 			group_by(operon) %>% 
-# 			tally %>% 
-# 			arrange(desc(n)) %>% 
-# 			inner_join(operon_conversion), 
-# 				by = c("AB19606" = "locus_tag")) %>% 
-# 	{
-# 		ggplot(data = ., aes(n, LFC, group = n)) +
-# 			scale_x_continuous(
-# 		breaks = seq(
-# 			min(.$n), 
-# 			max(.$n), 
-# 			by = 1)) 
-# 		} +
-# 	doc_theme +
-# 	theme(panel.grid.minor = element_blank()) +
-# 	geom_boxplot() +
-# 	facet_grid(~shift)
-# 
-# ##############
-# # nuo operon
-# 
-# melted_results %>% 
-# 	filter(base == "None_0_T0") %>%
-# 	filter(shift %in% c("None_0_T1", "None_0_T2")) %>%
-# 	# filter(type == "perfect") %>%
-# 	inner_join(
-# 		operon_conversion %>% 
-# 			group_by(operon) %>% 
-# 			tally %>% 
-# 			arrange(desc(n)) %>% 
-# 			inner_join(operon_conversion), 
-# 		by = c("AB19606" = "locus_tag")) %>% 
-# 	filter(operon == "TU286Y-1151") %>% 
-# 	arrange(operon, AB19606, offset) %>% 
-# 	inner_join(
-# 		aba_genome %>% 
-# 			select(
-# 				locus_tag, left, right) %>%
-# 			rename("AB19606" = locus_tag) %>% unique) %>%
-# 	mutate(macro_offset = left + offset) %>%
-# 	ggplot(aes(x = macro_offset, y = LFC.adj, colour = unique_name, size = y_pred, alpha = y_pred)) + 
-# 	geom_point() +
-# 	facet_grid(~shift) +
-# 	doc_theme
-# 
-# ########################
-# 
-# melted_results %>%
-# 	filter(base == "None_0_T0" & shift == "None_0_T1" & type == "perfect") %>%
-# 	inner_join(operon_conversion, by = c("AB19606" = "locus_tag")) %>%
-# 	inner_join(operon_details) %>%
-# 	filter(operon %in% c("TU286Y-1151", "TU286Y-1734", "TU286Y-1537", "TU286Y-1969", "TU286Y-846")) %>%
-# 	arrange(operon, AB19606, offset) %>%
-# 	mutate(operon_genes = stringr::str_wrap(operon_genes, 40)) %>%
-# 	inner_join(
-# 		aba_genome %>%
-# 			select(locus_tag, left, right) %>%
-# 			rename("AB19606" = locus_tag, "left gene coordinate" = left) %>% unique) %>%
-# 	ggplot(aes(x = `left gene coordinate`, y = LFC.adj, fill = unique_name)) +
-# 	geom_hline(yintercept = 0, colour = "gray", linewidth = 1) +
-# 	geom_boxplot() +
-# 	facet_grid(facets = c("shift", "operon_genes"), scales = "free_x") +
-# 	doc_theme +
-# 	theme(
-# 		axis.text.x = element_text(angle = 45),
-# 		legend.position = "none",
-# 		strip.text.x = element_text(face = "italic"))
-# 
+
+operon_pathways <- melted_results %>% 
+	select(AB19606, Pathway) %>% 
+	rename("locus_tag" = AB19606) %>% 
+	unique %>% 
+	inner_join(aba_genome_operons) %>% 
+	unique %>% 
+	select(operon, Pathway, locus_tag) %>% 
+	unique %>% 
+	group_by(operon, Pathway) %>% 
+	tally(name = "operon_pathway_size") %>%
+	mutate(operon_pathway_size = as.integer(operon_pathway_size))
+
+operon_median_results %>%
+	filter(condition %in%  c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
+	inner_join(operon_pathways %>% filter(Pathway %like% "Ribosome")) %>%
+	mutate(Pathway = case_when(
+		Pathway == "Ribosome" ~ "Ribosome",
+		TRUE ~ NA_character_)) %>%
+	ggplot(
+		aes(x = operon_mLFC,
+				y = FDR,
+				colour = Pathway)) +
+	geom_point(aes(size = operon_pathway_size)) +
+	# geom_point(data = . %>% filter(Pathway == "Ribosome"), size = 3) +
+	geom_hline(yintercept = 0.05,
+						 linetype = "dashed",
+						 color = "red",
+						 lwd = 1) +
+	geom_vline(xintercept = -1,
+						 linetype = "dashed",
+						 color = "red", 
+						 lwd = 1) +
+	geom_vline(xintercept = 0,
+						 linetype = "solid",
+						 color = "black",
+						 lwd = 1) +
+	doc_theme +
+	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
+	scale_colour_manual(values = c("dark red"), na.value = "grey") +
+	# theme(legend.position = "none") +
+	geom_text_repel(
+		data = . %>% filter(Pathway == "Ribosome" & FDR < 0.05 & operon_mLFC < -1),
+		aes(label = operon),
+		min.segment.length = 0,
+		box.padding = 1,
+		point.padding = .25,
+		# parse = TRUE,
+		max.overlaps = Inf,
+		colour = "black") +
+	facet_grid(~condition) -> to_plot
+
+print(to_plot)
+
