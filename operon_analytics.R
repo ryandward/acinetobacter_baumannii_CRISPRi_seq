@@ -55,10 +55,13 @@ operon_pathways <- melted_results %>%
 	inner_join(aba_genome_operons) %>% 
 	unique %>% 
 	select(operon, Pathway, locus_tag) %>% 
-	unique %>%
-	slice(mixedorder(Pathway)) %>% 
+	unique %>% 
+	mutate(
+		Pathway = factor(Pathway), 
+		Pathway = factor(Pathway, levels = c(levels(Pathway)[levels(Pathway) != "Other"], "Other"))) %>%
+	slice(mixedorder(Pathway)) %>%
 	group_by(operon) %>% 
-	summarise(essential_size = n(), Pathways = paste(unique(Pathway), collapse = ", "))
+	summarise(essential_size = n(), Pathways = paste(unique(Pathway), collapse = "+"))
 
 operon_details <- operon_details %>% inner_join(operon_pathways) %>% 
 	inner_join(aba_genome_operons_summary %>% select(operon, total_size) %>% unique) %>% 
