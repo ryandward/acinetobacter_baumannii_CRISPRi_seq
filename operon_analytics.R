@@ -1,6 +1,7 @@
 source("meta_counter.R")
 
 p_load_current_gh("hrbrmstr/hrbrthemes")
+p_load(ggallin, gtools)
 
 operon_conversion <- fread("Operons/AB19606_operon_conversion.tsv")
 
@@ -10,6 +11,7 @@ conflict_prefer("filter", "dplyr")
 
 operon_details <- 
 	curated_names %>% 
+	slice(mixedorder(AB19606)) %>%
 	inner_join(
 		operon_conversion, by = c("AB19606" = "locus_tag")) %>% 
 	group_by(operon) %>% 
@@ -27,15 +29,38 @@ aba_genome_operons_summary <- aba_genome_operons %>%
 	select(locus_tag, operon) %>% 
 	unique %>% 
 	group_by(operon) %>% 
-	tally %>% 
+	tally(name = "total_size") %>% 
 	inner_join(aba_genome_operons) %>% 
-	select(locus_tag, operon, n) %>% 
+	select(locus_tag, operon, total_size) %>% 
 	inner_join(
 		curated_names, 
 		by = c("locus_tag" = "AB19606")) %>% 
-	select(locus_tag, n, operon, unique_name) %>% 
+	select(locus_tag, total_size, operon, unique_name) %>% 
 	unique %>%
-	arrange(desc(n), locus_tag)
+	slice(mixedorder(locus_tag))  
+
+operon_pathways <- melted_results %>% 
+	filter(type == "perfect") %>%
+	select(AB19606, Pathway) %>% 
+	rename("locus_tag" = AB19606) %>% 
+	unique %>% 
+	inner_join(aba_genome_operons) %>% 
+	unique %>% 
+	select(operon, Pathway, locus_tag) %>% 
+	unique %>%
+	slice(mixedorder(locus_tag)) %>% 
+	group_by(operon) %>% 
+	summarise(essential_size = n(), Pathways = paste(unique(Pathway), collapse = ", "))
+
+operon_details <- operon_details %>% inner_join(operon_pathways) %>% 
+	inner_join(aba_genome_operons_summary %>% select(operon, total_size) %>% unique) %>% 
+	select(operon, operon_genes, operon_AB19606, operon_AB030, total_size, essential_size, Pathways) %>% 
+	slice(mixedorder(operon)) %>%
+	mutate(operon = gsub("-", "_", operon)) %>% 
+	slice(mixedorder(operon)) %>% 
+	mutate(operon = gsub("_", "-", operon))
+
+operon_details %>% fwrite("operon_details.tsv", sep = "\t")
 
 ##########################################################################################
 
@@ -117,17 +142,6 @@ melted_results %>%
 ##########################################################################################
 
 
-operon_pathways <- melted_results %>% 
-	select(AB19606, Pathway) %>% 
-	rename("locus_tag" = AB19606) %>% 
-	unique %>% 
-	inner_join(aba_genome_operons) %>% 
-	unique %>% 
-	select(operon, Pathway, locus_tag) %>% 
-	unique %>% 
-	group_by(operon, Pathway) %>% 
-	tally(name = "operon_pathway_size") %>%
-	mutate(operon_pathway_size = as.integer(operon_pathway_size))
 
 operon_median_results %>%
 	filter(condition %in%  c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
