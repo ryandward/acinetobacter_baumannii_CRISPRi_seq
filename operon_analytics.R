@@ -3,11 +3,19 @@ source("meta_counter.R")
 p_load_current_gh("hrbrmstr/hrbrthemes")
 p_load(ggallin, gtools)
 
-operon_conversion <- fread("Operons/AB19606_operon_conversion.tsv")
-
 conflict_prefer("extract", "magrittr")
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
+
+# Unfortunately, it's hard to anticipate lots of kinds of missingness.
+
+operon_conversion <- fread("Operons/AB19606_operon_conversion.tsv", na.strings = "")
+
+operon_conversion <- rbind(
+	operon_conversion, 
+	curated_names %>% filter(!AB19606 %in% operon_conversion$locus_tag) %>% select(AB19606) %>% rename(locus_tag = AB19606), fill = TRUE)
+operon_conversion <- operon_conversion %>% slice(mixedorder(locus_tag)) %>% filter(!is.na(locus_tag))
+operon_conversion[is.na(operon), operon := locus_tag]
 
 operon_details <- 
 	curated_names %>% 
@@ -54,13 +62,27 @@ operon_pathways <- melted_results %>%
 
 operon_details <- operon_details %>% inner_join(operon_pathways) %>% 
 	inner_join(aba_genome_operons_summary %>% select(operon, total_size) %>% unique) %>% 
-	select(operon, operon_genes, operon_AB19606, operon_AB030, total_size, essential_size, Pathways) %>% 
-	slice(mixedorder(operon)) %>%
-	mutate(operon = gsub("-", "_", operon)) %>% 
-	slice(mixedorder(operon)) %>% 
-	mutate(operon = gsub("_", "-", operon))
+	select(operon, operon_genes, operon_AB19606, operon_AB030, total_size, essential_size, Pathways)
+
+
+aba_genome_operons_summary <- melted_results %>% 
+	filter(type == "perfect") %>% 
+	filter(condition %in% interest$condition) %>%
+	left_join(aba_genome_operons_summary) %>% 
+	inner_join(aba_genome %>% select(left, right, spacer, strand), by = "spacer") %>% 
+	group_by(operon, strand) %>% 
+	summarise(tss = case_when(
+		strand == "+" ~ min(left), 
+		strand == "-" ~ max(right))) %>% unique %>% 
+	inner_join(aba_genome_operons_summary)
+
+operon_details <- operon_details %>% 
+	inner_join(aba_genome_operons_summary %>% ungroup %>% select(tss, strand, operon) %>% unique) %>%
+	arrange(tss) 
 
 operon_details %>% fwrite("operon_details.tsv", sep = "\t")
+
+operon_details <- fread("operon_details.tsv")
 
 ##########################################################################################
 
@@ -76,23 +98,6 @@ gene_median_results <- melted_results %>%
 	filter(condition %in% interest$condition) %>%
 	group_by(condition, unique_name, AB19606, AB030) %>% 
 	summarise(gene_mLFC = median(LFC.adj), FDR = stouffer(FDR)$p)
-
-melted_results %>% 
-	filter(type == "perfect") %>% 
-	filter(condition %in% interest$condition) %>%
-	left_join(aba_genome_operons_summary) %>% 
-	inner_join(aba_genome %>% select(left, right, spacer), by = "spacer") 
-
-aba_genome_operons_summary <- melted_results %>% 
-	filter(type == "perfect") %>% 
-	filter(condition %in% interest$condition) %>%
-	left_join(aba_genome_operons_summary) %>% 
-	inner_join(aba_genome %>% select(left, right, spacer, strand), by = "spacer") %>% 
-	group_by(operon, strand) %>% 
-	summarise(tss = case_when(
-		strand == "+" ~ min(left), 
-		strand == "-" ~ max(right))) %>% unique %>% 
-	inner_join(aba_genome_operons_summary)
 
 imipenem_operons <- melted_results %>% 
 	filter(type == "perfect") %>% 
@@ -146,6 +151,7 @@ melted_results %>%
 operon_median_results %>%
 	filter(condition %in%  c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
 	inner_join(operon_details %>% filter(Pathways %like% "Ribosome")) %>%
+	mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
 	mutate(`Transcription Unit` = case_when(essential_size == 1 ~ operon_genes, TRUE ~ operon_genes)) %>%
 	# mutate(Pathway = case_when(
 	# 	Pathway == "Ribosome" ~ "Ribosome",
@@ -181,7 +187,7 @@ operon_median_results %>%
 		# parse = TRUE,
 		max.overlaps = Inf,
 		colour = "black") +
-	facet_grid(~condition) -> to_plot
+	facet_wrap(~ condition, scales = "free") -> to_plot
 
 print(to_plot)
 
