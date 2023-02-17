@@ -48,7 +48,7 @@ operon_pathways <- melted_results %>%
 	unique %>% 
 	select(operon, Pathway, locus_tag) %>% 
 	unique %>%
-	slice(mixedorder(locus_tag)) %>% 
+	slice(mixedorder(Pathway)) %>% 
 	group_by(operon) %>% 
 	summarise(essential_size = n(), Pathways = paste(unique(Pathway), collapse = ", "))
 
@@ -145,15 +145,16 @@ melted_results %>%
 
 operon_median_results %>%
 	filter(condition %in%  c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
-	inner_join(operon_pathways %>% filter(Pathway %like% "Ribosome")) %>%
-	mutate(Pathway = case_when(
-		Pathway == "Ribosome" ~ "Ribosome",
-		TRUE ~ NA_character_)) %>%
+	inner_join(operon_details %>% filter(Pathways %like% "Ribosome")) %>%
+	mutate(`Transcription Unit` = case_when(essential_size == 1 ~ operon_genes, TRUE ~ operon_genes)) %>%
+	# mutate(Pathway = case_when(
+	# 	Pathway == "Ribosome" ~ "Ribosome",
+	# 	TRUE ~ NA_character_)) %>%
 	ggplot(
 		aes(x = operon_mLFC,
 				y = FDR,
-				colour = Pathway)) +
-	geom_point(aes(size = operon_pathway_size)) +
+				colour = Pathways)) +
+	geom_point(aes(size = essential_size)) +
 	# geom_point(data = . %>% filter(Pathway == "Ribosome"), size = 3) +
 	geom_hline(yintercept = 0.05,
 						 linetype = "dashed",
@@ -169,11 +170,11 @@ operon_median_results %>%
 						 lwd = 1) +
 	doc_theme +
 	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
-	scale_colour_manual(values = c("dark red"), na.value = "grey") +
+	# scale_colour_manual(values = c("dark red"), na.value = "grey") +
 	# theme(legend.position = "none") +
 	geom_text_repel(
-		data = . %>% filter(Pathway == "Ribosome" & FDR < 0.05 & operon_mLFC < -1),
-		aes(label = operon),
+		data = . %>% filter(Pathways %like% "Ribosome" & FDR < 0.05 & operon_mLFC < -1),
+		aes(label = `Transcription Unit`),
 		min.segment.length = 0,
 		box.padding = 1,
 		point.padding = .25,
