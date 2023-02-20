@@ -27,13 +27,15 @@ p_load(
 	ggallin,
 	gtools)
 
-doc_theme <- theme_ipsum(base_family = "Arial", caption_margin = 12, axis_title_size = 12, axis_col = "black")
-
 p_load_current_gh("hrbrmstr/hrbrthemes")
 
 conflict_prefer("extract", "magrittr")
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
+conflicts_prefer(dplyr::lag)
+
+doc_theme <- theme_ipsum(base_family = "Arial", caption_margin = 12, axis_title_size = 12, axis_col = "black")
+
 
 # Unfortunately, it's hard to anticipate lots of kinds of missingness.
 
@@ -64,9 +66,61 @@ operon_details <- curated_names %>%
 		operon_AB030 = case_when(
 			strand == "+" ~ paste(AB030, collapse = ", "), 
 			strand == "-" ~ paste(rev(AB030), collapse = ", ")),
-		essential_size = n())	%>% 
+		`Essentials in operon` = n())	%>% 
 	inner_join(operon_conversion %>% group_by(operon) %>% tally(name = "total_size")) %>%
 	arrange(tss)
+
+
+##########################################################################################
+# excessively hard way to find the condensed names of an operon
+
+operonize = function(x, .sep = "")
+{
+	concat = paste(x, collapse = .sep)
+	substring(concat, 1L, cumsum(c(nchar(x[[1L]]), nchar(x[-1L]) + nchar(.sep))))
+}
+
+short_names <- curated_names %>% 
+	inner_join(
+		aba_genome %>% rename("AB19606" = "locus_tag") %>%
+			select(left, right, strand, AB19606) %>% unique) %>%
+	separate(unique_name, c("prefix", "suffix"), sep = "(?<=[a-z]{3})") %>%	
+	mutate(suffix = case_when(is.na(suffix) ~ "", TRUE ~ suffix)) %>% 
+	inner_join(operon_conversion %>% rename("AB19606" = "locus_tag")) %>%
+	group_by(operon) %>% 
+	arrange(case_when(strand == "+" ~ left, strand == "-" ~ desc(right)))
+
+
+# Convert data to data.table
+short_names <- data.table(short_names)
+
+# Calculate the lengths of runs with identical operon and prefix
+groups <- rle(paste(short_names$operon, short_names$prefix, sep = "_"))$lengths
+
+# Add the group numbers to the data table
+short_names[, group := rep(seq_along(groups), groups)]
+
+# View the result
+short_names <- short_names %>%
+	group_by(group) %>%
+	mutate(
+		suffices = case_when(
+			prefix == lag(prefix) ~ operonize(suffix, ""),
+			TRUE ~ suffix)) %>%
+	group_by(group) %>% 
+	filter(nchar(suffices) == max(nchar(suffices))) %>% 
+	mutate(operon_substr = paste0(prefix, suffices)) %>% 
+	ungroup %>% group_by(operon) %>% 
+	mutate(condensed_name = paste(operon_substr, collapse = "-")) %>%
+	select(operon, condensed_name ) %>%
+	unique
+
+##########################################################################################
+
+operon_details <- operon_details %>% inner_join(short_names) %>%
+	select(operon, strand, tss, condensed_name, operon_genes, operon_AB19606, operon_AB030, `Essentials in operon`, total_size)
+
+##########################################################################################
 
 aba_genome_operons <-
 	aba_genome %>% 
@@ -106,7 +160,11 @@ operon_median_results <- melted_results %>%
 	left_join(operon_conversion, by = c("AB19606" = "locus_tag")) %>% 
 	filter(condition %in% interest$condition) %>%
 	group_by(condition, operon) %>% 
-	summarise(operon_mLFC = median(LFC.adj), FDR = stouffer(FDR)$p) 
+	summarise(operon_mLFC = median(LFC.adj), FDR = stouffer(FDR)$p) %>%
+	inner_join(operon_details %>% select(operon, condensed_name)) %>%
+	select(condition, condensed_name, operon_mLFC, FDR, operon)
+
+operon_median_results %>% fwrite("operon_median_results.tsv", sep = "\t")
 
 gene_median_results <- melted_results %>%
 	filter(type == "perfect") %>%
@@ -114,332 +172,141 @@ gene_median_results <- melted_results %>%
 	group_by(condition, unique_name, AB19606, AB030) %>% 
 	summarise(gene_mLFC = median(LFC.adj), FDR = stouffer(FDR)$p)
 
-imipenem_operons <- melted_results %>% 
-	filter(type == "perfect") %>% 
-	filter(condition %in% interest$condition) %>%
-	left_join(aba_genome_operons_summary) %>% 
-	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & (Pathway %like% "tRNA" | Pathway %like% "PG") & unique_name != "ftsN") %>% 
-	select(operon) %>% 
-	unique 
+gene_median_results %>% fwrite("gene_median_results.tsv", sep = "\t")
 
-melted_results %>% 
-	filter(type == "perfect") %>% 
-	filter(condition %in% interest$condition) %>%
-	left_join(aba_genome_operons_summary) %>% 
-	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & operon %in% imipenem_operons$operon & unique_name != "ftsN") %>%
-	inner_join(operon_details %>% mutate(operon_genes = gsub(", ", "\n", operon_genes))) %>%
-	ggplot(aes(x = tss, y = LFC, group = tss)) + 
-	geom_boxplot(width = 50000, aes(fill = Pathway, colour = Pathway), outlier.shape = NA) + 
-	geom_abline(slope = 0) + 
-	geom_jitter(aes(colour = Pathway), size = 2, alpha = 0.5, height = 0, width = 25000) +
-	geom_label_repel(
-		force = 5,
-		aes(label = operon_genes),
-		box.padding = 1.0,
-		point.padding = 1.5,
-		stat = "summary",
-		max.iter = 1000000000,
-		min.segment.length = 0,
-		segment.curvature = -0.25,
-		segment.angle = 90,
-		fun = median)  + 
-	doc_theme +
-	scale_colour_manual(
-		values = c(
-			"Other" = "black",
-			"Ox Phos" = "#6A3D9A",
-			"LOS" = "#33A02C",
-			"Cell Wall/PG" = "#FF7F00",
-			"tRNA Ligase" = "#1F78B4")) +
-	scale_fill_manual(
-		values = c(
-			"Other" = "gray",
-			"Ox Phos" = "#CAB2D6",
-			"LOS" = "#B2DF8A",
-			"Cell Wall/PG" = "#FDBF6F",
-			"tRNA Ligase" = "#A6CEE3")) 
+# 
+# imipenem_operons <- melted_results %>% 
+# 	filter(type == "perfect") %>% 
+# 	filter(condition %in% interest$condition) %>%
+# 	left_join(aba_genome_operons_summary) %>% 
+# 	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & (Pathway %like% "tRNA" | Pathway %like% "PG") & unique_name != "ftsN") %>% 
+# 	select(operon) %>% 
+# 	unique 
+# 
+# melted_results %>% 
+# 	filter(type == "perfect") %>% 
+# 	filter(condition %in% interest$condition) %>%
+# 	left_join(aba_genome_operons_summary) %>% 
+# 	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & operon %in% imipenem_operons$operon & unique_name != "ftsN") %>%
+# 	inner_join(operon_details %>% mutate(operon_genes = gsub(", ", "\n", operon_genes))) %>%
+# 	ggplot(aes(x = tss, y = LFC, group = tss)) + 
+# 	geom_boxplot(width = 50000, aes(fill = Pathway, colour = Pathway), outlier.shape = NA) + 
+# 	geom_abline(slope = 0) + 
+# 	geom_jitter(aes(colour = Pathway), size = 2, alpha = 0.5, height = 0, width = 25000) +
+# 	geom_label_repel(
+# 		force = 5,
+# 		aes(label = operon_genes),
+# 		box.padding = 1.0,
+# 		point.padding = 1.5,
+# 		stat = "summary",
+# 		max.iter = 1000000000,
+# 		min.segment.length = 0,
+# 		segment.curvature = -0.25,
+# 		segment.angle = 90,
+# 		fun = median)  + 
+# 	doc_theme +
+# 	scale_colour_manual(
+# 		values = c(
+# 			"Other" = "black",
+# 			"Ox Phos" = "#6A3D9A",
+# 			"LOS" = "#33A02C",
+# 			"Cell Wall/PG" = "#FF7F00",
+# 			"tRNA Ligase" = "#1F78B4")) +
+# 	scale_fill_manual(
+# 		values = c(
+# 			"Other" = "gray",
+# 			"Ox Phos" = "#CAB2D6",
+# 			"LOS" = "#B2DF8A",
+# 			"Cell Wall/PG" = "#FDBF6F",
+# 			"tRNA Ligase" = "#A6CEE3")) 
 
 ##########################################################################################
+# function to plot operons
 
+plot_operon <- function(operon_median_results, conditions){
+	operon_median_results %>% 
+		mutate(Significance = case_when(
+			FDR < 0.05 & abs(operon_mLFC) >= 1 ~ "Significant",
+			TRUE ~ "Not Significant")) %>%
+		filter(condition %in% conditions) %>%
+		group_by(condition) %>% 
+		arrange(operon_mLFC) %>% mutate(operon_mLFC_ix = row_number()) %>%
+		arrange(desc(operon_mLFC)) %>% mutate(operon_mLFC_desc_ix = row_number()) %>%
+		arrange(FDR) %>% mutate(FDR_ix = row_number()) %>%
+		inner_join(operon_details) %>%
+		mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
+		mutate(`Transcription Unit` = case_when(`Essentials in operon` == 1 ~ condensed_name, TRUE ~ condensed_name)) %>%
+		ggplot(
+			aes(x = operon_mLFC,
+					y = FDR,
+					fill = Pathways)) +
+		geom_point(aes(size = `Essentials in operon`, alpha = Significance), shape = 21) +
+		geom_hline(yintercept = 0.05,
+							 linetype = "dashed",
+							 color = "#5A5A5A",
+							 lwd = 0.5) +
+		geom_vline(xintercept = -1,
+							 linetype = "dashed",
+							 color = "#5A5A5A", 
+							 lwd = 0.5) +
+		geom_vline(xintercept = 1,
+							 linetype = "dashed",
+							 color = "#5A5A5A", 
+							 lwd = 0.5) +
+		geom_vline(xintercept = 0,
+							 linetype = "solid",
+							 color = "#5A5A5A",
+							 lwd = 0.5) +
+		doc_theme +
+		scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
+		geom_label_repel(
+			fill = alpha(c("white"),0.5),
+			max.iter = 1000000000,
+			data = . %>% filter(
+				FDR < 0.05 & 
+					(operon_mLFC_ix <= 7 & operon_mLFC < -0.5 | 
+					 	(operon_mLFC_desc_ix <= 7 & operon_mLFC > 0.5 ) | 
+					 	FDR_ix <= 5)),
+			aes(label = `Transcription Unit`),
+			force = 7.5,
+			segment.size = 0.15,
+			min.segment.length = 0,
+			box.padding = 2,
+			point.padding = .25,
+			size = 3.5,
+			max.overlaps = Inf,
+			colour = "black") +
+		facet_wrap(~ condition, scales = "free") +
+		scale_fill_manual(
+			values = c(
+				"Other" = "#404040",
+				"Ribosome" = "#E31A1C",
+				"Ribosome+Other" = "#FB9A99",
+				"Ox Phos" = "#6A3D9A",
+				"Ox Phos+Other" = "#CAB2D6",
+				"LOS" = "#33A02C",
+				"LOS+Other" = "#B2DF8A",
+				"Cell Wall/PG" = "#FF7F00",
+				"Cell Wall/PG+Other" = "#FDBF6F",
+				"tRNA Ligase" = "#1F78B4",
+				"tRNA Ligase+Other" = "#A6CEE3")) +
+		guides(fill = guide_legend(
+			override.aes = list(shape = 21, size = 5))) + 
+		guides(alpha = guide_legend(
+			override.aes = list(shape = 21, size = 5, fill = "black"))) +
+		scale_alpha_manual(
+			values = c(
+				"Significant" = 0.85,
+				"Not Significant" = 0.25)) +
+		scale_size_area(breaks = c(1, 5, 10, 13))
+}
 
+##########################################################################################
+plot_operon(operon_median_results, c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"))
+plot_operon(operon_median_results, c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2"))
+plot_operon(operon_median_results, c("Rifampicin_0.34_T1 - None_0_T1", "Rifampicin_0.34_T2 - None_0_T2"))
+plot_operon(operon_median_results, c("Meropenem_0.17_T1 - None_0_T1", "Meropenem_0.17_T2 - None_0_T2"))
+plot_operon(operon_median_results, c("Imipenem_0.09_T1 - None_0_T1", "Imipenem_0.09_T2 - None_0_T2"))
 
-operon_median_results %>%
-	filter(condition %in% c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0")) %>%
-	group_by(condition) %>% 
-	arrange(operon_mLFC) %>% mutate(operon_mLFC_ix = row_number())%>%
-	arrange(FDR) %>% mutate(FDR_ix = row_number()) %>%
-	inner_join(operon_details) %>%
-	mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
-	mutate(`Transcription Unit` = case_when(essential_size == 1 ~ operon_genes, TRUE ~ operon_genes)) %>%
-	ggplot(
-		aes(x = operon_mLFC,
-				y = FDR,
-				colour = Pathways)) +
-	geom_point(aes(size = essential_size)) +
-	geom_hline(yintercept = 0.05,
-						 linetype = "dashed",
-						 color = "dark grey",
-						 lwd = 1) +
-	geom_vline(xintercept = -1,
-						 linetype = "dashed",
-						 color = "dark grey", 
-						 lwd = 1) +
-	geom_vline(xintercept = 0,
-						 linetype = "solid",
-						 color = "dark grey",
-						 lwd = 1) +
-	doc_theme +
-	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
-	geom_text_repel(
-		max.iter = 1000000000,
-		data = . %>% filter(operon_mLFC_ix <= 15 | FDR_ix <= 10),
-		aes(label = `Transcription Unit`),
-		force = 7.5,
-		min.segment.length = 0,
-		box.padding = 2,
-		point.padding = .25,
-		# parse = TRUE,
-		size = 3,
-		max.overlaps = Inf,
-		colour = "black") +
-	facet_wrap(~ condition, scales = "free") +
-	scale_colour_manual(
-		values = c(
-			"Other" = "gray",
-			"Ribosome" = "#E31A1C",
-			"Ribosome+Other" = "#FB9A99",
-			"Ox Phos" = "#6A3D9A",
-			"Ox Phos+Other" = "#CAB2D6",
-			"LOS" = "#33A02C",
-			"LOS+Other" = "#B2DF8A",
-			"Cell Wall/PG" = "#FF7F00",
-			"Cell Wall/PG+Other" = "#FDBF6F",
-			"tRNA Ligase" = "#1F78B4",
-			"tRNA Ligase+Other" = "#A6CEE3")) 
-
-
-operon_median_results %>%
-	filter(condition %in% c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2")) %>%
-	group_by(condition) %>% 
-	arrange(operon_mLFC) %>% mutate(operon_mLFC_ix = row_number()) %>%
-	arrange(desc(operon_mLFC)) %>% mutate(operon_mLFC_desc_ix = row_number()) %>%
-	arrange(FDR) %>% mutate(FDR_ix = row_number()) %>%
-	inner_join(operon_details) %>%
-	mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
-	mutate(`Transcription Unit` = case_when(essential_size == 1 ~ operon_genes, TRUE ~ operon_genes)) %>%
-	ggplot(
-		aes(x = operon_mLFC,
-				y = FDR,
-				colour = Pathways)) +
-	geom_point(aes(size = essential_size)) +
-	geom_hline(yintercept = 0.05,
-						 linetype = "dashed",
-						 color = "dark grey",
-						 lwd = 1) +
-	# geom_vline(xintercept = -1,
-	# 					 linetype = "dashed",
-	# 					 color = "dark grey", 
-	# 					 lwd = 1) +
-	geom_vline(xintercept = 0,
-						 linetype = "solid",
-						 color = "dark grey",
-						 lwd = 1) +
-	doc_theme +
-	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
-	geom_text_repel(
-		max.iter = 1000000000,
-		data = . %>% filter(FDR < 0.05 & (operon_mLFC_ix <= 10 & operon_mLFC < -0.5 | (operon_mLFC_desc_ix <= 10 & operon_mLFC > 0.5 ) | FDR_ix <= 10)),
-		aes(label = `Transcription Unit`),
-		force = 7.5,
-		min.segment.length = 0,
-		box.padding = 2,
-		point.padding = .25,
-		# parse = TRUE,
-		size = 3,
-		max.overlaps = Inf,
-		colour = "black") +
-	facet_wrap(~ condition, scales = "free") +
-	scale_colour_manual(
-		values = c(
-			"Other" = "gray",
-			"Ribosome" = "#E31A1C",
-			"Ribosome+Other" = "#FB9A99",
-			"Ox Phos" = "#6A3D9A",
-			"Ox Phos+Other" = "#CAB2D6",
-			"LOS" = "#33A02C",
-			"LOS+Other" = "#B2DF8A",
-			"Cell Wall/PG" = "#FF7F00",
-			"Cell Wall/PG+Other" = "#FDBF6F",
-			"tRNA Ligase" = "#1F78B4",
-			"tRNA Ligase+Other" = "#A6CEE3")) 
-
-
-operon_median_results %>%
-	filter(condition %in% c("Rifampicin_0.34_T1 - None_0_T1", "Rifampicin_0.34_T2 - None_0_T2")) %>%
-	group_by(condition) %>% 
-	arrange(operon_mLFC) %>% mutate(operon_mLFC_ix = row_number()) %>%
-	arrange(desc(operon_mLFC)) %>% mutate(operon_mLFC_desc_ix = row_number()) %>%
-	arrange(FDR) %>% mutate(FDR_ix = row_number()) %>%
-	inner_join(operon_details) %>%
-	mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
-	mutate(`Transcription Unit` = case_when(essential_size == 1 ~ operon_genes, TRUE ~ operon_genes)) %>%
-	ggplot(
-		aes(x = operon_mLFC,
-				y = FDR,
-				colour = Pathways)) +
-	geom_point(aes(size = essential_size)) +
-	geom_hline(yintercept = 0.05,
-						 linetype = "dashed",
-						 color = "dark grey",
-						 lwd = 1) +
-	# geom_vline(xintercept = -1,
-	# 					 linetype = "dashed",
-	# 					 color = "dark grey", 
-	# 					 lwd = 1) +
-	geom_vline(xintercept = 0,
-						 linetype = "solid",
-						 color = "dark grey",
-						 lwd = 1) +
-	doc_theme +
-	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
-	geom_text_repel(
-		max.iter = 1000000000,
-		data = . %>% filter(FDR < 0.05 & (operon_mLFC_ix <= 10 & operon_mLFC < -0.5 | (operon_mLFC_desc_ix <= 10 & operon_mLFC > 0.5 ) | FDR_ix <= 10)),
-		aes(label = `Transcription Unit`),
-		force = 7.5,
-		min.segment.length = 0,
-		box.padding = 2,
-		point.padding = .25,
-		# parse = TRUE,
-		size = 3,
-		max.overlaps = Inf,
-		colour = "black") +
-	facet_wrap(~ condition, scales = "free") +
-	scale_colour_manual(
-		values = c(
-			"Other" = "gray",
-			"Ribosome" = "#E31A1C",
-			"Ribosome+Other" = "#FB9A99",
-			"Ox Phos" = "#6A3D9A",
-			"Ox Phos+Other" = "#CAB2D6",
-			"LOS" = "#33A02C",
-			"LOS+Other" = "#B2DF8A",
-			"Cell Wall/PG" = "#FF7F00",
-			"Cell Wall/PG+Other" = "#FDBF6F",
-			"tRNA Ligase" = "#1F78B4",
-			"tRNA Ligase+Other" = "#A6CEE3")) 
-
-
-
-operon_median_results %>%
-	filter(condition %in% c("Imipenem_0.09_T1 - None_0_T1", "Imipenem_0.09_T2 - None_0_T2")) %>%
-	group_by(condition) %>% 
-	arrange(operon_mLFC) %>% mutate(operon_mLFC_ix = row_number()) %>%
-	arrange(desc(operon_mLFC)) %>% mutate(operon_mLFC_desc_ix = row_number()) %>%
-	arrange(FDR) %>% mutate(FDR_ix = row_number()) %>%
-	inner_join(operon_details) %>%
-	mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
-	mutate(`Transcription Unit` = case_when(essential_size == 1 ~ operon_genes, TRUE ~ operon_genes)) %>%
-	ggplot(
-		aes(x = operon_mLFC,
-				y = FDR,
-				colour = Pathways)) +
-	geom_point(aes(size = essential_size)) +
-	geom_hline(yintercept = 0.05,
-						 linetype = "dashed",
-						 color = "dark grey",
-						 lwd = 1) +
-	# geom_vline(xintercept = -1,
-	# 					 linetype = "dashed",
-	# 					 color = "dark grey", 
-	# 					 lwd = 1) +
-	geom_vline(xintercept = 0,
-						 linetype = "solid",
-						 color = "dark grey",
-						 lwd = 1) +
-	doc_theme +
-	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
-	geom_text_repel(
-		max.iter = 1000000000,
-		data = . %>% filter(FDR < 0.05 & (operon_mLFC_ix <= 10 & operon_mLFC < -0.5 | (operon_mLFC_desc_ix <= 10 & operon_mLFC > 0.5 ) | FDR_ix <= 10)),
-		aes(label = `Transcription Unit`),
-		force = 7.5,
-		min.segment.length = 0,
-		box.padding = 2,
-		point.padding = .25,
-		# parse = TRUE,
-		size = 3,
-		max.overlaps = Inf,
-		colour = "black") +
-	facet_wrap(~ condition, scales = "free") +
-	scale_colour_manual(
-		values = c(
-			"Other" = "gray",
-			"Ribosome" = "#E31A1C",
-			"Ribosome+Other" = "#FB9A99",
-			"Ox Phos" = "#6A3D9A",
-			"Ox Phos+Other" = "#CAB2D6",
-			"LOS" = "#33A02C",
-			"LOS+Other" = "#B2DF8A",
-			"Cell Wall/PG" = "#FF7F00",
-			"Cell Wall/PG+Other" = "#FDBF6F",
-			"tRNA Ligase" = "#1F78B4",
-			"tRNA Ligase+Other" = "#A6CEE3")) 
-
-
-operon_median_results %>%
-	filter(condition %in% c("Meropenem_0.17_T1 - None_0_T1", "Meropenem_0.17_T2 - None_0_T2")) %>%
-	group_by(condition) %>% 
-	arrange(operon_mLFC) %>% mutate(operon_mLFC_ix = row_number()) %>%
-	arrange(desc(operon_mLFC)) %>% mutate(operon_mLFC_desc_ix = row_number()) %>%
-	arrange(FDR) %>% mutate(FDR_ix = row_number()) %>%
-	inner_join(operon_details) %>%
-	mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
-	mutate(`Transcription Unit` = case_when(essential_size == 1 ~ operon_genes, TRUE ~ operon_genes)) %>%
-	ggplot(
-		aes(x = operon_mLFC,
-				y = FDR,
-				colour = Pathways)) +
-	geom_point(aes(size = essential_size)) +
-	geom_hline(yintercept = 0.05,
-						 linetype = "dashed",
-						 color = "dark grey",
-						 lwd = 1) +
-	# geom_vline(xintercept = -1,
-	# 					 linetype = "dashed",
-	# 					 color = "dark grey", 
-	# 					 lwd = 1) +
-	geom_vline(xintercept = 0,
-						 linetype = "solid",
-						 color = "dark grey",
-						 lwd = 1) +
-	doc_theme +
-	scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
-	geom_text_repel(
-		max.iter = 1000000000,
-		data = . %>% filter(FDR < 0.05 & (operon_mLFC_ix <= 10 & operon_mLFC < -0.5 | (operon_mLFC_desc_ix <= 10 & operon_mLFC > 0.5 ) | FDR_ix <= 10)),
-		aes(label = `Transcription Unit`),
-		force = 7.5,
-		min.segment.length = 0,
-		box.padding = 2,
-		point.padding = .25,
-		# parse = TRUE,
-		size = 3,
-		max.overlaps = Inf,
-		colour = "black") +
-	facet_wrap(~ condition, scales = "free") +
-	scale_colour_manual(
-		values = c(
-			"Other" = "gray",
-			"Ribosome" = "#E31A1C",
-			"Ribosome+Other" = "#FB9A99",
-			"Ox Phos" = "#6A3D9A",
-			"Ox Phos+Other" = "#CAB2D6",
-			"LOS" = "#33A02C",
-			"LOS+Other" = "#B2DF8A",
-			"Cell Wall/PG" = "#FF7F00",
-			"Cell Wall/PG+Other" = "#FDBF6F",
-			"tRNA Ligase" = "#1F78B4",
-			"tRNA Ligase+Other" = "#A6CEE3")) 
 
 
