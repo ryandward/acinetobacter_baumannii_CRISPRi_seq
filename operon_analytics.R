@@ -17,11 +17,8 @@ p_load(
 	svglite,
 	ggplot2,
 	ggrepel,
-	Rtsne,
 	pracma,
-	colourpicker,
 	RColorBrewer,
-	vegan,
 	tidyverse,
 	magrittr,
 	ggallin,
@@ -32,7 +29,7 @@ p_load_current_gh("hrbrmstr/hrbrthemes")
 conflict_prefer("extract", "magrittr")
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
-conflicts_prefer(dplyr::lag)
+conflict_prefer("lag", "dplyr")
 
 doc_theme <- theme_ipsum(base_family = "Arial", caption_margin = 12, axis_title_size = 12, axis_col = "black")
 
@@ -223,8 +220,9 @@ gene_median_results %>% fwrite("gene_median_results.tsv", sep = "\t")
 ##########################################################################################
 # function to plot operons
 
-plot_operon <- function(operon_median_results, conditions){
+plot_operon <- function(operon_median_results, conditions, max_left = 5, max_right = 5, max_top = 5, max_sig = 1e-100){
 	operon_median_results %>% 
+		mutate(FDR = case_when(FDR < max_sig ~ FDR == min(FDR[FDR!= 0]), TRUE ~ FDR)) %>%
 		mutate(Significance = case_when(
 			FDR < 0.05 & abs(operon_mLFC) >= 1 ~ "Significant",
 			TRUE ~ "Not Significant")) %>%
@@ -260,26 +258,26 @@ plot_operon <- function(operon_median_results, conditions){
 		doc_theme +
 		scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 		geom_label_repel(
-			fill = alpha(c("white"),0.5),
+			fill = alpha(c("white"),0.75),
 			max.iter = 1000000000,
 			data = . %>% filter(
 				FDR < 0.05 & 
-					(operon_mLFC_ix <= 7 & operon_mLFC < -0.5 | 
-					 	(operon_mLFC_desc_ix <= 7 & operon_mLFC > 0.5 ) | 
-					 	FDR_ix <= 5)),
+					(operon_mLFC_ix <= max_left & operon_mLFC < -0.5 | 
+					 	(operon_mLFC_desc_ix <= max_right & operon_mLFC > 0.5 ) | 
+					 	FDR_ix <= max_top)),
 			aes(label = `Transcription Unit`),
-			force = 7.5,
+			force = 5.5,
 			segment.size = 0.15,
 			min.segment.length = 0,
 			box.padding = 2,
 			point.padding = .25,
-			size = 3.5,
+			size = 2.5,
 			max.overlaps = Inf,
 			colour = "black") +
 		facet_wrap(~ condition, scales = "free") +
 		scale_fill_manual(
 			values = c(
-				"Other" = "#404040",
+				"Other" = "grey",
 				"Ribosome" = "#E31A1C",
 				"Ribosome+Other" = "#FB9A99",
 				"Ox Phos" = "#6A3D9A",
@@ -303,6 +301,8 @@ plot_operon <- function(operon_median_results, conditions){
 
 ##########################################################################################
 plot_operon(operon_median_results, c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"))
+plot_operon(operon_median_results, c("None_0_T2 - None_0_T0"), 15, 5, 10, 1e-75)
+
 plot_operon(operon_median_results, c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2"))
 plot_operon(operon_median_results, c("Rifampicin_0.34_T1 - None_0_T1", "Rifampicin_0.34_T2 - None_0_T2"))
 plot_operon(operon_median_results, c("Meropenem_0.17_T1 - None_0_T1", "Meropenem_0.17_T2 - None_0_T2"))

@@ -194,7 +194,7 @@ GO593_02590	IX87_10165	lipB	lipB	lipB	lipB		lipB
 GO593_08370	IX87_16425	lnt	lnt	lnt	lnt		lnt
 GO593_02640	IX87_10215	lolA	lolA	lolA	lolA		lolA
 GO593_10365	IX87_18505	lolB	lolB	lolB	lolB		lolB
-GO593_02040	IX87_09570	lolC, lolE	AIL78869.1	lolC, lolE	lolCE		lolCE
+GO593_02040	IX87_09570	lolC, lolE	AIL78869.1	lolC, lolE	lolF		lolCE
 GO593_02035	IX87_09565	lolD	lolD	lolD	lolD		lolD
 GO593_13545	IX87_04355	lptA	lptA	lptA	lptA		lptA
 GO593_13550	IX87_04350	lptB	lptB	lptB	lptB		lptB
@@ -235,7 +235,7 @@ GO593_10480	IX87_01870	nadE	IX87_01870	nadE	nadE		nadE
 GO593_01880	IX87_09395	unknown	AIL78836.1	GO593_01880	nadM	https://www.genome.jp/dbget-bin/www_bget?ko:K13522	nadM
 GO593_09040	IX87_17090	ndk	ndk	ndk	ndk		ndk
 GO593_13310	IX87_06920	fis	fis	fis	ninH		ninH
-GO593_03265	IX87_11135	unknown	nphR_2	GO593_03265	nphR2		nphR_2
+GO593_03265	IX87_11135	unknown	nphR_2	GO593_03265	GO593_03265		nphR_2
 GO593_09915	IX87_18015	nrdA, nrdJa	nrdA	nrdA, nrdJa	nrdA		nrdA
 GO593_09905	IX87_18005	nrdB	AIL80430.1	nrdB	nrdB		nrdB
 GO593_09945	IX87_18075	nuoA	nuoA	nuoA	nuoA		nuoA
