@@ -216,11 +216,11 @@ GO593_12465	IX87_05280	hcaR, marR	marR_1	hcaR, marR	marR1		marR_1
 GO593_15290	IX87_02540	metK	metK	metK	metK		metK
 GO593_10585	IX87_01750	minC	minC	minC	minC		minC
 GO593_10575	IX87_01760	minE	minE	minE	minE		minE
-GO593_08225	IX87_16280	phaC	mnhC1	phaC	mnhC1		mnhC1
+GO593_08225	IX87_16280	phaC	mnhC1	phaC	phaC		mnhC1
 GO593_01330	IX87_08855	mnmA, trmU	mnmA	mnmA	mnmA		mnmA
 GO593_17870	IX87_21800	moaE	moaE	moaE	moaE		moaE
 GO593_04790	IX87_12830	mraY	IX87_12830	mraY	mraY		mraY
-GO593_08210	IX87_16265	phaF	mrpF	phaF	mrpF		mrpF
+GO593_08210	IX87_16265	phaF	mrpF	phaF	phaF		mrpF
 GO593_15475	IX87_02345	msbA	IX87_02345	msbA	msbA		msbA
 GO593_11270	IX87_00610	cynT	mtcA2	cynT	mtcA2		mtcA2
 GO593_09595	IX87_17660	murA	murA	murA	murA		murA

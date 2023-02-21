@@ -114,11 +114,6 @@ short_names <- short_names %>%
 
 ##########################################################################################
 
-operon_details <- operon_details %>% inner_join(short_names) %>%
-	select(operon, strand, tss, condensed_name, operon_genes, operon_AB19606, operon_AB030, `Essentials in operon`, total_size)
-
-##########################################################################################
-
 aba_genome_operons <-
 	aba_genome %>% 
 	full_join(operon_conversion) 
@@ -140,6 +135,13 @@ operon_pathways <- melted_results %>%
 	summarise(Pathways = paste(unique(Pathway), collapse = "+"))
 
 operon_details <- operon_details %>% inner_join(operon_pathways) %>% arrange(tss)
+
+##########################################################################################
+
+operon_details <- operon_details %>% inner_join(short_names) %>%
+	select(operon, strand, tss, condensed_name, Pathways, operon_genes, operon_AB19606, operon_AB030, `Essentials in operon`, total_size)
+
+##########################################################################################
 
 operon_details %>% fwrite("operon_details.tsv", sep = "\t")
 
@@ -266,12 +268,12 @@ plot_operon <- function(operon_median_results, conditions, max_left = 5, max_rig
 					 	(operon_mLFC_desc_ix <= max_right & operon_mLFC > 0.5 ) | 
 					 	FDR_ix <= max_top)),
 			aes(label = `Transcription Unit`),
-			force = 5.5,
+			force = 7.5,
 			segment.size = 0.15,
 			min.segment.length = 0,
 			box.padding = 2,
 			point.padding = .25,
-			size = 2.5,
+			size = 3,
 			max.overlaps = Inf,
 			colour = "black") +
 		facet_wrap(~ condition, scales = "free") +
@@ -294,8 +296,8 @@ plot_operon <- function(operon_median_results, conditions, max_left = 5, max_rig
 			override.aes = list(shape = 21, size = 5, fill = "black"))) +
 		scale_alpha_manual(
 			values = c(
-				"Significant" = 0.85,
-				"Not Significant" = 0.25)) +
+				"Significant" = 0.75,
+				"Not Significant" = 0.15)) +
 		scale_size_area(breaks = c(1, 5, 10, 13))
 }
 
@@ -304,6 +306,10 @@ plot_operon(operon_median_results, c("None_0_T1 - None_0_T0", "None_0_T2 - None_
 plot_operon(operon_median_results, c("None_0_T2 - None_0_T0"), 15, 5, 10, 1e-75)
 
 plot_operon(operon_median_results, c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2"))
+
+plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - None_0_T2", "Colistin_0.44_T2 - None_0_T2"), 7, 7, 5, 1e-100)
+
+
 plot_operon(operon_median_results, c("Rifampicin_0.34_T1 - None_0_T1", "Rifampicin_0.34_T2 - None_0_T2"))
 plot_operon(operon_median_results, c("Meropenem_0.17_T1 - None_0_T1", "Meropenem_0.17_T2 - None_0_T2"))
 plot_operon(operon_median_results, c("Imipenem_0.09_T1 - None_0_T1", "Imipenem_0.09_T2 - None_0_T2"))
