@@ -303,7 +303,7 @@ plot_operon <- function(operon_median_results, conditions, max_left = 5, max_rig
 
 ##########################################################################################
 plot_operon(operon_median_results, c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"))
-plot_operon(operon_median_results, c("None_0_T2 - None_0_T0"), 15, 5, 10, 1e-75)
+plot_operon(operon_median_results, c("None_0_T2 - None_0_T0"), 15, 5, 10)
 
 plot_operon(operon_median_results, c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2"))
 
