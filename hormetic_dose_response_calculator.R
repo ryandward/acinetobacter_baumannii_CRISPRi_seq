@@ -194,6 +194,11 @@ vuln.summary <- mismatches %>% select(
 	vuln.kd_50,
 	vuln.p)
 
+# vuln.summary <- vuln.summary %>% mutate(
+# 	vuln.est = as.numeric(format(vuln.est, scientific = TRUE, digits = 3)),
+# 	vuln.kd_50 = as.numeric(format(vuln.kd_50, scientific = TRUE, digits = 3)),
+# 	vuln.p = as.numeric(format(vuln.p, scientific = TRUE, digits = 3)))
+
 vuln.summary %>% fwrite("Results/hormetic_vulnerability_summary.tsv.gz", sep = "\t")
 
 # add 90% confidence interval predictions to the dose-response curves
