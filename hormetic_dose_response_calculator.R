@@ -12,11 +12,7 @@ p_load_current_gh(
 	"ryandward/drc",
 	"hrbrmstr/hrbrthemes")
 
-conflict_prefer("gaussian", "drc")
-
-conflict_prefer("select", "dplyr")
-conflict_prefer("filter", "dplyr")
-conflicted::conflicts_prefer(gtools::permute)
+conflicted::conflicts_prefer(gtools::permute, dplyr::filter, dplyr::select, drc::gaussian)
 
 # https://jgeb.springeropen.com/articles/10.1186/s43141-020-00048-4
 
@@ -37,19 +33,19 @@ interested.conditions <- c(
 	"Imipenem_0.06_T1 - None_0_T0",
 	"Imipenem_0.09_T1 - None_0_T0",
 	"Imipenem_0.06_T2 - None_0_T0",
-	"Imipenem_0.09_T2 - None_0_T0",
-	"Colistin_0.44_T1 - None_0_T1",
-	"Colistin_0.44_T2 - None_0_T2",
-	"Rifampicin_0.34_T1 - None_0_T1",
-	"Rifampicin_0.34_T2 - None_0_T2",
-	"Meropenem_0.11_T1 - None_0_T1",
-	"Meropenem_0.17_T1 - None_0_T1",
-	"Meropenem_0.11_T2 - None_0_T2",
-	"Meropenem_0.17_T2 - None_0_T2",
-	"Imipenem_0.06_T1 - None_0_T1",
-	"Imipenem_0.09_T1 - None_0_T1",
-	"Imipenem_0.06_T2 - None_0_T2",
-	"Imipenem_0.09_T2 - None_0_T2"
+	"Imipenem_0.09_T2 - None_0_T0"
+	# "Colistin_0.44_T1 - None_0_T1",
+	# "Colistin_0.44_T2 - None_0_T2",
+	# "Rifampicin_0.34_T1 - None_0_T1",
+	# "Rifampicin_0.34_T2 - None_0_T2",
+	# "Meropenem_0.11_T1 - None_0_T1",
+	# "Meropenem_0.17_T1 - None_0_T1",
+	# "Meropenem_0.11_T2 - None_0_T2",
+	# "Meropenem_0.17_T2 - None_0_T2",
+	# "Imipenem_0.06_T1 - None_0_T1",
+	# "Imipenem_0.09_T1 - None_0_T1",
+	# "Imipenem_0.06_T2 - None_0_T2",
+	# "Imipenem_0.09_T2 - None_0_T2"
 )
 
 # read results
@@ -84,6 +80,14 @@ tidy.try <- possibly(tidy, otherwise = NA)
 
 #estimate dose-response models
 
+active_results <- melted_results %>%
+	filter(condition %in% interested.conditions, type == "mismatch") %>%
+	select(target, condition) %>%
+	unique() %>%
+	inner_join(melted_results %>% filter(type == "perfect", abs(LFC) > 0.25, FDR <= 0.05), by = c("target", "condition")) %>%
+	select(target, condition) %>%
+	inner_join(melted_results, by = c("target", "condition"))
+
 mismatches <- melted_results %>%
 	filter(condition %in% interested.conditions) %>%
 	filter(unique_name %in% interested.genes) %>% 
@@ -104,43 +108,18 @@ mismatches <- melted_results %>%
 L4.parameters <- c("hill", "min_value", "max_value", "kd_50")
 BC5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
-# In CRISPRi, either the min or max value should be constrained to 0.
-zero_min <- c(NA, 0, NA, NA, NA)
-zero_max <- c(NA, NA, 0, NA, NA)
 
-# names(zero_min) <- names(zero_max) <- BC5.parameters
-# 
-# mismatches <- mismatches %>%
-# 	mutate(fit = map(data, ~ drm.try(data = .x, LFC.adj ~ exp(y_pred), fct = BC.5(names = BC5.parameters))))
-
-
-# # look for each gene whether max or min is closer to zero
-# mismatches <- mismatches %>% 
-# 	mutate(fit = map(
-# 		data, ~ drm.try(
-# 			data = .x, 
-# 			LFC.adj ~ y_pred, 
-# 			fct = L.4(names = L4.parameters))))
-# 
-# # which end varies the most away from zero?
-# away_from_zero <- mismatches %>%
-# 	mutate(
-# 		results_look = map(fit, tidy)) %>%
-# 	select(unique_name, condition, results_look) %>%
-# 	unnest(results_look) %>%
-# 	group_by(unique_name, condition) %>%
-# 	filter(term %in% c("min_value", "max_value")) %>%
-# 	filter(abs(estimate) == max(abs(estimate))) %>%
-# 	select(term) %>%
-# 	rename("variable_term" = "term")
-# 
-# mismatches <- mismatches %>% inner_join(away_from_zero)
-
-mismatches <- mismatches %>% 
+mismatches <- mismatches %>%
 	# filter(unique_name == "lpxC" | unique_name == "nuoB") %>%
 	mutate(fit = case_when(
-		response_max > 0 ~ map2(data, response_max, ~ drm.try(data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC5.parameters))),
-		response_max < 0 ~ map2(data, response_max, ~ drm.try(data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC5.parameters)))))
+		response_max > 0 ~ map2(
+			data, 
+			response_max, 
+			~drm.try(data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC5.parameters))),
+		response_max < 0 ~ map2(
+			data, 
+			response_max, 
+			~drm.try(data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC5.parameters)))))
 
 
 # mismatches <- mismatches %>% filter(unique_name == "lpxC" | unique_name == "nuoB") %>%
@@ -168,13 +147,7 @@ mismatches <- mismatches %>%
 			~augment.try(
 				.x,
 				newdata = .y %>% filter (term == "kd_50") %>% select (estimate)) %>%
-				rename (., vuln.est = .fitted, vuln.kd_50 = estimate))) %>%
-	mutate(
-		hill.tibble = map(
-			p.vals,
-			~filter(.x, term == 'hill') %>%
-				select(estimate, p.value) %>%
-				rename (., hill.est = estimate, hill.p = p.value)))
+				rename (., vuln.est = .fitted, vuln.kd_50 = estimate))) 
 # 
 mismatches <- mismatches %>%
 	unnest(vuln.tibble) %>%
@@ -229,4 +202,22 @@ fit_points <- mismatches %>%
 	unnest(data)
 
 fit_points %>% fwrite("Results/hormetic_fit_points.tsv.gz")
+
+# Evaluate performance
+
+model_performance <- mismatches %>% 
+	mutate(
+		bayes = map(fit, glance), 
+		bayes = map(bayes, ~mutate(.x, logLik = c(logLik)))) %>% 
+	unnest(bayes) %>% 
+	select(unique_name, condition, AIC, BIC, logLik, df.residual)
+
+model_performance %>% fwrite("Results/hormetic_performance.tsv.gz", sep = "\t")
+
+model_parameters <- mismatches %>%
+	mutate(perf = map(fit, tidy)) %>%
+	unnest(perf) %>%
+	select(unique_name, condition, term, estimate, std.error, statistic, p.value)
+
+model_parameters %>% fwrite("Results/hormetic_parameters.tsv.gz", sep = "\t")
 
