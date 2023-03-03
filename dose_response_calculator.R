@@ -58,26 +58,27 @@ interested.conditions <- c(
 melted_results <- fread(
 	"Results/melted_results.tsv.gz", sep = "\t")
 
-median_melted_results <- fread(
-	"Results/median_melted_results.tsv.gz", sep = "\t")
-
 curated_names <- fread(
 	"curated_names.tsv", sep = "\t")
 
-# function to rescale between 0 and 1
-range01 <- function(x){(x - min(x))/(max(x) - min(x))}
+aba_key <- fread(
+	"aba_key.tsv", sep = "\t")
 
-melted_results[!is.na(y_pred), y_pred := range01(y_pred)]
+# function to rescale between 0 and 1
+# range01 <- function(x){(x - min(x))/(max(x) - min(x))}
+# 
+# melted_results[!is.na(y_pred), y_pred := range01(y_pred)]
+
+melted_results$y_pred <- NULL
+
+melted_results <- melted_results %>% inner_join(aba_key %>% select(y_pred, spacer)) 
 
 melted_results <- tibble(melted_results)
 
 # define parameters of interest for dose-response plots
 
-drm.parameters <- c("hill", "min_value", "max_value", "kd_50")
+L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
 
-lower_range <- min(melted_results$y_pred, na.rm = T)
-
-upper_range <- max(melted_results$y_pred, na.rm = T)
 
 drm.try <- possibly(drm, otherwise = NA)
 
@@ -91,42 +92,22 @@ mismatches <- melted_results %>%
 	filter(type == "mismatch") %>%
 	nest(data = c(-condition, -unique_name))
 
-mismatches <- mismatches %>% 
-	mutate(fit = map(data, ~ drm.try(data = .x, LFC.adj ~y_pred, fct = L.4(names = drm.parameters))))
+mismatches <- mismatches %>% mutate(fit = map(data, ~ drm.try(data = .x, LFC.adj ~y_pred, fct = L.4(names = L.4.parameters))))
+
+mismatches <- mismatches %>% mutate(parameters = map(fit, tidy)) 
 
 mismatches <- mismatches %>% 
-	mutate(results = map(fit, glance)) %>%
-	mutate(p.vals = map(fit, tidy)) %>%
-	mutate(results = map(results, ~mutate(.x, logLik = c(logLik)))) %>%
-	unnest(results)
+	inner_join(
+		mismatches %>% 
+			select(unique_name, condition, parameters) %>% 
+			unnest(parameters) %>% filter(term == "kd_50") %>% 
+			rename(vuln.est = estimate, vuln.p = p.value) %>% 
+			select(unique_name, condition, vuln.est, vuln.p))
 
-mismatches <- mismatches %>%
-	mutate(
-		kd_50.tibble = map(
-			p.vals, 
-			~filter(.x, term == 'kd_50') %>%
-				select(p.value) %>%
-				rename (., vuln.p = p.value))) %>%
-	mutate(
-		vuln.tibble = map2(
-			fit, 
-			p.vals, 
-			~augment.try(
-				.x,
-				newdata = .y %>% filter (term == "kd_50") %>% select (estimate)) %>% 
-				rename (., vuln.est = .fitted, vuln.kd_50 = estimate))) %>%
-	mutate(
-		hill.tibble = map(
-			p.vals, 
-			~filter(.x, term == 'hill') %>%
-				select(estimate, p.value) %>%
-				rename (., hill.est = estimate, hill.p = p.value)))
-
-mismatches <- mismatches %>%
-	unnest(vuln.tibble) %>%
-	unnest(kd_50.tibble) %>%
-	unnest(hill.tibble) %>%
-	select(-c(p.vals))
+mismatches <- mismatches %>% 
+	mutate(vulnerability = map2(fit, vuln.est, ~augment(.x, newdata = data.frame(vuln.est = .y)))) %>%
+	mutate(vuln.kd_50 = map_dbl(vulnerability, ".fitted")) %>% 
+	select(unique_name, condition, vuln.est, vuln.kd_50, vuln.p, fit, data)
 
 mismatches <- mismatches %>% 
 	mutate(Gene = factor(unique_name, levels = unique(interested.genes))) %>%
@@ -139,10 +120,7 @@ vuln.summary <- mismatches %>% select(
 	condition, 
 	vuln.est, 
 	vuln.kd_50, 
-	vuln.p, 
-	hill.est, 
-	hill.p, 
-	logLik)
+	vuln.p)
 
 vuln.summary %>% fwrite("Results/vulnerability_summary.tsv.gz", sep = "\t")
 
@@ -172,4 +150,6 @@ fit_points <- mismatches %>%
 	unnest(data)
 
 fit_points %>% fwrite("Results/fit_points.tsv.gz")
+
+
 
