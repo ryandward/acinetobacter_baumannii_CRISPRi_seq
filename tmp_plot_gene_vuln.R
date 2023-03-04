@@ -1,4 +1,7 @@
-plot.genes <- c("lpxC","nuoB")
+# fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
+# fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
+
+plot.genes <- c("lpxC","nuoB", "valS")
 
 doc_theme <- theme_ipsum(
 	base_family = "Arial", 
@@ -12,7 +15,11 @@ plot.conditions <- c(
 	"Rifampicin_0.34_T1 - None_0_T0",
 	"Rifampicin_0.34_T2 - None_0_T0",
 	"Colistin_0.44_T1 - None_0_T0",
-	"Colistin_0.44_T2 - None_0_T0")
+	"Colistin_0.44_T2 - None_0_T0",
+	"Imipenem_0.09_T1 - None_0_T0",
+	"Imipenem_0.09_T2 - None_0_T0")
+
+
 
 
 plot.fit_predictions <-
@@ -24,8 +31,10 @@ plot.fit_predictions <-
 		Drug = case_when(
 			Condition %like% "^None_0" ~ "No drug",
 			Condition %like% "Rifampicin" ~ "Rifampicin",
-			Condition %like% "Colistin" ~ "Colistin"),
-		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin")))
+			Condition %like% "Colistin" ~ "Colistin",
+			Condition %like% "Meropenem" ~ "Meropenem",
+			Condition %like% "Imipenem" ~ "Imipenem"),
+		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin", "Meropenem", "Imipenem")))
 
 plot.fit_points <-
 	fit_points %>% 
@@ -36,19 +45,21 @@ plot.fit_points <-
 		Drug = case_when(
 			Condition %like% "^None_0" ~ "No drug",
 			Condition %like% "Rifampicin" ~ "Rifampicin",
-			Condition %like% "Colistin" ~ "Colistin"),
-		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin")))
+			Condition %like% "Colistin" ~ "Colistin",
+			Condition %like% "Meropenem" ~ "Meropenem",
+			Condition %like% "Imipenem" ~ "Imipenem"),
+		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin", "Meropenem", "Imipenem")))
 
-plot.labeller <- as_labeller(
-	c(
-		`None_0_T1 - None_0_T0` = "Induction Only (T1)",
-		`None_0_T2 - None_0_T0` = "Induction Only (T2)",
-		`Rifampicin_0.34_T1 - None_0_T0` = "Rifampicin (T1)",
-		`Rifampicin_0.34_T2 - None_0_T0` = "Rifampicin (T2)",
-		`Colistin_0.44_T1 - None_0_T0` = "Colistin (T1)",
-		`Colistin_0.44_T2 - None_0_T0` = "Colistin (T2)"))
+# plot.labeller <- as_labeller(
+# 	c(
+# 		`None_0_T1 - None_0_T0` = "Induction Only (T1)",
+# 		`None_0_T2 - None_0_T0` = "Induction Only (T2)",
+# 		`Rifampicin_0.34_T1 - None_0_T0` = "Rifampicin (T1)",
+# 		`Rifampicin_0.34_T2 - None_0_T0` = "Rifampicin (T2)",
+# 		`Colistin_0.44_T1 - None_0_T0` = "Colistin (T1)",
+# 		`Colistin_0.44_T2 - None_0_T0` = "Colistin (T2)"))
 
-plot.title <- bquote(bold("Gene dose effect on drug activity" ~ at ~ hour[36] ~ '(Confidence = 0.90)'))
+# plot.title <- bquote(bold("Gene dose effect on drug activity" ~ at ~ hour[36] ~ '(Confidence = 0.90)'))
 
 plot.graphic <- plot.fit_predictions %>% 
 	filter(
@@ -107,19 +118,20 @@ plot.graphic <- plot.fit_predictions %>%
 	# 		fill = interaction(Timing, Gene))) +
 	scale_fill_manual(
 		values = c(
-			"No drug" = "white",
-			"Colistin" = "#A6CEE3",
-			"Rifampicin" = "#FB9A99",
 			"T1.nuoB" = "#CAB2D6",
 			"T2.nuoB" = "#6A3D9A",
 			"T1.lpxC" = "#B2DF8A",
-			"T2.lpxC" = "#33A02C")) +
+			"T2.lpxC" = "#33A02C",
+			"T1.valS" = "#A6CEE3",
+			"T2.valS" = "#1F78B4")) +
 	scale_color_manual(
 		values = c(
 			"T1.nuoB" = "#CAB2D6",
 			"T2.nuoB" = "#6A3D9A",
 			"T1.lpxC" = "#B2DF8A",
-			"T2.lpxC" = "#33A02C")) +
+			"T2.lpxC" = "#33A02C",
+			"T1.valS" = "#A6CEE3",
+			"T2.valS" = "#1F78B4")) +
 	xlab("Knockdown") +
 	ylab("Fitness (Log2)") +
 	doc_theme +

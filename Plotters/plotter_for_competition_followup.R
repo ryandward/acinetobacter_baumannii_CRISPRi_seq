@@ -51,7 +51,7 @@ competition_raw <- competition_raw %>%
 competition_raw %>%
 	filter(timing == "T0") %>%
 	mutate(treatment = "drug") %>%
-	rbind(competition_raw, fill = TRUE) %>%
+	rbind(competition_raw) %>%
 	inner_join(drug_sets) %>%
 	mutate(
 		timing = factor(timing, levels = c("T0", "T1", "T2")),
