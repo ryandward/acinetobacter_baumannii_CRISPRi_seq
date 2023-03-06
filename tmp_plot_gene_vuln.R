@@ -1,7 +1,7 @@
-# fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
-# fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
+fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
+fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
 
-plot.genes <- c("lpxC","nuoB", "valS")
+plot.genes <- c("lpxC","nuoB", "glnS", "murA")
 
 doc_theme <- theme_ipsum(
 	base_family = "Arial", 
@@ -18,8 +18,6 @@ plot.conditions <- c(
 	"Colistin_0.44_T2 - None_0_T0",
 	"Imipenem_0.09_T1 - None_0_T0",
 	"Imipenem_0.09_T2 - None_0_T0")
-
-
 
 
 plot.fit_predictions <-
@@ -122,16 +120,20 @@ plot.graphic <- plot.fit_predictions %>%
 			"T2.nuoB" = "#6A3D9A",
 			"T1.lpxC" = "#B2DF8A",
 			"T2.lpxC" = "#33A02C",
-			"T1.valS" = "#A6CEE3",
-			"T2.valS" = "#1F78B4")) +
+			"T1.glnS" = "#A6CEE3",
+			"T2.glnS" = "#1F78B4",
+			"T1.murA" = "#FDBF6F",
+			"T2.murA" = "#FF7F00")) +
 	scale_color_manual(
 		values = c(
 			"T1.nuoB" = "#CAB2D6",
 			"T2.nuoB" = "#6A3D9A",
 			"T1.lpxC" = "#B2DF8A",
 			"T2.lpxC" = "#33A02C",
-			"T1.valS" = "#A6CEE3",
-			"T2.valS" = "#1F78B4")) +
+			"T1.glnS" = "#A6CEE3",
+			"T2.glnS" = "#1F78B4",
+			"T1.murA" = "#FDBF6F",
+			"T2.murA" = "#FF7F00")) +
 	xlab("Knockdown") +
 	ylab("Fitness (Log2)") +
 	doc_theme +
