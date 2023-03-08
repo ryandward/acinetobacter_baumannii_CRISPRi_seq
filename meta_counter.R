@@ -96,10 +96,11 @@ aba_y <- DGEList(
 # filterByExpr is part of the SummarizedExperiment package
 aba_keep <-	aba_y %>% filterByExpr(design = aba_permut, group = aba_group)
 
-# Subset the DGEList object, normalize, and estimate dispersion
-aba_y <- aba_y %>% 
-	extract(aba_keep, 1:nrow(.$samples), keep.lib.sizes = FALSE) %>%
-	calcNormFactors %>% estimateDisp(aba_permut)
+# Subset the DGEList object
+aba_y <- aba_y[aba_keep, , keep.lib.sizes = FALSE] 
+
+# Normalize, and estimate dispersion
+aba_y <- aba_y %>% calcNormFactors %>% estimateDisp(aba_permut)
 
 ##########################################################################################
 
