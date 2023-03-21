@@ -12,7 +12,11 @@ p_load_current_gh(
 	"ryandward/drc",
 	"hrbrmstr/hrbrthemes")
 
-conflicted::conflicts_prefer(gtools::permute, dplyr::filter, dplyr::select, drc::gaussian)
+conflicted::conflicts_prefer(
+	gtools::permute, 
+	dplyr::filter, 
+	dplyr::select, 
+	drc::gaussian)
 
 # https://jgeb.springeropen.com/articles/10.1186/s43141-020-00048-4
 
