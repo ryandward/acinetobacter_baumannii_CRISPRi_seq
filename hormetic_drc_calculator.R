@@ -119,11 +119,16 @@ mismatches <- mismatches %>%
 		response_max > 0 ~ map2(
 			data, 
 			response_max, 
-			~drm.try(data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC5.parameters))),
+			~drm.try(
+				data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC5.parameters),
+				start = c(1, 0.5, 0))),
 		response_max < 0 ~ map2(
 			data, 
 			response_max, 
-			~drm.try(data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC5.parameters)))))
+			~drm.try(
+				data = .x, LFC.adj ~ y_pred, 
+				fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC5.parameters),
+				start = c(1, 0.5, 0)))))
 
 
 # mismatches <- mismatches %>% filter(unique_name == "lpxC" | unique_name == "nuoB") %>%
