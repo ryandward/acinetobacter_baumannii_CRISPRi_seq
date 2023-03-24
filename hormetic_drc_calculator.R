@@ -104,8 +104,8 @@ mismatches <- melted_results %>%
 			group_by(unique_name, condition) %>% 
 			select(unique_name, condition, LFC.adj) %>% 
 			filter(abs(LFC.adj) == max(abs(LFC.adj))) %>% 
-			rename(response_max = LFC.adj)) %>%
-	nest(data = c(-condition, -unique_name, -response_max))
+			rename(response.max = LFC.adj)) %>%
+	nest(data = c(-condition, -unique_name, -response.max))
 
 ################################################################################
 
@@ -116,15 +116,15 @@ BC5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 mismatches <- mismatches %>%
 	# filter(unique_name == "lpxC" | unique_name == "nuoB") %>%
 	mutate(fit = case_when(
-		response_max > 0 ~ map2(
+		response.max > 0 ~ map2(
 			data, 
-			response_max, 
+			response.max, 
 			~drm.try(
 				data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC5.parameters),
 				start = c(1, 0.5, 0))),
-		response_max < 0 ~ map2(
+		response.max < 0 ~ map2(
 			data, 
-			response_max, 
+			response.max, 
 			~drm.try(
 				data = .x, LFC.adj ~ y_pred, 
 				fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC5.parameters),
@@ -133,8 +133,8 @@ mismatches <- mismatches %>%
 
 # mismatches <- mismatches %>% filter(unique_name == "lpxC" | unique_name == "nuoB") %>%
 # 	mutate(fit = case_when(
-# 		response_max > 0 ~ map2(data, response_max, ~ drm.try(data = .x, LFC.adj ~ y_pred, fct = L.4(fixed = c(NA, 0, .y, NA), names = L4.parameters))),
-# 		response_max < 0 ~ map2(data, response_max, ~ drm.try(data = .x, LFC.adj ~ y_pred, fct = L.4(fixed = c(NA, .y, 0, NA), names = L4.parameters)))))
+# 		response.max > 0 ~ map2(data, response.max, ~ drm.try(data = .x, LFC.adj ~ y_pred, fct = L.4(fixed = c(NA, 0, .y, NA), names = L4.parameters))),
+# 		response.max < 0 ~ map2(data, response.max, ~ drm.try(data = .x, LFC.adj ~ y_pred, fct = L.4(fixed = c(NA, .y, 0, NA), names = L4.parameters)))))
 
 ################################################################################
 
@@ -181,6 +181,7 @@ vuln.summary <- mismatches %>% select(
 # 	vuln.kd_50 = as.numeric(format(vuln.kd_50, scientific = TRUE, digits = 3)),
 # 	vuln.p = as.numeric(format(vuln.p, scientific = TRUE, digits = 3)))
 
+vuln.summary <- mismatches %>% select(condition, unique_name, response.max) %>% inner_join(vuln.summary) 
 vuln.summary %>% fwrite("Results/hormetic_vulnerability_summary.tsv.gz", sep = "\t")
 
 # add 90% confidence interval predictions to the dose-response curves
