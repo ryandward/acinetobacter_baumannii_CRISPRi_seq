@@ -108,9 +108,11 @@ short_names <- short_names %>%
 	filter(nchar(suffices) == max(nchar(suffices))) %>% 
 	mutate(operon_substr = paste0(prefix, suffices)) %>% 
 	ungroup %>% group_by(operon) %>% 
-	mutate(condensed_name = paste(operon_substr, collapse = "-")) %>%
-	select(operon, condensed_name ) %>%
-	unique
+	mutate(long_name = paste(operon_substr, collapse = "-")) %>%
+	select(operon, long_name) %>%
+	unique %>% 
+	mutate(condensed_name = str_replace(long_name, "^([^-]+-[^-]+)-.*$", "\\1…")) 
+
 
 ##########################################################################################
 
@@ -139,7 +141,8 @@ operon_details <- operon_details %>% inner_join(operon_pathways) %>% arrange(tss
 ##########################################################################################
 
 operon_details <- operon_details %>% inner_join(short_names) %>%
-	select(operon, strand, tss, condensed_name, Pathways, operon_genes, operon_AB19606, operon_AB030, `Essentials in operon`, total_size)
+	select(operon, strand, tss, long_name, condensed_name, Pathways, operon_genes, operon_AB19606, operon_AB030, `Essentials in operon`, total_size)
+
 
 ##########################################################################################
 
@@ -157,74 +160,35 @@ operon_details <- operon_details %>%
 operon_median_results <- melted_results %>% 
 	filter(type == "perfect") %>% 
 	left_join(operon_conversion, by = c("AB19606" = "locus_tag")) %>% 
-	filter(condition %in% interest$condition) %>%
+	# filter(condition %in% interest$condition) %>%
 	group_by(condition, operon) %>% 
 	summarise(operon_mLFC = median(LFC.adj), FDR = stouffer(FDR)$p) %>%
-	inner_join(operon_details %>% select(operon, condensed_name)) %>%
-	select(condition, condensed_name, operon_mLFC, FDR, operon)
+	inner_join(operon_details %>% select(operon, long_name, condensed_name)) %>%
+	select(condition, long_name, condensed_name, operon_mLFC, FDR, operon)
 
-operon_median_results %>% fwrite("operon_median_results.tsv", sep = "\t")
+operon_median_results %>% fwrite("Results/operon_median_results.tsv", sep = "\t")
 
 gene_median_results <- melted_results %>%
 	filter(type == "perfect") %>%
-	filter(condition %in% interest$condition) %>%
+	# filter(condition %in% interest$condition) %>%
 	group_by(condition, unique_name, AB19606, AB030) %>% 
 	summarise(gene_mLFC = median(LFC.adj), FDR = stouffer(FDR)$p)
 
-gene_median_results %>% fwrite("gene_median_results.tsv", sep = "\t")
-
-# 
-# imipenem_operons <- melted_results %>% 
-# 	filter(type == "perfect") %>% 
-# 	filter(condition %in% interest$condition) %>%
-# 	left_join(aba_genome_operons_summary) %>% 
-# 	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & (Pathway %like% "tRNA" | Pathway %like% "PG") & unique_name != "ftsN") %>% 
-# 	select(operon) %>% 
-# 	unique 
-# 
-# melted_results %>% 
-# 	filter(type == "perfect") %>% 
-# 	filter(condition %in% interest$condition) %>%
-# 	left_join(aba_genome_operons_summary) %>% 
-# 	filter(condition %like% "Imipenem" & condition %like% "T1" & condition %like% "0.09" & operon %in% imipenem_operons$operon & unique_name != "ftsN") %>%
-# 	inner_join(operon_details %>% mutate(operon_genes = gsub(", ", "\n", operon_genes))) %>%
-# 	ggplot(aes(x = tss, y = LFC, group = tss)) + 
-# 	geom_boxplot(width = 50000, aes(fill = Pathway, colour = Pathway), outlier.shape = NA) + 
-# 	geom_abline(slope = 0) + 
-# 	geom_jitter(aes(colour = Pathway), size = 2, alpha = 0.5, height = 0, width = 25000) +
-# 	geom_label_repel(
-# 		force = 5,
-# 		aes(label = operon_genes),
-# 		box.padding = 1.0,
-# 		point.padding = 1.5,
-# 		stat = "summary",
-# 		max.iter = 1000000000,
-# 		min.segment.length = 0,
-# 		segment.curvature = -0.25,
-# 		segment.angle = 90,
-# 		fun = median)  + 
-# 	doc_theme +
-# 	scale_colour_manual(
-# 		values = c(
-# 			"Other" = "black",
-# 			"Ox Phos" = "#6A3D9A",
-# 			"LOS" = "#33A02C",
-# 			"Cell Wall/PG" = "#FF7F00",
-# 			"tRNA Ligase" = "#1F78B4")) +
-# 	scale_fill_manual(
-# 		values = c(
-# 			"Other" = "gray",
-# 			"Ox Phos" = "#CAB2D6",
-# 			"LOS" = "#B2DF8A",
-# 			"Cell Wall/PG" = "#FDBF6F",
-# 			"tRNA Ligase" = "#A6CEE3")) 
+gene_median_results %>% fwrite("Results/gene_median_results.tsv", sep = "\t")
 
 ##########################################################################################
 # function to plot operons
 
-plot_operon <- function(operon_median_results, conditions, max_left = 5, max_right = 5, max_top = 5, max_sig = 1e-100){
+plot_operon <- function(
+		operon_median_results, 
+		conditions, 
+		use_condensed_name = FALSE, 
+		max_left = 10, 
+		max_right = 10, 
+		max_top = 10, 
+		min_sig = 1e-100) {
 	operon_median_results %>% 
-		mutate(FDR = case_when(FDR < max_sig ~ FDR == min(FDR[FDR!= 0]), TRUE ~ FDR)) %>%
+		mutate(FDR = case_when(FDR < min_sig ~ min_sig, TRUE ~ FDR)) %>%
 		mutate(Significance = case_when(
 			FDR < 0.05 & abs(operon_mLFC) >= 1 ~ "Significant",
 			TRUE ~ "Not Significant")) %>%
@@ -235,7 +199,13 @@ plot_operon <- function(operon_median_results, conditions, max_left = 5, max_rig
 		arrange(FDR) %>% mutate(FDR_ix = row_number()) %>%
 		inner_join(operon_details) %>%
 		mutate(FDR = case_when(FDR != 0 ~ FDR, FDR == 0 ~ min(FDR[FDR != 0]))) %>%
-		mutate(`Transcription Unit` = case_when(`Essentials in operon` == 1 ~ condensed_name, TRUE ~ condensed_name)) %>%
+		{
+			if (use_condensed_name) {
+				mutate(., `Transcription Unit` = condensed_name)
+			} else {
+				mutate(., `Transcription Unit` = long_name)
+			}
+		} %>%
 		ggplot(
 			aes(x = operon_mLFC,
 					y = FDR,
@@ -260,7 +230,7 @@ plot_operon <- function(operon_median_results, conditions, max_left = 5, max_rig
 		doc_theme +
 		scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 		geom_label_repel(
-			fill = alpha(c("white"),0.75),
+			fill = alpha(c("white"), 0.75),
 			max.iter = 1000000000,
 			data = . %>% filter(
 				FDR < 0.05 & 
@@ -276,7 +246,7 @@ plot_operon <- function(operon_median_results, conditions, max_left = 5, max_rig
 			size = 3,
 			max.overlaps = Inf,
 			colour = "black") +
-		facet_wrap(~ condition, scales = "free") +
+		facet_wrap(~ condition, scales = "free_x") +
 		scale_fill_manual(
 			values = c(
 				"Other" = "grey",
@@ -296,22 +266,30 @@ plot_operon <- function(operon_median_results, conditions, max_left = 5, max_rig
 			override.aes = list(shape = 21, size = 5, fill = "black"))) +
 		scale_alpha_manual(
 			values = c(
-				"Significant" = 0.75,
-				"Not Significant" = 0.15)) +
+				"Significant" = 0.85,
+				"Not Significant" = 0.10)) +
 		scale_size_area(breaks = c(1, 5, 10, 13))
 }
 
 ##########################################################################################
-plot_operon(operon_median_results, c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"))
+plot_operon(
+	operon_median_results, 
+	c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"), 
+	use_condensed_name = TRUE, 
+	max_left = 5, max_right = 5, max_top = 10, min_sig = 1e-100)
+
 plot_operon(operon_median_results, c("None_0_T2 - None_0_T0"), 15, 5, 10)
 
 plot_operon(operon_median_results, c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2"))
 
-plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - None_0_T2", "Colistin_0.44_T2 - None_0_T2"), 7, 7, 5, 1e-100)
+plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - None_0_T2", "Colistin_0.44_T2 - None_0_T2"), TRUE, 7, 7, 5, 1e-100)
 
+plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - Colistin_0.44_T2"), FALSE, 10, 10, 10, 1e-150)
 
 plot_operon(operon_median_results, c("Rifampicin_0.34_T1 - None_0_T1", "Rifampicin_0.34_T2 - None_0_T2"))
+
 plot_operon(operon_median_results, c("Meropenem_0.17_T1 - None_0_T1", "Meropenem_0.17_T2 - None_0_T2"))
+
 plot_operon(operon_median_results, c("Imipenem_0.09_T1 - None_0_T1", "Imipenem_0.09_T2 - None_0_T2"))
 
 

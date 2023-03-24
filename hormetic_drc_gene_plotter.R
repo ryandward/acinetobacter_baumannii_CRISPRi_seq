@@ -1,7 +1,8 @@
 fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
 fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
 
-plot.genes <- c("lpxC","nuoB", "glnS", "murA")
+# plot.genes <- c("lpxC","nuoB", "glnS", "murA")
+plot.genes <- c("lpxC", "nuoB")
 
 doc_theme <- theme_ipsum(
 	base_family = "Arial", 
@@ -9,15 +10,23 @@ doc_theme <- theme_ipsum(
 	axis_title_size = 12,
 	axis_col = "black")
 
+# plot.conditions <- c(
+# 	"None_0_T1 - None_0_T0",
+# 	"None_0_T2 - None_0_T0",
+# 	"Rifampicin_0.34_T1 - None_0_T0",
+# 	"Rifampicin_0.34_T2 - None_0_T0",
+# 	"Colistin_0.44_T1 - None_0_T0",
+# 	"Colistin_0.44_T2 - None_0_T0",
+# 	"Imipenem_0.09_T1 - None_0_T0",
+# 	"Imipenem_0.09_T2 - None_0_T0")
+
 plot.conditions <- c(
 	"None_0_T1 - None_0_T0",
 	"None_0_T2 - None_0_T0",
 	"Rifampicin_0.34_T1 - None_0_T0",
 	"Rifampicin_0.34_T2 - None_0_T0",
 	"Colistin_0.44_T1 - None_0_T0",
-	"Colistin_0.44_T2 - None_0_T0",
-	"Imipenem_0.09_T1 - None_0_T0",
-	"Imipenem_0.09_T2 - None_0_T0")
+	"Colistin_0.44_T2 - None_0_T0")
 
 
 plot.fit_predictions <-
@@ -27,11 +36,11 @@ plot.fit_predictions <-
 			Condition %like% "T1" ~ "T1",
 			Condition %like% "T2" ~ "T2"),
 		Drug = case_when(
-			Condition %like% "^None_0" ~ "No drug",
 			Condition %like% "Rifampicin" ~ "Rifampicin",
 			Condition %like% "Colistin" ~ "Colistin",
-			Condition %like% "Meropenem" ~ "Meropenem",
-			Condition %like% "Imipenem" ~ "Imipenem"),
+			# Condition %like% "Meropenem" ~ "Meropenem",
+			# Condition %like% "Imipenem" ~ "Imipenem",
+			Condition %like% "^None_0" ~ "No drug"),
 		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin", "Meropenem", "Imipenem")))
 
 plot.fit_points <-
@@ -41,11 +50,11 @@ plot.fit_points <-
 			Condition %like% "T1" ~ "T1",
 			Condition %like% "T2" ~ "T2"),
 		Drug = case_when(
-			Condition %like% "^None_0" ~ "No drug",
 			Condition %like% "Rifampicin" ~ "Rifampicin",
 			Condition %like% "Colistin" ~ "Colistin",
-			Condition %like% "Meropenem" ~ "Meropenem",
-			Condition %like% "Imipenem" ~ "Imipenem"),
+			# Condition %like% "Meropenem" ~ "Meropenem",
+			# Condition %like% "Imipenem" ~ "Imipenem",
+			Condition %like% "^None_0" ~ "No drug"),
 		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin", "Meropenem", "Imipenem")))
 
 # plot.labeller <- as_labeller(
