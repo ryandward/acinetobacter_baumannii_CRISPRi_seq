@@ -147,7 +147,7 @@ plot.graphic <- plot.fit_predictions %>%
 	ylab("Fitness (Log2)") +
 	doc_theme +
 	theme(legend.position = "bottom") +
-	facet_grid(
+	facet_grid(scales = "free_y",
 		facets = c("Gene", "Drug")) + 
 	guides(fill = guide_legend(nrow = 2, byrow = TRUE))
 
