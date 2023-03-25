@@ -160,87 +160,87 @@ sankey.df %>%
 ```
 
 ```{r sankey plot 2}
-median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
-
-sankey.levels <- c(
-	"Highly Resistant",
-	"Resistant",
-	"No Response",
-	"Vulnerable",
-	"Highly Vulnerable")
-
-five_pct_vuln <- median_melted_results %>% 
-	filter(condition == "None_0_T2 - None_0_T0" & FDR < 0.05 & medLFC < -1) %>% 
-	pull(medLFC) %>% 
-	quantile(0.05)
-
-sankey.df <- median_melted_results %>% filter(base == "None_0_T0") %>%
-	filter(type == "perfect") %>%
-		mutate(
-		Response = case_when(
-			medLFC < five_pct_vuln  & FDR < 0.05 ~ "Highly Vulnerable",
-			medLFC < -1 & FDR < 0.05 ~ "Vulnerable",
-			medLFC > 1 & FDR < 0.05 ~ "Resistant",
-			TRUE ~ "No Response")) %>%
-	select(AB19606, condition, Response) %>%
-	mutate(condition = case_when(
-		condition == "None_0_T1 - None_0_T0" ~ "T1",
-		condition == "None_0_T2 - None_0_T0" ~ "T2"))	%>%
-	pivot_longer(!c(condition, AB19606)) %>%
-	filter(!is.na(condition)) %>%
-	pivot_wider(id_cols = c(AB19606), names_from = condition, values_from = value) %>%
-	make_long(`T1`, `T2`) %>%
-	  mutate(
-    node = factor(node, levels = sankey.levels),
-    next_node = factor(next_node, levels = sankey.levels))
-
-sankey.tally <- sankey.df %>% group_by(node, x) %>% tally
-
-sankey.df %>% 
-	inner_join(sankey.tally) %>%
-	ggplot(aes(
-		x = x,
-		next_x = next_x,
-		node = node,
-		next_node = next_node,
-		fill = factor(node),
-		label = paste(node, n, sep = "\n"))) +
-	geom_sankey(
-		smooth = 6, 
-		flow.colour = "black",
-		flow.alpha = 0.25,
-		node.color = "black") +
-	scale_fill_manual(
-		values = c(
-			 "#E31A1C", "grey", "#FB9A99")) +
-	geom_sankey_label(
-		aes(colour = "node"),
-		size = 3.5, 
-		colour = c("black", "black", "black", "black", "black")) +
-		geom_sankey_text(
-		aes(colour = "node"),
-		size = 3.5, 
-		colour = c("black", "black", "black", "black", "white")) +
-	guides(
-		fill = guide_legend(title = "Relative Response to Knockdown")) +
-	theme(
-		legend.position = "none",
-		panel.background = element_blank(),
-		panel.border = element_rect(
-			colour = NA, 
-			fill = NA, 
-			size = 1),
-        axis.line = element_blank(),
-        panel.grid = element_blank(),
-        axis.text.x   = element_text(
-        	size = 14, 
-        	color = "black", 
-        	family = "Arial",
-        	hjust = 0.5, 
-        	angle = 0),
-        axis.text.y   = element_blank(),
-        axis.title  = element_blank(),
-        axis.ticks =  element_blank())
+# median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
+# 
+# sankey.levels <- c(
+# 	"Highly Resistant",
+# 	"Resistant",
+# 	"No Response",
+# 	"Vulnerable",
+# 	"Highly Vulnerable")
+# 
+# five_pct_vuln <- median_melted_results %>% 
+# 	filter(condition == "None_0_T2 - None_0_T0" & FDR < 0.05 & medLFC < -1) %>% 
+# 	pull(medLFC) %>% 
+# 	quantile(0.05)
+# 
+# sankey.df <- median_melted_results %>% filter(base == "None_0_T0") %>%
+# 	filter(type == "perfect") %>%
+# 		mutate(
+# 		Response = case_when(
+# 			medLFC < five_pct_vuln  & FDR < 0.05 ~ "Highly Vulnerable",
+# 			medLFC < -1 & FDR < 0.05 ~ "Vulnerable",
+# 			medLFC > 1 & FDR < 0.05 ~ "Resistant",
+# 			TRUE ~ "No Response")) %>%
+# 	select(AB19606, condition, Response) %>%
+# 	mutate(condition = case_when(
+# 		condition == "None_0_T1 - None_0_T0" ~ "T1",
+# 		condition == "None_0_T2 - None_0_T0" ~ "T2"))	%>%
+# 	pivot_longer(!c(condition, AB19606)) %>%
+# 	filter(!is.na(condition)) %>%
+# 	pivot_wider(id_cols = c(AB19606), names_from = condition, values_from = value) %>%
+# 	make_long(`T1`, `T2`) %>%
+# 	  mutate(
+#     node = factor(node, levels = sankey.levels),
+#     next_node = factor(next_node, levels = sankey.levels))
+# 
+# sankey.tally <- sankey.df %>% group_by(node, x) %>% tally
+# 
+# sankey.df %>% 
+# 	inner_join(sankey.tally) %>%
+# 	ggplot(aes(
+# 		x = x,
+# 		next_x = next_x,
+# 		node = node,
+# 		next_node = next_node,
+# 		fill = factor(node),
+# 		label = paste(node, n, sep = "\n"))) +
+# 	geom_sankey(
+# 		smooth = 6, 
+# 		flow.colour = "black",
+# 		flow.alpha = 0.25,
+# 		node.color = "black") +
+# 	scale_fill_manual(
+# 		values = c(
+# 			 "#E31A1C", "grey", "#FB9A99")) +
+# 	geom_sankey_label(
+# 		aes(colour = "node"),
+# 		size = 3.5, 
+# 		colour = c("black", "black", "black", "black", "black")) +
+# 		geom_sankey_text(
+# 		aes(colour = "node"),
+# 		size = 3.5, 
+# 		colour = c("black", "black", "black", "black", "white")) +
+# 	guides(
+# 		fill = guide_legend(title = "Relative Response to Knockdown")) +
+# 	theme(
+# 		legend.position = "none",
+# 		panel.background = element_blank(),
+# 		panel.border = element_rect(
+# 			colour = NA, 
+# 			fill = NA, 
+# 			size = 1),
+#         axis.line = element_blank(),
+#         panel.grid = element_blank(),
+#         axis.text.x   = element_text(
+#         	size = 14, 
+#         	color = "black", 
+#         	family = "Arial",
+#         	hjust = 0.5, 
+#         	angle = 0),
+#         axis.text.y   = element_blank(),
+#         axis.title  = element_blank(),
+#         axis.ticks =  element_blank())
 ```
 
 ```{r}
