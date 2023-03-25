@@ -97,11 +97,9 @@ UpSet(
 median_melted_results <- fread("../../Results/median_melted_results.tsv.gz")
 
 sankey.levels <- c(
-	"Highly Resistant",
 	"Resistant",
 	"No Response",
-	"Vulnerable",
-	"Highly Vulnerable")
+	"Vulnerable")
 
 five_pct_vuln <- median_melted_results %>% 
 	filter(condition == "None_0_T2 - None_0_T0" & FDR < 0.05 & medLFC < -1) %>% 
@@ -113,7 +111,6 @@ sankey.df <- median_melted_results %>%
 	filter(type == "perfect") %>%
 		mutate(
 		Response = case_when(
-			medLFC < five_pct_vuln  & FDR < 0.05 ~ "Highly Vulnerable",
 			medLFC < -1 & FDR < 0.05 ~ "Vulnerable",
 			medLFC > 1 & FDR < 0.05 ~ "Resistant",
 			TRUE ~ "No Response")) %>%
@@ -145,7 +142,7 @@ sankey.df %>%
 		flow.alpha = 0.25,
 		node.color = "black") +
 	scale_fill_manual(values = c(
-		 "#e53935", "grey", "#ffb300")) +
+		 "grey", "#e53935", "#ffb300")) +
 	geom_sankey_label(aes(colour = "node"),
 										size = 3.5, color = 1) +
 	guides(
