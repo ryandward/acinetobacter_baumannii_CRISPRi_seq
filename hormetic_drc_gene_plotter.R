@@ -1,3 +1,23 @@
+require(conflicted)
+require(pacman)
+
+p_load(
+	"data.table", 
+	"tidyverse", 
+	"broom", 
+	"modelr")
+
+p_load_current_gh(
+	"DoseResponse/drcData",
+	"ryandward/drc",
+	"hrbrmstr/hrbrthemes")
+
+conflicted::conflicts_prefer(
+	gtools::permute, 
+	dplyr::filter, 
+	dplyr::select, 
+	drc::gaussian)
+
 fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
 fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
 
@@ -86,10 +106,10 @@ plot.graphic <- plot.fit_predictions %>%
 		yintercept = 0, 
 		linetype = "dashed", 
 		color = "black", 
-		size = 0.5) +
+		linewidth = 0.5) +
 	geom_line(
 		alpha = 1, 
-		size = 2, 
+		linewidth = 2, 
 		aes(
 			x = y_pred, 
 			y = .fitted, 
