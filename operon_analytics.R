@@ -33,7 +33,6 @@ conflict_prefer("lag", "dplyr")
 
 doc_theme <- theme_ipsum(base_family = "Arial", caption_margin = 12, axis_title_size = 12, axis_col = "black")
 
-
 # Unfortunately, it's hard to anticipate lots of kinds of missingness.
 
 operon_conversion <- fread("Operons/AB19606_operon_conversion.tsv", na.strings = "")

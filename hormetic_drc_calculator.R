@@ -93,6 +93,8 @@ active_results <- melted_results %>%
 	inner_join(melted_results, by = c("target", "condition"))
 
 mismatches <- melted_results %>%
+	filter(y_pred > 0) %>%
+	# mutate(y_pred = case_when(y_pred < 0 ~ 0, TRUE ~ y_pred)) %>%
 	filter(condition %in% interested.conditions) %>%
 	filter(unique_name %in% interested.genes) %>% 
 	filter(type == "mismatch") %>%
@@ -103,7 +105,7 @@ mismatches <- melted_results %>%
 			filter(type == "perfect") %>% 
 			group_by(unique_name, condition) %>% 
 			select(unique_name, condition, LFC.adj) %>% 
-			filter(abs(LFC.adj) == max(abs(LFC.adj))) %>% 
+			filter(abs(LFC.adj) == max(abs(LFC.adj))) %>%
 			rename(response.max = LFC.adj)) %>%
 	nest(data = c(-condition, -unique_name, -response.max))
 
@@ -114,7 +116,7 @@ BC5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
 
 mismatches <- mismatches %>%
-	# filter(unique_name == "lpxC" | unique_name == "nuoB") %>%
+	# filter(unique_name %in%  c("murA", "rpmB", "aroC", "GO593_00515")) %>%
 	mutate(fit = case_when(
 		response.max > 0 ~ map2(
 			data, 
