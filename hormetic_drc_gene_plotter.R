@@ -1,8 +1,10 @@
 fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
 fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
 
-# plot.genes <- c("lpxC","nuoB", "glnS", "murA")
-plot.genes <- c("lpxC", "nuoB", "glnS", "murA", "rpmB")
+# plot.genes <- c("lpxC","nuoB")
+# plot.genes <- c("lpxC", "nuoB", "glnS", "murA", "rpmB")
+plot.genes <- c("murA")
+
 
 doc_theme <- theme_ipsum(
 	base_family = "Arial", 
@@ -20,13 +22,17 @@ doc_theme <- theme_ipsum(
 # 	"Imipenem_0.09_T1 - None_0_T0",
 # 	"Imipenem_0.09_T2 - None_0_T0")
 
+# plot.conditions <- c(
+# 	"None_0_T1 - None_0_T0",
+# 	"None_0_T2 - None_0_T0",
+# 	"Rifampicin_0.34_T1 - None_0_T0",
+# 	"Rifampicin_0.34_T2 - None_0_T0",
+# 	"Colistin_0.44_T1 - None_0_T0",
+# 	"Colistin_0.44_T2 - None_0_T0")
+
 plot.conditions <- c(
 	"None_0_T1 - None_0_T0",
-	"None_0_T2 - None_0_T0",
-	"Rifampicin_0.34_T1 - None_0_T0",
-	"Rifampicin_0.34_T2 - None_0_T0",
-	"Colistin_0.44_T1 - None_0_T0",
-	"Colistin_0.44_T2 - None_0_T0")
+	"None_0_T2 - None_0_T0")
 
 
 plot.fit_predictions <-
@@ -51,6 +57,7 @@ plot.fit_points <-
 			Condition %like% "T2" ~ "T2"),
 		Drug = case_when(
 			Condition %like% "Rifampicin" ~ "Rifampicin",
+			
 			Condition %like% "Colistin" ~ "Colistin",
 			Condition %like% "Meropenem" ~ "Meropenem",
 			Condition %like% "Imipenem" ~ "Imipenem",
@@ -97,6 +104,7 @@ plot.graphic <- plot.fit_predictions %>%
 	geom_point(
 		data = plot.fit_points %>%
 			filter(
+				
 				Gene %in% plot.genes &
 					Condition %in% plot.conditions) %>%
 			filter(
@@ -108,21 +116,21 @@ plot.graphic <- plot.fit_predictions %>%
 			x = y_pred, 
 			y = LFC.adj, 
 			color = interaction(Timing, Gene))) + 
-	# geom_ribbon(
-	# 	data = plot.fit_predictions %>%
-	# 		filter(
-	# 			Gene %in% plot.genes &
-	# 				Condition %in% plot.conditions) %>%
-	# 		filter(
-	# 			Gene %in% plot.genes &
-	# 				Condition %in% plot.conditions),
-	# 	alpha = 0.25,
-	# 	aes(
-	# 		x = y_pred,
-	# 		y = .fitted,
-	# 		ymin = .lower,
-	# 		ymax = .upper,
-	# 		fill = interaction(Timing, Gene))) +
+	geom_ribbon(
+		data = plot.fit_predictions %>%
+			filter(
+				Gene %in% plot.genes &
+					Condition %in% plot.conditions) %>%
+			filter(
+				Gene %in% plot.genes &
+					Condition %in% plot.conditions),
+		alpha = 0.25,
+		aes(
+			x = y_pred,
+			y = .fitted,
+			ymin = .lower,
+			ymax = .upper,
+			fill = interaction(Timing, Gene))) +
 	scale_fill_manual(
 		values = c(
 			"T1.nuoB" = "#CAB2D6",
