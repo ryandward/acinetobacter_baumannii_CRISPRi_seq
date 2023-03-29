@@ -1,29 +1,8 @@
-require(conflicted)
-require(pacman)
-
-p_load(
-	"data.table", 
-	"tidyverse", 
-	"broom", 
-	"modelr")
-
-p_load_current_gh(
-	"DoseResponse/drcData",
-	"ryandward/drc",
-	"hrbrmstr/hrbrthemes")
-
-conflicted::conflicts_prefer(
-	gtools::permute, 
-	dplyr::filter, 
-	dplyr::select, 
-	drc::gaussian)
-
 fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
 fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
 
 # plot.genes <- c("lpxC","nuoB", "glnS", "murA")
-# plot.genes <- c("lpxC", "nuoB",)
-plot.genes <- c("lpxC", "murA", "rpmB", "aroC", "GO593_00515")
+plot.genes <- c("lpxC", "nuoB", "glnS", "murA", "rpmB")
 
 doc_theme <- theme_ipsum(
 	base_family = "Arial", 
@@ -41,17 +20,13 @@ doc_theme <- theme_ipsum(
 # 	"Imipenem_0.09_T1 - None_0_T0",
 # 	"Imipenem_0.09_T2 - None_0_T0")
 
-# plot.conditions <- c(
-# 	"None_0_T1 - None_0_T0",
-# 	"None_0_T2 - None_0_T0",
-# 	"Rifampicin_0.34_T1 - None_0_T0",
-# 	"Rifampicin_0.34_T2 - None_0_T0",
-# 	"Colistin_0.44_T1 - None_0_T0",
-# 	"Colistin_0.44_T2 - None_0_T0")
-
 plot.conditions <- c(
 	"None_0_T1 - None_0_T0",
-	"None_0_T2 - None_0_T0")
+	"None_0_T2 - None_0_T0",
+	"Rifampicin_0.34_T1 - None_0_T0",
+	"Rifampicin_0.34_T2 - None_0_T0",
+	"Colistin_0.44_T1 - None_0_T0",
+	"Colistin_0.44_T2 - None_0_T0")
 
 
 plot.fit_predictions <-
@@ -63,8 +38,8 @@ plot.fit_predictions <-
 		Drug = case_when(
 			Condition %like% "Rifampicin" ~ "Rifampicin",
 			Condition %like% "Colistin" ~ "Colistin",
-			# Condition %like% "Meropenem" ~ "Meropenem",
-			# Condition %like% "Imipenem" ~ "Imipenem",
+			Condition %like% "Meropenem" ~ "Meropenem",
+			Condition %like% "Imipenem" ~ "Imipenem",
 			Condition %like% "^None_0" ~ "No drug"),
 		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin", "Meropenem", "Imipenem")))
 
@@ -77,8 +52,8 @@ plot.fit_points <-
 		Drug = case_when(
 			Condition %like% "Rifampicin" ~ "Rifampicin",
 			Condition %like% "Colistin" ~ "Colistin",
-			# Condition %like% "Meropenem" ~ "Meropenem",
-			# Condition %like% "Imipenem" ~ "Imipenem",
+			Condition %like% "Meropenem" ~ "Meropenem",
+			Condition %like% "Imipenem" ~ "Imipenem",
 			Condition %like% "^None_0" ~ "No drug"),
 		Drug = factor(Drug, levels = c("No drug", "Colistin", "Rifampicin", "Meropenem", "Imipenem")))
 
@@ -111,10 +86,10 @@ plot.graphic <- plot.fit_predictions %>%
 		yintercept = 0, 
 		linetype = "dashed", 
 		color = "black", 
-		linewidth = 0.5) +
+		size = 0.5) +
 	geom_line(
 		alpha = 1, 
-		linewidth = 2, 
+		size = 2, 
 		aes(
 			x = y_pred, 
 			y = .fitted, 
@@ -157,13 +132,7 @@ plot.graphic <- plot.fit_predictions %>%
 			"T1.glnS" = "#A6CEE3",
 			"T2.glnS" = "#1F78B4",
 			"T1.murA" = "#FDBF6F",
-			"T2.murA" = "#FF7F00",
-			"T1.aroC" = "light grey",
-			"T2.aroC" = "dark grey",
-			"T1.rpmB" = "light grey",
-			"T2.rpmB" = "dark grey",
-			"T1.GO593_00515" = "light grey",
-			"T2.GO593_00515" = "dark grey")) +
+			"T2.murA" = "#FF7F00")) +
 	scale_color_manual(
 		values = c(
 			"T1.nuoB" = "#CAB2D6",
@@ -173,18 +142,12 @@ plot.graphic <- plot.fit_predictions %>%
 			"T1.glnS" = "#A6CEE3",
 			"T2.glnS" = "#1F78B4",
 			"T1.murA" = "#FDBF6F",
-			"T2.murA" = "#FF7F00",
-			"T1.aroC" = "light grey",
-			"T2.aroC" = "dark grey",
-			"T1.rpmB" = "light grey",
-			"T2.rpmB" = "dark grey",
-			"T1.GO593_00515" = "light grey",
-			"T2.GO593_00515" = "dark grey")) +
+			"T2.murA" = "#FF7F00")) +
 	xlab("Knockdown") +
 	ylab("Fitness (Log2)") +
 	doc_theme +
 	theme(legend.position = "bottom") +
-	facet_grid(
+	facet_grid(scales = "free_y",
 		facets = c("Gene", "Drug")) + 
 	guides(fill = guide_legend(nrow = 2, byrow = TRUE))
 

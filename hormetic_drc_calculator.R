@@ -1,10 +1,21 @@
 require(conflicted)
 require(pacman)
 
+
+aba_key <- fread("aba_key.tsv")
+
+mismatch_recalc <- fread(
+	"/home/ryandward/Git/mismatch_crispri/ABA_recalc_mismatch.tsv",
+	header = F,
+	col.names = c("original", "spacer", "locus_tag", "pam", "y_pred", "y_pred_new"))
+
+aba_key[mismatch_recalc, on = .(original, spacer), y_pred := y_pred_new]
+
+
 p_load(
-	"data.table", 
-	"tidyverse", 
-	"broom", 
+	"data.table",
+	"tidyverse",
+	"broom",
 	"modelr")
 
 p_load_current_gh(
@@ -13,9 +24,9 @@ p_load_current_gh(
 	"hrbrmstr/hrbrthemes")
 
 conflicted::conflicts_prefer(
-	gtools::permute, 
-	dplyr::filter, 
-	dplyr::select, 
+	gtools::permute,
+	dplyr::filter,
+	dplyr::select,
 	drc::gaussian)
 
 # https://jgeb.springeropen.com/articles/10.1186/s43141-020-00048-4
@@ -37,19 +48,19 @@ interested.conditions <- c(
 	"Imipenem_0.06_T1 - None_0_T0",
 	"Imipenem_0.09_T1 - None_0_T0",
 	"Imipenem_0.06_T2 - None_0_T0",
-	"Imipenem_0.09_T2 - None_0_T0"
-	# "Colistin_0.44_T1 - None_0_T1",
-	# "Colistin_0.44_T2 - None_0_T2",
-	# "Rifampicin_0.34_T1 - None_0_T1",
-	# "Rifampicin_0.34_T2 - None_0_T2",
-	# "Meropenem_0.11_T1 - None_0_T1",
-	# "Meropenem_0.17_T1 - None_0_T1",
-	# "Meropenem_0.11_T2 - None_0_T2",
-	# "Meropenem_0.17_T2 - None_0_T2",
-	# "Imipenem_0.06_T1 - None_0_T1",
-	# "Imipenem_0.09_T1 - None_0_T1",
-	# "Imipenem_0.06_T2 - None_0_T2",
-	# "Imipenem_0.09_T2 - None_0_T2"
+	"Imipenem_0.09_T2 - None_0_T0",
+	"Colistin_0.44_T1 - None_0_T1",
+	"Colistin_0.44_T2 - None_0_T2",
+	"Rifampicin_0.34_T1 - None_0_T1",
+	"Rifampicin_0.34_T2 - None_0_T2",
+	"Meropenem_0.11_T1 - None_0_T1",
+	"Meropenem_0.17_T1 - None_0_T1",
+	"Meropenem_0.11_T2 - None_0_T2",
+	"Meropenem_0.17_T2 - None_0_T2",
+	"Imipenem_0.06_T1 - None_0_T1",
+	"Imipenem_0.09_T1 - None_0_T1",
+	"Imipenem_0.06_T2 - None_0_T2",
+	"Imipenem_0.09_T2 - None_0_T2"
 )
 
 # read results
@@ -62,18 +73,26 @@ curated_names <- fread("curated_names.tsv", sep = "\t")
 
 aba_key <- fread("aba_key.tsv", sep = "\t")
 
-# function to rescale between 0 and 1
-# range01 <- function(x){(x - min(x))/(max(x) - min(x))}
-
-# melted_results[!is.na(y_pred), y_pred := range01(y_pred)]
-
-# melted_results <- melted_results %>% group_by(target) %>% mutate(y_pred = range01(y_pred))
-
-# melted_results <- tibble(melted_results)
 
 melted_results$y_pred <- NULL
 
-melted_results <- melted_results %>% inner_join(aba_key %>% select(y_pred, spacer)) 
+melted_results[aba_key, on = .(spacer), y_pred := y_pred]
+# 
+# # Function to rescale between 0 and 1
+# range01 <- function(x) {
+# 	(x - min(x)) / (max(x) - min(x))
+# }
+# 
+# # Apply the range01 function to the y_pred column, omitting NA values
+# melted_results[!is.na(y_pred), y_pred := range01(y_pred)]
+# 
+# # Rescale y_pred column within each target group
+# melted_results <- melted_results %>%
+# 	group_by(target) %>%
+# 	mutate(y_pred = range01(y_pred))
+# 
+# # Convert melted_results to a tibble
+# melted_results <- tibble(melted_results)
 
 # define parameters of interest for dose-response plots
 
@@ -84,27 +103,19 @@ tidy.try <- possibly(tidy, otherwise = NA)
 
 #estimate dose-response models
 
-active_results <- melted_results %>%
-	filter(condition %in% interested.conditions, type == "mismatch") %>%
-	select(target, condition) %>%
-	unique() %>%
-	inner_join(melted_results %>% filter(type == "perfect", abs(LFC) > 0.25, FDR <= 0.05), by = c("target", "condition")) %>%
-	select(target, condition) %>%
-	inner_join(melted_results, by = c("target", "condition"))
-
 mismatches <- melted_results %>%
 	filter(y_pred > 0) %>%
 	# mutate(y_pred = case_when(y_pred < 0 ~ 0, TRUE ~ y_pred)) %>%
 	filter(condition %in% interested.conditions) %>%
-	filter(unique_name %in% interested.genes) %>% 
+	filter(unique_name %in% interested.genes) %>%
 	filter(type == "mismatch") %>%
 	inner_join(
 		melted_results %>%
 			filter(condition %in% interested.conditions) %>%
 			filter(unique_name %in% interested.genes) %>%
-			filter(type == "perfect") %>% 
-			group_by(unique_name, condition) %>% 
-			select(unique_name, condition, LFC.adj) %>% 
+			filter(type == "perfect") %>%
+			group_by(unique_name, condition) %>%
+			select(unique_name, condition, LFC.adj) %>%
 			filter(abs(LFC.adj) == max(abs(LFC.adj))) %>%
 			rename(response.max = LFC.adj)) %>%
 	nest(data = c(-condition, -unique_name, -response.max))
@@ -116,21 +127,29 @@ BC5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
 
 mismatches <- mismatches %>%
-	# filter(unique_name %in%  c("murA", "rpmB", "aroC", "GO593_00515")) %>%
+	# filter(unique_name %in% c("murA", "rpmB", "aroC", "GO593_00515", "glnS", "nuoB", "lpxC")) %>%
 	mutate(fit = case_when(
 		response.max > 0 ~ map2(
-			data, 
-			response.max, 
+			data,
+			response.max,
 			~drm.try(
-				data = .x, LFC.adj ~ y_pred, fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC5.parameters),
-				start = c(1, 0.5, 0))),
+				data = .x, 
+				LFC.adj ~ y_pred, 
+				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
+				fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC5.parameters)
+			)
+		),
 		response.max < 0 ~ map2(
-			data, 
-			response.max, 
+			data,
+			response.max,
 			~drm.try(
-				data = .x, LFC.adj ~ y_pred, 
-				fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC5.parameters),
-				start = c(1, 0.5, 0)))))
+				data = .x, 
+				LFC.adj ~ y_pred, 
+				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
+				fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC5.parameters)
+			)
+		)
+	))
 
 
 # mismatches <- mismatches %>% filter(unique_name == "lpxC" | unique_name == "nuoB") %>%
@@ -140,11 +159,11 @@ mismatches <- mismatches %>%
 
 ################################################################################
 
-mismatches <- mismatches %>% 
+mismatches <- mismatches %>%
 	filter(!is.na(fit)) %>%
-	mutate(p.vals = map(fit, tidy)) 
+	mutate(p.vals = map(fit, tidy))
 
-mismatches <- mismatches %>% 
+mismatches <- mismatches %>%
 	mutate(
 		kd_50.tibble = map(
 			p.vals,
@@ -158,14 +177,14 @@ mismatches <- mismatches %>%
 			~augment.try(
 				.x,
 				newdata = .y %>% filter (term == "kd_50") %>% select (estimate)) %>%
-				rename (., vuln.est = .fitted, vuln.kd_50 = estimate))) 
-# 
+				rename (., vuln.est = .fitted, vuln.kd_50 = estimate)))
+#
 mismatches <- mismatches %>%
 	unnest(vuln.tibble) %>%
 	unnest(kd_50.tibble) %>%
 	select(-c(p.vals))
 
-mismatches <- mismatches %>% 
+mismatches <- mismatches %>%
 	mutate(Gene = factor(unique_name, levels = unique(interested.genes))) %>%
 	mutate(Condition = factor(condition, levels = unique(interested.conditions)))
 
@@ -183,12 +202,12 @@ vuln.summary <- mismatches %>% select(
 # 	vuln.kd_50 = as.numeric(format(vuln.kd_50, scientific = TRUE, digits = 3)),
 # 	vuln.p = as.numeric(format(vuln.p, scientific = TRUE, digits = 3)))
 
-vuln.summary <- mismatches %>% select(condition, unique_name, response.max) %>% inner_join(vuln.summary) 
+vuln.summary <- mismatches %>% select(condition, unique_name, response.max) %>% inner_join(vuln.summary)
 vuln.summary %>% fwrite("Results/hormetic_vulnerability_summary.tsv.gz", sep = "\t")
 
 # add 90% confidence interval predictions to the dose-response curves
 
-mismatches <- mismatches %>% 
+mismatches <- mismatches %>%
 	mutate(predictions = map2(fit, data, ~augment.try(
 		.x,
 		newdata = expand.grid(
@@ -203,25 +222,25 @@ mismatches <- mismatches %>%
 
 # write and save fitted points, and fitted predictions
 
-fit_predictions <- mismatches %>% 
-	select(Gene, Condition, predictions) %>% 
+fit_predictions <- mismatches %>%
+	select(Gene, Condition, predictions) %>%
 	unnest(predictions)
 
 fit_predictions %>% fwrite("Results/hormetic_fit_predictions.tsv.gz")
 
-fit_points <- mismatches %>% 
-	select(Gene, Condition, data) %>% 
+fit_points <- mismatches %>%
+	select(Gene, Condition, data) %>%
 	unnest(data)
 
 fit_points %>% fwrite("Results/hormetic_fit_points.tsv.gz")
 
 # Evaluate performance
 
-model_performance <- mismatches %>% 
+model_performance <- mismatches %>%
 	mutate(
-		bayes = map(fit, glance), 
-		bayes = map(bayes, ~mutate(.x, logLik = c(logLik)))) %>% 
-	unnest(bayes) %>% 
+		bayes = map(fit, glance),
+		bayes = map(bayes, ~mutate(.x, logLik = c(logLik)))) %>%
+	unnest(bayes) %>%
 	select(unique_name, condition, AIC, BIC, logLik, df.residual)
 
 model_performance %>% fwrite("Results/hormetic_performance.tsv.gz", sep = "\t")
