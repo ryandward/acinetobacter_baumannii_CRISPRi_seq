@@ -136,5 +136,21 @@ plot_gene_dose_effect(
 
 plot_gene_dose_effect(
 	c("glnS"), 
+	c("Imipenem_0.09_T1 - None_0_T0"), 
+	gene_colors)
+
+plot_gene_dose_effect(
+	c("lysC"), 
 	c("Imipenem_0.09_T2 - None_0_T0"), 
 	gene_colors)
+
+plot_gene_dose_effect(
+	c("lysC"), 
+	c("Imipenem_0.09_T2 - None_0_T0"), 
+	gene_colors)
+
+ plot_gene_dose_effect(
+ 	c("lysC", "glnS", "trpS", "serS"), 
+	c("Imipenem_0.09_T2 - None_0_T0"), 
+ 	gene_colors)
+ 
