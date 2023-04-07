@@ -4,14 +4,6 @@ require(pacman)
 
 aba_key <- fread("aba_key.tsv")
 
-mismatch_recalc <- fread(
-	"/home/ryandward/Git/mismatch_crispri/ABA_recalc_mismatch.tsv",
-	header = F,
-	col.names = c("original", "spacer", "locus_tag", "pam", "y_pred", "y_pred_new"))
-
-aba_key[mismatch_recalc, on = .(original, spacer), y_pred := y_pred_new]
-
-
 p_load(
 	"data.table",
 	"tidyverse",
@@ -48,20 +40,7 @@ interested.conditions <- c(
 	"Imipenem_0.06_T1 - None_0_T0",
 	"Imipenem_0.09_T1 - None_0_T0",
 	"Imipenem_0.06_T2 - None_0_T0",
-	"Imipenem_0.09_T2 - None_0_T0",
-	"Colistin_0.44_T1 - None_0_T1",
-	"Colistin_0.44_T2 - None_0_T2",
-	"Rifampicin_0.34_T1 - None_0_T1",
-	"Rifampicin_0.34_T2 - None_0_T2",
-	"Meropenem_0.11_T1 - None_0_T1",
-	"Meropenem_0.17_T1 - None_0_T1",
-	"Meropenem_0.11_T2 - None_0_T2",
-	"Meropenem_0.17_T2 - None_0_T2",
-	"Imipenem_0.06_T1 - None_0_T1",
-	"Imipenem_0.09_T1 - None_0_T1",
-	"Imipenem_0.06_T2 - None_0_T2",
-	"Imipenem_0.09_T2 - None_0_T2"
-)
+	"Imipenem_0.09_T2 - None_0_T0")
 
 # read results
 

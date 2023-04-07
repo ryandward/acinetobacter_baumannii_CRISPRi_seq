@@ -1,7 +1,53 @@
+# Load several packages from CRAN and Bioconductor
+require('pacman')
+p_load(
+	data.table,
+	scales,
+	edgeR,
+	statmod,
+	poolr,
+	pheatmap,
+	svglite,
+	ggplot2,
+	ggrepel,
+	Rtsne,
+	pracma,
+	colourpicker,
+	RColorBrewer,
+	vegan,
+	tidyverse,
+	magrittr
+)
+
+p_load(
+	"data.table",
+	"tidyverse",
+	"broom",
+	"modelr")
+
+p_load_current_gh(
+	"DoseResponse/drcData",
+	"ryandward/drc",
+	"hrbrmstr/hrbrthemes")
+
+conflicted::conflicts_prefer(
+	gtools::permute,
+	dplyr::filter,
+	dplyr::select,
+	drc::gaussian)
+
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
+
 fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
 fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
 vulnerability <- fread("Results/hormetic_vulnerability_summary.tsv.gz")
 model_performance <- fread("Results/hormetic_performance.tsv.gz")
+
 
 process_data <- function(data) {
 	data %>%
@@ -124,6 +170,7 @@ gene_colors <- c(
 	"murA" = "#FF7F00",
 	"rpmB" = "#E31A1C")
 
+# beautiful 
 plot_gene_dose_effect(
 	c("rpmB", "murA", "nuoB", "lpxC"), 
 	c("None_0_T1 - None_0_T0"), 
@@ -134,10 +181,12 @@ plot_gene_dose_effect(
 	c("Rifampicin_0.34_T2 - None_0_T0"), 
 	gene_colors)
 
+# beautiful
 plot_gene_dose_effect(
 	c("glnS"), 
 	c("Imipenem_0.09_T1 - None_0_T0"), 
 	gene_colors)
+
 
 plot_gene_dose_effect(
 	c("lysC"), 
@@ -150,7 +199,13 @@ plot_gene_dose_effect(
 	gene_colors)
 
  plot_gene_dose_effect(
- 	c("lysC", "glnS", "trpS", "serS"), 
+ 	c("lysC", "glnS", "trpS", "pheS"), 
 	c("Imipenem_0.09_T2 - None_0_T0"), 
  	gene_colors)
+ 
+ plot_gene_dose_effect(
+ 	c("lysC", "glnS", "trpS", "cysS"), 
+ 	c("Meropenem_0.17_T2 - None_0_T0"), 
+ 	gene_colors)
+
  
