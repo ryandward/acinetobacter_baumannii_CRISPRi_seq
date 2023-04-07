@@ -188,23 +188,13 @@ plot_gene_dose_effect(
 	gene_colors)
 
 
-plot_gene_dose_effect(
-	c("lysC"), 
-	c("Imipenem_0.09_T2 - None_0_T0"), 
-	gene_colors)
-
-plot_gene_dose_effect(
-	c("lysC"), 
-	c("Imipenem_0.09_T2 - None_0_T0"), 
-	gene_colors)
-
  plot_gene_dose_effect(
- 	c("lysC", "glnS", "trpS", "pheS"), 
+ 	c("lysC", "glnS", "trpS", "tyrS"), 
 	c("Imipenem_0.09_T2 - None_0_T0"), 
  	gene_colors)
  
  plot_gene_dose_effect(
- 	c("lysC", "glnS", "trpS", "cysS"), 
+ 	c("lysC", "glnS", "trpS", "tyrS"), 
  	c("Meropenem_0.17_T2 - None_0_T0"), 
  	gene_colors)
 
