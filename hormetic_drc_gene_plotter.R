@@ -1,10 +1,29 @@
+require(conflicted)
+require(pacman)
+
+p_load(
+	"data.table", 
+	"tidyverse", 
+	"broom", 
+	"modelr")
+
+p_load_current_gh(
+	"DoseResponse/drcData",
+	"ryandward/drc",
+	"hrbrmstr/hrbrthemes")
+
+conflicted::conflicts_prefer(
+	gtools::permute, 
+	dplyr::filter, 
+	dplyr::select, 
+	drc::gaussian)
+
 fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
 fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
 
-# plot.genes <- c("lpxC","nuoB")
-# plot.genes <- c("lpxC", "nuoB", "glnS", "murA", "rpmB")
-plot.genes <- c("murA")
-
+plot.genes <- c("lpxC","nuoB", "glnS", "murA")
+# plot.genes <- c("lpxC", "nuoB",)
+# plot.genes <- c("lpxC", "murA", "rpmB", "aroC", "GO593_00515")
 
 doc_theme <- theme_ipsum(
 	base_family = "Arial", 
@@ -12,15 +31,15 @@ doc_theme <- theme_ipsum(
 	axis_title_size = 12,
 	axis_col = "black")
 
-# plot.conditions <- c(
-# 	"None_0_T1 - None_0_T0",
-# 	"None_0_T2 - None_0_T0",
-# 	"Rifampicin_0.34_T1 - None_0_T0",
-# 	"Rifampicin_0.34_T2 - None_0_T0",
-# 	"Colistin_0.44_T1 - None_0_T0",
-# 	"Colistin_0.44_T2 - None_0_T0",
-# 	"Imipenem_0.09_T1 - None_0_T0",
-# 	"Imipenem_0.09_T2 - None_0_T0")
+plot.conditions <- c(
+	"None_0_T1 - None_0_T0",
+	"None_0_T2 - None_0_T0",
+	"Rifampicin_0.34_T1 - None_0_T0",
+	"Rifampicin_0.34_T2 - None_0_T0",
+	"Colistin_0.44_T1 - None_0_T0",
+	"Colistin_0.44_T2 - None_0_T0",
+	"Imipenem_0.09_T1 - None_0_T0",
+	"Imipenem_0.09_T2 - None_0_T0")
 
 # plot.conditions <- c(
 # 	"None_0_T1 - None_0_T0",
@@ -30,9 +49,9 @@ doc_theme <- theme_ipsum(
 # 	"Colistin_0.44_T1 - None_0_T0",
 # 	"Colistin_0.44_T2 - None_0_T0")
 
-plot.conditions <- c(
-	"None_0_T1 - None_0_T0",
-	"None_0_T2 - None_0_T0")
+# plot.conditions <- c(
+# 	"None_0_T1 - None_0_T0",
+# 	"None_0_T2 - None_0_T0")
 
 
 plot.fit_predictions <-
@@ -57,7 +76,6 @@ plot.fit_points <-
 			Condition %like% "T2" ~ "T2"),
 		Drug = case_when(
 			Condition %like% "Rifampicin" ~ "Rifampicin",
-			
 			Condition %like% "Colistin" ~ "Colistin",
 			Condition %like% "Meropenem" ~ "Meropenem",
 			Condition %like% "Imipenem" ~ "Imipenem",
@@ -93,10 +111,10 @@ plot.graphic <- plot.fit_predictions %>%
 		yintercept = 0, 
 		linetype = "dashed", 
 		color = "black", 
-		size = 0.5) +
+		linewidth = 0.5) +
 	geom_line(
 		alpha = 1, 
-		size = 2, 
+		linewidth = 2, 
 		aes(
 			x = y_pred, 
 			y = .fitted, 
@@ -104,7 +122,6 @@ plot.graphic <- plot.fit_predictions %>%
 	geom_point(
 		data = plot.fit_points %>%
 			filter(
-				
 				Gene %in% plot.genes &
 					Condition %in% plot.conditions) %>%
 			filter(
@@ -116,21 +133,21 @@ plot.graphic <- plot.fit_predictions %>%
 			x = y_pred, 
 			y = LFC.adj, 
 			color = interaction(Timing, Gene))) + 
-	geom_ribbon(
-		data = plot.fit_predictions %>%
-			filter(
-				Gene %in% plot.genes &
-					Condition %in% plot.conditions) %>%
-			filter(
-				Gene %in% plot.genes &
-					Condition %in% plot.conditions),
-		alpha = 0.25,
-		aes(
-			x = y_pred,
-			y = .fitted,
-			ymin = .lower,
-			ymax = .upper,
-			fill = interaction(Timing, Gene))) +
+	# geom_ribbon(
+	# 	data = plot.fit_predictions %>%
+	# 		filter(
+	# 			Gene %in% plot.genes &
+	# 				Condition %in% plot.conditions) %>%
+	# 		filter(
+	# 			Gene %in% plot.genes &
+	# 				Condition %in% plot.conditions),
+	# 	alpha = 0.25,
+	# 	aes(
+	# 		x = y_pred,
+	# 		y = .fitted,
+	# 		ymin = .lower,
+	# 		ymax = .upper,
+	# 		fill = interaction(Timing, Gene))) +
 	scale_fill_manual(
 		values = c(
 			"T1.nuoB" = "#CAB2D6",
@@ -140,7 +157,13 @@ plot.graphic <- plot.fit_predictions %>%
 			"T1.glnS" = "#A6CEE3",
 			"T2.glnS" = "#1F78B4",
 			"T1.murA" = "#FDBF6F",
-			"T2.murA" = "#FF7F00")) +
+			"T2.murA" = "#FF7F00",
+			"T1.aroC" = "light grey",
+			"T2.aroC" = "dark grey",
+			"T1.rpmB" = "light grey",
+			"T2.rpmB" = "dark grey",
+			"T1.GO593_00515" = "light grey",
+			"T2.GO593_00515" = "dark grey")) +
 	scale_color_manual(
 		values = c(
 			"T1.nuoB" = "#CAB2D6",
@@ -150,7 +173,13 @@ plot.graphic <- plot.fit_predictions %>%
 			"T1.glnS" = "#A6CEE3",
 			"T2.glnS" = "#1F78B4",
 			"T1.murA" = "#FDBF6F",
-			"T2.murA" = "#FF7F00")) +
+			"T2.murA" = "#FF7F00",
+			"T1.aroC" = "light grey",
+			"T2.aroC" = "dark grey",
+			"T1.rpmB" = "light grey",
+			"T2.rpmB" = "dark grey",
+			"T1.GO593_00515" = "light grey",
+			"T2.GO593_00515" = "dark grey")) +
 	xlab("Knockdown") +
 	ylab("Fitness (Log2)") +
 	doc_theme +
