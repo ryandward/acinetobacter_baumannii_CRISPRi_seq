@@ -135,4 +135,7 @@ model_comparisons <- compare_models(
 	BC.5_model,
 	BC.5_reduced_model)
 
-fwrite(model_comparisons, "Results/hormetic_model_comparisons.tsv", step = "\t")
+closeAllConnections()   # turn off sink FIX LATER
+
+fwrite(model_comparisons, "Results/hormetic_model_comparisons.tsv", sep = "\t")
+
