@@ -129,3 +129,8 @@ save_results(BC.5_model_summary, BC.5_model_predictions, BC.5_model_fit_points,
 
 save_results(BC.5_reduced_summary, BC.5_reduced_predictions, BC.5_reduced_fit_points, 
 	BC.5_reduced_performance, BC.5_reduced_parameters, file_names_reduced)
+
+# Compare the models
+model_comparisons <- compare_models(
+	BC.5_model,
+	BC.5_reduced_model)

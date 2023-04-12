@@ -2,7 +2,7 @@
 # Ryan Ward
 # Tuesday, April 11, 2023
 
-pacman::p_load(lmtest)
+pacman::p_load(lmtest, tidyverse)
 
 L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
@@ -10,8 +10,8 @@ BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 # BC.5 Logistic function model using L.4.parameters and BC.5.parameters
 BC.5.logistic <-
 	function(fixed = c(NA, NA, NA, NA, NA),
-						names = c("b", "c", "d", "e", "f"),
-						...)
+					 names = c("b", "c", "d", "e", "f"),
+					 ...)
 	{
 		numParm <- 5
 		if (!is.character(names) | !(length(names) == numParm)) {
@@ -253,90 +253,81 @@ save_results <- function(
 	fwrite(model_parameters, file.path(output_dir, file_names$model_parameters), sep = "\t")
 }
 
-compare_models <- function(full_model, reduced_model) {
-	
-	# Check if both models have the same unique combinations of gene and condition
-	full_model_combinations <- full_model %>% select(unique_name, condition) %>% distinct()
-	reduced_model_combinations <- reduced_model %>% select(unique_name, condition) %>% distinct()
-	
-	if (!identical(full_model_combinations, reduced_model_combinations)) {
-		stop("The full and reduced models do not have the same unique combinations of genes and conditions.")
-	}
-	
-	# Create a nested data frame for each unique combination of gene and condition
-	all_gene_conditions <- full_model_combinations %>%
-		nest_by(unique_name, condition)
-	
-	# Calculate ANOVA and LRT test results for all genes and conditions
-	results <- all_gene_conditions %>%
-		mutate(
-			HA_fit = list(collect(select(full_model, unique_name, condition, fit))),
-			H0_fit = list(collect(select(reduced_model, unique_name, condition, fit))),
-			anova_result = purrr::map2(HA_fit, H0_fit, ~anova(.x[[1]]$fit[[1]], .y[[1]]$fit[[1]])),
-			lrt_result = purrr::map2(HA_fit, H0_fit, ~lrtest(.x[[1]]$fit[[1]], .y[[1]]$fit[[1]]))
-		) %>%
-		select(-HA_fit, -H0_fit) %>%
-		unnest(cols = c(anova_result, lrt_result))
-	
-	# Extract p-values from the test results and return them in a tidy format
-	p_values <- results %>%
-		mutate(
-			anova_p_value = purrr::map_dbl(anova_result, ~.x[["Pr(>F)"]][2]),
-			lrt_p_value = purrr::map_dbl(lrt_result, ~.x[["Pr(>Chisq)"]][1])
-		) %>%
-		select(unique_name, condition, anova_p_value, lrt_p_value)
-	
-	return(p_values)
-}
 
-
-
-##########################################################################################
-# scratch pad
-
-# Define LRT and ANOVA calculation functions
-calculate_lrt <- function(this.gene, this.condition, this.HA, this.H0) {
+# Modify calculate_lrt function to accept any two models
+calculate_lrt <- function(this.gene, this.condition, filtered_HA, filtered_H0) {
 	
-	# Filter the BC.5.model and LBC.5.reduced data frames for the given gene and condition
-	this.HA <- BC.5_model %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
+	# Get the model fits for the given gene and condition
+	this.HA <- filtered_HA %>%
+		filter(unique_name == this.gene, condition == this.condition) %>%
 		pull(fit)
 	
-	this.H0 <- BC.5_reduced_model %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
+	this.H0 <- filtered_H0 %>%
+		filter(unique_name == this.gene, condition == this.condition) %>%
 		pull(fit)
 	
 	# Perform the likelihood ratio test
 	lrt.result <- lrtest(this.HA[[1]], this.H0[[1]])
 	
-	# Return the likelihood ratio test result
-	# return(lrt.result)
-	return(lrt.result)
+	# Return the likelihood ratio test p-value
+	return(lrt.result$'Pr(>Chisq)'[2])
 }
 
-calculate_anova <- function(this.gene, this.condition, this.HA, this.H0) {
+# Modify calculate_anova function to accept any two models
+calculate_anova <- function(this.gene, this.condition, filtered_HA, filtered_H0) {
 	
-	# Filter the BC.5.model and LBC.5.reduced data frames for the given gene and condition
-	this.HA <- BC.5_model %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
+	# Get the model fits for the given gene and condition
+	this.HA <- filtered_HA %>%
+		filter(unique_name == this.gene, condition == this.condition) %>%
 		pull(fit)
 	
-	this.H0 <- BC.5_reduced_model %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
+	this.H0 <- filtered_H0 %>%
+		filter(unique_name == this.gene, condition == this.condition) %>%
 		pull(fit)
 	
-	# Perform the likelihood ratio test
+	# Perform the likelihood ratio test and suppress the output
+	sink(tempfile())
 	anova.result <- anova(this.HA[[1]], this.H0[[1]])
+	sink()
 	
-	# Return the likelihood ratio test result
-	# return(lrt.result) 
-	return(anova.result)
+	# Restore console output and return the ANOVA p-value
+	return(anova.result$'p value'[2])
+}
+
+compare_models <- function(HA_model, H0_model) {
+	
+	# Get all unique gene and condition combinations from both models
+	HA_gene_condition_combos <- HA_model %>%
+		select(unique_name, condition) %>%
+		distinct()
+	
+	H0_gene_condition_combos <- H0_model %>%
+		select(unique_name, condition) %>%
+		distinct()
+	
+	# Find gene-condition combinations present in both models
+	common_gene_condition_combos <- inner_join(HA_gene_condition_combos, H0_gene_condition_combos, by = c("unique_name", "condition"))
+	
+	# Filter both data frames once
+	filtered_HA <- HA_model %>% select(unique_name, condition, fit)
+	filtered_H0 <- H0_model %>% select(unique_name, condition, fit)
+	
+	# Initialize an empty data frame to store the results
+	results <- tibble(unique_name = character(), condition = character(), lrt_p_value = numeric(), anova_p_value = numeric())
+	
+	# Iterate through each common gene and condition combination
+	for (i in seq_along(common_gene_condition_combos$unique_name)) {
+		this.gene <- common_gene_condition_combos$unique_name[i]
+		this.condition <- common_gene_condition_combos$condition[i]
+		
+		# Calculate LRT and ANOVA p-values
+		lrt_p_value <- calculate_lrt(this.gene, this.condition, filtered_HA, filtered_H0)
+		anova_p_value <- calculate_anova(this.gene, this.condition, filtered_HA, filtered_H0)
+		
+		# Store the p-values
+		results <- results %>%
+			add_row(unique_name = this.gene, condition = this.condition, lrt_p_value = lrt_p_value, anova_p_value = anova_p_value)
+	}
+	
+	return(results)
 }
