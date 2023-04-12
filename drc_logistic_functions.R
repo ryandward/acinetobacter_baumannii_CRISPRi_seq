@@ -2,6 +2,8 @@
 # Ryan Ward
 # Tuesday, April 11, 2023
 
+require(pacman)
+
 pacman::p_load(lmtest, tidyverse, data.table)
 
 p_load(data.table, tidyverse, broom, modelr, Hmisc)
@@ -13,7 +15,11 @@ conflicted::conflicts_prefer(dplyr::select)
 L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
+################################################################################
 # BC.5 Logistic function model using L.4.parameters and BC.5.parameters
+################################################################################
+
+# DRC helper functions
 BC.5.logistic <-
 	function(fixed = c(NA, NA, NA, NA, NA),
 					 names = c("b", "c", "d", "e", "f"),
@@ -34,7 +40,7 @@ BC.5.logistic <-
 		))
 	}
 
-# Brain-Cousens logistic model for hormesis with a linear x
+# Workhorse of the Brain-Cousens logistic model for hormesis with a linear x
 braincousens_logistic <- function(
 		fixed = c(NA, NA, NA, NA, NA),
 		names = c("b", "c", "d", "e", "f"),
@@ -190,6 +196,10 @@ braincousens_logistic <- function(
 	invisible(returnList)
 }
 
+################################################################################
+# Functions to extract and predict based on models
+################################################################################
+
 # Processes mismatches in the model and calculates p-values, tibble and other related variables
 process_mismatches <- function(mismatches) {
 	mismatches %>%
@@ -246,19 +256,9 @@ compute_model_parameters <- function(mismatches) {
 		select(unique_name, condition, term, estimate, std.error, statistic, p.value)
 }
 
-# Saves the results of the analysis, including vulnerability summary, predictions, data points, model performance, and model parameters
-save_results <- function(
-		vuln.summary, fit_predictions, fit_points, model_performance, 
-		model_parameters, file_names, output_dir = "Results") {
-	if (!dir.exists(output_dir)) {dir.create(output_dir)}
-	
-	fwrite(vuln.summary, file.path(output_dir, file_names$vuln_summary), sep = "\t")
-	fwrite(fit_predictions, file.path(output_dir, file_names$fit_predictions))
-	fwrite(fit_points, file.path(output_dir, file_names$fit_points))
-	fwrite(model_performance, file.path(output_dir, file_names$model_performance), sep = "\t")
-	fwrite(model_parameters, file.path(output_dir, file_names$model_parameters), sep = "\t")
-}
-
+################################################################################
+# Functions to compare between models
+################################################################################
 
 # Modify calculate_lrt function to accept any two models
 calculate_lrt <- function(this.gene, this.condition, filtered_HA, filtered_H0) {
@@ -300,6 +300,7 @@ calculate_anova <- function(this.gene, this.condition, filtered_HA, filtered_H0)
 	return(anova.result$'p value'[2])
 }
 
+# Compare between two DRC models
 compare_models <- function(HA_model, H0_model) {
 	
 	# Get all unique gene and condition combinations from both models
@@ -345,4 +346,55 @@ compare_models <- function(HA_model, H0_model) {
 	}
 	
 	return(results)
+}
+
+################################################################################
+# Functions to check, save, and read results
+################################################################################
+
+# Check if all files in the list exist
+check_files_exist <- function(file_names, output_dir = "Results") {
+	all_files_exist <- TRUE
+	for (file_name in file_names) {
+		if (!file.exists(file.path(output_dir, file_name))) {
+			all_files_exist <- FALSE
+			break
+		}
+	}
+	return(all_files_exist)
+}
+
+# Save results function including DRC objects
+save_results <- function(results, file_names, output_dir = "Results") {
+	if (!dir.exists(output_dir)) {dir.create(output_dir)}
+	
+	fwrite(results$vuln.summary, file.path(output_dir, file_names$vuln_summary), sep = "\t")
+	fwrite(results$fit_predictions, file.path(output_dir, file_names$fit_predictions))
+	fwrite(results$fit_points, file.path(output_dir, file_names$fit_points))
+	fwrite(results$model_performance, file.path(output_dir, file_names$model_performance), sep = "\t")
+	fwrite(results$model_parameters, file.path(output_dir, file_names$model_parameters), sep = "\t")
+	saveRDS(results$drc_fits, file.path(output_dir, file_names$drc_fits))
+}
+
+# Read results from the saved files
+read_results <- function(file_names, output_dir = "Results") {
+	vuln.summary <- fread(file.path(output_dir, file_names$vuln_summary), sep = "\t")
+	fit_predictions <- fread(file.path(output_dir, file_names$fit_predictions))
+	fit_points <- fread(file.path(output_dir, file_names$fit_points))
+	model_performance <- fread(file.path(output_dir, file_names$model_performance), sep = "\t")
+	model_parameters <- fread(file.path(output_dir, file_names$model_parameters), sep = "\t")
+	
+	drc_fits <- NULL
+	if (file.exists(file.path(output_dir, file_names$drc_fits))) {
+		drc_fits <- readRDS(file.path(output_dir, file_names$drc_fits))
+	}
+	
+	return(list(
+		vuln.summary = vuln.summary,
+		fit_predictions = fit_predictions,
+		fit_points = fit_points,
+		model_performance = model_performance,
+		model_parameters = model_parameters,
+		drc_fits = drc_fits
+	))
 }
