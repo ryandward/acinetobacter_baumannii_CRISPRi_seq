@@ -1,3 +1,11 @@
+# Load necessary libraries
+library(conflicted)
+library(pacman)
+
+# Use pacman to load the following packages
+p_load(data.table, tidyverse, broom, modelr, Hmisc)
+p_load_current_gh("DoseResponse/drcData", "ryandward/drc", "hrbrmstr/hrbrthemes")
+
 require(conflicted)
 require(pacman)
 

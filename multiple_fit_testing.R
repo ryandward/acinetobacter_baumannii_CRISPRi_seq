@@ -61,95 +61,71 @@ test.genes <- c("murA", "rpmB", "aroC", "GO593_00515", "glnS", "nuoB", "lpxC")
 L.4.parameters <- c("shape", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
-BC.5.model <- mismatches %>%
+BC.5_model <- mismatches %>%
 	# filter(unique_name %in% test.genes) %>%
 	mutate(fit = case_when(
-		response.max > 0 ~ map2(
-			data,
-			response.max,
-			~drm.try(
+		response.max > 0 ~ map2(data, response.max, ~drm.try(
 				data = .x, 
 				LFC.adj ~ y_pred, 
 				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
-				fct = BC.5.logistic(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters)
-			)
-		),
-		response.max < 0 ~ map2(
-			data,
-			response.max,
-			~drm.try(
+				fct = BC.5.logistic(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))),
+		response.max < 0 ~ map2(data, response.max, ~drm.try(
 				data = .x, 
 				LFC.adj ~ y_pred, 
 				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
-				fct = BC.5.logistic(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters)
-			)
-		)
-	))
+				fct = BC.5.logistic(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters)))))
 
-# Define BC.5.model and BC.5.reduced
-BC.5.reduced <- mismatches %>%
+# Define BC.5_model and BC.5_reduced_model
+BC.5_reduced_model <- mismatches %>%
 	# filter(unique_name %in% test.genes) %>%
 	mutate(fit = case_when(
-		response.max > 0 ~ map2(
-			data,
-			response.max,
-			~drm.try(
+		response.max > 0 ~ map2(data, response.max, ~drm.try(
 				data = .x, 
 				LFC.adj ~ y_pred, 
 				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
 				fct = BC.5.logistic(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))),
-		response.max < 0 ~ map2(
-			data,
-			response.max,
-			~drm.try(
+		response.max < 0 ~ map2(data, response.max, ~drm.try(
 				data = .x, 
 				LFC.adj ~ y_pred, 
 				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
 				fct = BC.5.logistic(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters)))))
 
-# Define LRT and ANOVA calculation functions
-calculate_lrt <- function(this.gene, this.condition, this.HA, this.H0) {
-	
-	# Filter the BC.5.model and LBC.5.reduced data frames for the given gene and condition
-	this.HA <- BC.5.model %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
-		pull(fit)
-	
-	this.H0 <- BC.5.reduced %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
-		pull(fit)
-	
-	# Perform the likelihood ratio test
-	lrt.result <- lrtest(this.HA[[1]], this.H0[[1]])
-	
-	# Return the likelihood ratio test result
-	# return(lrt.result)
-	return(lrt.result)
-}
 
-calculate_anova <- function(this.gene, this.condition, this.HA, this.H0) {
-	
-	# Filter the BC.5.model and LBC.5.reduced data frames for the given gene and condition
-	this.HA <- BC.5.model %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
-		pull(fit)
-	
-	this.H0 <- BC.5.reduced %>%
-		filter(unique_name == this.gene) %>%
-		filter(condition == this.condition) %>%
-		select(fit) %>%
-		pull(fit)
-	
-	# Perform the likelihood ratio test
-	anova.result <- anova(this.HA[[1]], this.H0[[1]])
-	
-	# Return the likelihood ratio test result
-	# return(lrt.result) 
-	return(anova.result)
-}
+##########################################################################################
+# Main script for full model
+BC.5_model_processed <- process_mismatches(BC.5_model)
+BC.5_model_summary <- compute_vuln_summary(BC.5_model_processed)
+BC.5_model_predictions <- compute_predictions(BC.5_model_processed)
+BC.5_model_performance <- compute_model_performance(BC.5_model_processed)
+BC.5_model_parameters <- compute_model_parameters(BC.5_model_processed)
+BC.5_model_fit_points <- extract_fit_points(BC.5_model_processed)
+
+# Main script for reduced model
+BC.5_reduced_processed <- process_mismatches(BC.5_reduced_model)
+BC.5_reduced_summary <- compute_vuln_summary(BC.5_reduced_processed)
+BC.5_reduced_predictions <- compute_predictions(BC.5_reduced_processed)
+BC.5_reduced_performance <- compute_model_performance(BC.5_reduced_processed)
+BC.5_reduced_parameters <- compute_model_parameters(BC.5_reduced_processed)
+BC.5_reduced_fit_points <- extract_fit_points(BC.5_reduced_processed)
+
+# Save results for full and reduced models
+file_names_full <- list(
+	vuln_summary = "hormetic_vulnerability_summary_full.tsv.gz",
+	fit_predictions = "hormetic_fit_predictions_full.tsv.gz",
+	fit_points = "hormetic_fit_points_full.tsv.gz",
+	model_performance = "hormetic_performance_full.tsv.gz",
+	model_parameters = "hormetic_parameters_full.tsv.gz")
+
+file_names_reduced <- list(
+	vuln_summary = "hormetic_vulnerability_summary_reduced.tsv.gz",
+	fit_predictions = "hormetic_fit_predictions_reduced.tsv.gz",
+	fit_points = "hormetic_fit_points_reduced.tsv.gz",
+	model_performance = "hormetic_performance_reduced.tsv.gz",
+	model_parameters = "hormetic_parameters_reduced.tsv.gz")
+
+# Save results for full and reduced models
+save_results(BC.5_model_summary, BC.5_model_predictions, BC.5_model_fit_points, 
+	BC.5_model_performance, BC.5_model_parameters, file_names_full)
+
+save_results(BC.5_reduced_summary, BC.5_reduced_predictions, BC.5_reduced_fit_points, 
+	BC.5_reduced_performance, BC.5_reduced_parameters, file_names_reduced)

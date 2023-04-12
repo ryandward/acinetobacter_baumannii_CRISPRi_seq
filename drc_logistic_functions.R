@@ -2,8 +2,13 @@
 # Ryan Ward
 # Tuesday, April 11, 2023
 
+
+L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
+BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
+
+# BC.5 Logistic function model using L.4.parameters and BC.5.parameters
 BC.5.logistic <-
-	function (fixed = c(NA, NA, NA, NA, NA),
+	function(fixed = c(NA, NA, NA, NA, NA),
 						names = c("b", "c", "d", "e", "f"),
 						...)
 	{
@@ -22,8 +27,8 @@ BC.5.logistic <-
 		))
 	}
 
-
-braincousens_logistic <- function (
+# Brain-Cousens logistic model for hormesis with a linear x
+braincousens_logistic <- function(
 		fixed = c(NA, NA, NA, NA, NA),
 		names = c("b", "c", "d", "e", "f"),
 		method = c("1", "2", "3", "4"),
@@ -45,7 +50,7 @@ braincousens_logistic <- function (
 	fct <- function(dose, parm) {
 		parmMat <- matrix(parmVec, nrow(parm), numParm, byrow = TRUE)
 		parmMat[, notFixed] <- parm
-		parmMat[, 2] + (parmMat[, 3] + parmMat[, 5] * dose - parmMat[, 2]) / (1 + exp(parmMat[, 1] * (dose -parmMat[, 4])))
+		parmMat[, 2] + (parmMat[, 3] + parmMat[, 5] * dose - parmMat[, 2]) / (1 + exp(parmMat[, 1] * (dose - parmMat[, 4])))
 	}
 	if (FALSE) {
 		ssfct <- function(dataFra) {
@@ -177,3 +182,110 @@ braincousens_logistic <- function (
 	class(returnList) <- "braincousens_logistic"
 	invisible(returnList)
 }
+
+# Processes mismatches in the model and calculates p-values, tibble and other related variables
+process_mismatches <- function(mismatches) {
+	mismatches %>%
+		filter(!is.na(fit)) %>%
+		mutate(p.vals = map(fit, tidy)) %>%
+		mutate(kd_50.tibble = map(p.vals, ~filter(.x, term == 'kd_50') %>%
+																select(p.value) %>%
+																rename(., vuln.p = p.value))) %>%
+		mutate(vuln.tibble = map2(fit, p.vals, ~augment.try(.x, newdata = .y %>% filter(term == "kd_50") %>% select(estimate)) %>%
+																rename(., vuln.est = .fitted, vuln.kd_50 = estimate))) %>%
+		unnest(vuln.tibble) %>%
+		unnest(kd_50.tibble) %>%
+		select(-c(p.vals)) %>%
+		mutate(Gene = factor(unique_name, levels = unique(interested.genes))) %>%
+		mutate(Condition = factor(condition, levels = unique(interested.conditions)))
+}
+
+# Computes a summary of vulnerability results
+compute_vuln_summary <- function(mismatches) {
+	vuln.summary <- mismatches %>% select(unique_name, condition, vuln.est, vuln.kd_50, vuln.p)
+	vuln.summary <- mismatches %>% select(condition, unique_name, response.max) %>% inner_join(vuln.summary)
+	vuln.summary
+}
+
+# Computes predictions for the fitted model
+compute_predictions <- function(mismatches) {
+	mismatches %>%
+		mutate(predictions = map2(fit, data, ~augment.try(.x, newdata = expand.grid(y_pred = seq(0, max(1, max(.y$y_pred)), length = 250)), conf.int = T, conf.level = 0.90))) %>%
+		select(Gene, Condition, predictions) %>%
+		unnest(predictions)
+}
+
+# Extracts data points from the fitted model
+extract_fit_points <- function(mismatches) {
+	mismatches %>%
+		select(Gene, Condition, data) %>%
+		unnest(data)
+}
+
+# Computes model performance metrics such as AIC, BIC, logLik, and df.residual
+compute_model_performance <- function(mismatches) {
+	mismatches %>%
+		mutate(bayes = map(fit, glance),
+					 bayes = map(bayes, ~mutate(.x, logLik = c(logLik)))) %>%
+		unnest(bayes) %>%
+		select(unique_name, condition, AIC, BIC, logLik, df.residual)
+}
+
+# Computes model parameters and their statistics
+compute_model_parameters <- function(mismatches) {
+	mismatches %>%
+		mutate(perf = map(fit, tidy)) %>%
+		unnest(perf) %>%
+		select(unique_name, condition, term, estimate, std.error, statistic, p.value)
+}
+
+# Saves the results of the analysis, including vulnerability summary, predictions, data points, model performance, and model parameters
+save_results <- function(
+		vuln.summary, fit_predictions, fit_points, model_performance, 
+		model_parameters, file_names, output_dir = "Results") {
+	if (!dir.exists(output_dir)) {dir.create(output_dir)}
+	
+	fwrite(vuln.summary, file.path(output_dir, file_names$vuln_summary), sep = "\t")
+	fwrite(fit_predictions, file.path(output_dir, file_names$fit_predictions))
+	fwrite(fit_points, file.path(output_dir, file_names$fit_points))
+	fwrite(model_performance, file.path(output_dir, file_names$model_performance), sep = "\t")
+	fwrite(model_parameters, file.path(output_dir, file_names$model_parameters), sep = "\t")
+}
+
+# Function to perform ANOVA and LRT tests for all genes and conditions
+compare_models <- function(full_model, reduced_model) {
+	
+	# Check if both models have the same unique combinations of gene and condition
+	full_model_combinations <- full_model %>% select(unique_name, condition) %>% distinct()
+	reduced_model_combinations <- reduced_model %>% select(unique_name, condition) %>% distinct()
+	
+	if (!identical(full_model_combinations, reduced_model_combinations)) {
+		stop("The full and reduced models do not have the same unique combinations of genes and conditions.")
+	}
+	
+	# Create a nested data frame for each unique combination of gene and condition
+	all_gene_conditions <- full_model_combinations %>%
+		nest_by(unique_name, condition)
+	
+	# Calculate ANOVA and LRT test results for all genes and conditions
+	results <- all_gene_conditions %>%
+		mutate(
+			HA_fit = list(collect(select(full_model, unique_name, condition, fit))),
+			H0_fit = list(collect(select(reduced_model, unique_name, condition, fit))),
+			anova_result = purrr::map2(HA_fit, H0_fit, ~anova(.x$fit[[1]], .y$fit[[1]])),
+			lrt_result = purrr::map2(HA_fit, H0_fit, ~lrtest(.x$fit[[1]], .y$fit[[1]]))
+		) %>%
+		select(-HA_fit, -H0_fit) %>%
+		unnest(cols = c(anova_result, lrt_result))
+	
+	# Extract p-values from the test results and return them in a tidy format
+	p_values <- results %>%
+		mutate(
+			anova_p_value = purrr::map_dbl(anova_result, ~.x[["Pr(>F)"]][2]),
+			lrt_p_value = purrr::map_dbl(lrt_result, ~.x[["Pr(>Chisq)"]][1])
+		) %>%
+		select(unique_name, condition, anova_p_value, lrt_p_value)
+	
+	return(p_values)
+}
+
