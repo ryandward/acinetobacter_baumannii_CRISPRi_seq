@@ -2,6 +2,7 @@
 # Ryan Ward
 # Tuesday, April 11, 2023
 
+pacman::p_load(lmtest)
 
 L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
@@ -252,7 +253,6 @@ save_results <- function(
 	fwrite(model_parameters, file.path(output_dir, file_names$model_parameters), sep = "\t")
 }
 
-# Function to perform ANOVA and LRT tests for all genes and conditions
 compare_models <- function(full_model, reduced_model) {
 	
 	# Check if both models have the same unique combinations of gene and condition
@@ -272,8 +272,8 @@ compare_models <- function(full_model, reduced_model) {
 		mutate(
 			HA_fit = list(collect(select(full_model, unique_name, condition, fit))),
 			H0_fit = list(collect(select(reduced_model, unique_name, condition, fit))),
-			anova_result = purrr::map2(HA_fit, H0_fit, ~anova(.x$fit[[1]], .y$fit[[1]])),
-			lrt_result = purrr::map2(HA_fit, H0_fit, ~lrtest(.x$fit[[1]], .y$fit[[1]]))
+			anova_result = purrr::map2(HA_fit, H0_fit, ~anova(.x[[1]]$fit[[1]], .y[[1]]$fit[[1]])),
+			lrt_result = purrr::map2(HA_fit, H0_fit, ~lrtest(.x[[1]]$fit[[1]], .y[[1]]$fit[[1]]))
 		) %>%
 		select(-HA_fit, -H0_fit) %>%
 		unnest(cols = c(anova_result, lrt_result))
@@ -289,3 +289,54 @@ compare_models <- function(full_model, reduced_model) {
 	return(p_values)
 }
 
+
+
+##########################################################################################
+# scratch pad
+
+# Define LRT and ANOVA calculation functions
+calculate_lrt <- function(this.gene, this.condition, this.HA, this.H0) {
+	
+	# Filter the BC.5.model and LBC.5.reduced data frames for the given gene and condition
+	this.HA <- BC.5_model %>%
+		filter(unique_name == this.gene) %>%
+		filter(condition == this.condition) %>%
+		select(fit) %>%
+		pull(fit)
+	
+	this.H0 <- BC.5_reduced_model %>%
+		filter(unique_name == this.gene) %>%
+		filter(condition == this.condition) %>%
+		select(fit) %>%
+		pull(fit)
+	
+	# Perform the likelihood ratio test
+	lrt.result <- lrtest(this.HA[[1]], this.H0[[1]])
+	
+	# Return the likelihood ratio test result
+	# return(lrt.result)
+	return(lrt.result)
+}
+
+calculate_anova <- function(this.gene, this.condition, this.HA, this.H0) {
+	
+	# Filter the BC.5.model and LBC.5.reduced data frames for the given gene and condition
+	this.HA <- BC.5_model %>%
+		filter(unique_name == this.gene) %>%
+		filter(condition == this.condition) %>%
+		select(fit) %>%
+		pull(fit)
+	
+	this.H0 <- BC.5_reduced_model %>%
+		filter(unique_name == this.gene) %>%
+		filter(condition == this.condition) %>%
+		select(fit) %>%
+		pull(fit)
+	
+	# Perform the likelihood ratio test
+	anova.result <- anova(this.HA[[1]], this.H0[[1]])
+	
+	# Return the likelihood ratio test result
+	# return(lrt.result) 
+	return(anova.result)
+}
