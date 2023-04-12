@@ -43,13 +43,15 @@ doc_theme <- theme_ipsum(
 	axis_col = "black")
 
 
-fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
-fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
-vulnerability <- fread("Results/hormetic_vulnerability_summary.tsv.gz")
-model_performance <- fread("Results/hormetic_performance.tsv.gz")
+# fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
+# fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
+# vulnerability <- fread("Results/hormetic_vulnerability_summary.tsv.gz")
+# model_performance <- fread("Results/hormetic_performance.tsv.gz")
 
+full_results <- read_results(file_names_full)
 
-process_data <- function(data) {
+process_data <- function(data_list, data_name) {
+	data <- data_list[[data_name]]
 	data %>%
 		mutate(
 			Timing = case_when(
@@ -65,9 +67,9 @@ process_data <- function(data) {
 		)
 }
 
-plot.fit_predictions <- process_data(fit_predictions)
-plot.fit_points <- process_data(fit_points)
-
+plot.fit_predictions <- process_data(full_results, "fit_predictions")
+plot.fit_points <- process_data(full_results, "fit_points")
+plot.vulnerability <- full_results[['vuln.summary']]
 
 plot_gene_dose_effect <- function(unique_names, conditions, colors) {
 	
@@ -82,7 +84,7 @@ plot_gene_dose_effect <- function(unique_names, conditions, colors) {
 		filter(Gene %in% unique_names) %>%
 		mutate(Gene = factor(Gene, levels = unique(unique_names)))
 	
-	plot.parameters <- vulnerability %>%
+	plot.parameters <- plot.vulnerability %>%
 		filter(unique_name %in% plot.genes) %>% 
 		filter(condition %in% plot.conditions) %>%
 		filter(vuln.p <= 0.05) %>%
