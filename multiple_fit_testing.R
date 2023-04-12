@@ -139,3 +139,7 @@ closeAllConnections()   # turn off sink FIX LATER
 
 fwrite(model_comparisons, "Results/hormetic_model_comparisons.tsv", sep = "\t")
 
+model_comparisons <- inner_join(
+	BC.5_model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik=logLik),
+	BC.5_reduced_performance %>% select(unique_name, condition, logLik) %>% rename(reduced_logLik=logLik)
+	) %>% inner_join(model_comparisons)
