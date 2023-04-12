@@ -320,9 +320,18 @@ compare_models <- function(HA_model, H0_model) {
 		this.gene <- common_gene_condition_combos$unique_name[i]
 		this.condition <- common_gene_condition_combos$condition[i]
 		
-		# Calculate LRT and ANOVA p-values
-		lrt_p_value <- calculate_lrt(this.gene, this.condition, filtered_HA, filtered_H0)
-		anova_p_value <- calculate_anova(this.gene, this.condition, filtered_HA, filtered_H0)
+		# Calculate LRT and ANOVA p-values with error handling
+		lrt_p_value <- tryCatch({
+			calculate_lrt(this.gene, this.condition, filtered_HA, filtered_H0)
+		}, error = function(e) {
+			NA
+		})
+		
+		anova_p_value <- tryCatch({
+			calculate_anova(this.gene, this.condition, filtered_HA, filtered_H0)
+		}, error = function(e) {
+			NA
+		})
 		
 		# Store the p-values
 		results <- results %>%
