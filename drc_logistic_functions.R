@@ -2,7 +2,13 @@
 # Ryan Ward
 # Tuesday, April 11, 2023
 
-pacman::p_load(lmtest, tidyverse)
+pacman::p_load(lmtest, tidyverse, data.table)
+
+p_load(data.table, tidyverse, broom, modelr, Hmisc)
+p_load_current_gh("DoseResponse/drcData", "ryandward/drc", "hrbrmstr/hrbrthemes")
+
+conflicted::conflicts_prefer(dplyr::filter)
+conflicted::conflicts_prefer(dplyr::select)
 
 L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")

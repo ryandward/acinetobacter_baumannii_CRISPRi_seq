@@ -134,3 +134,5 @@ save_results(BC.5_reduced_summary, BC.5_reduced_predictions, BC.5_reduced_fit_po
 model_comparisons <- compare_models(
 	BC.5_model,
 	BC.5_reduced_model)
+
+fwrite(model_comparisons, "Results/hormetic_model_comparisons.tsv", step = "\t")
