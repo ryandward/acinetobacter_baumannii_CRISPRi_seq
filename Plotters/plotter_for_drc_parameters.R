@@ -43,12 +43,22 @@ doc_theme <- theme_ipsum(
 	axis_col = "black")
 
 
-# fit_predictions <- fread("Results/hormetic_fit_predictions.tsv.gz")
-# fit_points <- fread("Results/hormetic_fit_points.tsv.gz")
-# vulnerability <- fread("Results/hormetic_vulnerability_summary.tsv.gz")
-# model_performance <- fread("Results/hormetic_performance.tsv.gz")
+if (!exists("full_results")) {
+	if (exists("file_names_full")) {
+		full_results <- read_results(file_names_full)
+	} else {
+		message("file_names_full not found.")
+	}
+}
 
-full_results <- read_results(file_names_full)
+if (!exists("reduced_results")) {
+	if (exists("file_names_reduced")) {
+		reduced_results <- read_results(file_names_reduced)
+	} else {
+		message("file_names_reduced not found.")
+	}
+}
+
 
 process_data <- function(data_list, data_name) {
 	data <- data_list[[data_name]]
@@ -71,7 +81,10 @@ plot.fit_predictions <- process_data(full_results, "fit_predictions")
 plot.fit_points <- process_data(full_results, "fit_points")
 plot.vulnerability <- full_results[['vuln.summary']]
 
-plot_gene_dose_effect <- function(unique_names, conditions, colors) {
+plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors) {
+	plot.fit_predictions <- process_data(results_data, "fit_predictions")
+	plot.fit_points <- process_data(results_data, "fit_points")
+	plot.vulnerability <- results_data[['vuln.summary']]
 	
 	plot.genes <- unique_names
 	plot.conditions <- conditions
@@ -174,23 +187,37 @@ gene_colors <- c(
 
 # beautiful 
 plot_gene_dose_effect(
+	reduced_results,
 	c("rpmB", "murA", "nuoB", "lpxC"), 
 	c("None_0_T1 - None_0_T0"), 
 	gene_colors)
 
+# not justifiable use, check model comparison results
+# plot_gene_dose_effect(
+# 	full_results,
+# 	c("rpmB", "murA", "nuoB", "lpxC"), 
+# 	c("None_0_T1 - None_0_T0"), 
+# 	gene_colors)
+
+
+
+#lrt p-value = 1.281345e-05
 plot_gene_dose_effect(
+	full_results,
 	c("nuoB"), 
 	c("Rifampicin_0.34_T2 - None_0_T0"), 
 	gene_colors)
 
 # beautiful
 plot_gene_dose_effect(
+	reduced_results,
 	c("glnS"), 
 	c("Imipenem_0.09_T1 - None_0_T0"), 
 	gene_colors)
 
 
  plot_gene_dose_effect(
+ 	full_results,
  	c("lysC", "glnS", "trpS", "tyrS"), 
 	c("Imipenem_0.09_T2 - None_0_T0"), 
  	gene_colors)
