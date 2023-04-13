@@ -44,6 +44,8 @@ tidy.try <- possibly(tidy, otherwise = NA)
 
 # Test genes and parameters
 test.genes <- c("murA", "rpmB", "aroC", "GO593_00515", "glnS", "nuoB", "lpxC")
+test.genes <- c(test.genes, c("rpmF", "glnS", "trpS", "acpT"))
+
 L.4.parameters <- c("shape", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
@@ -66,7 +68,9 @@ mismatches <- melted_results %>%
 			rename(response.max = LFC.adj)) %>%
 	nest(data = c(-condition, -unique_name, -response.max))
 
+
 # Update file_names lists with the new DRC objects entry
+message("Updating file_names lists...\n")
 file_names_full <- list(
 	vuln_summary = "hormetic_vulnerability_summary_full.tsv.gz",
 	fit_predictions = "hormetic_fit_predictions_full.tsv.gz",
@@ -84,82 +88,115 @@ file_names_reduced <- list(
 	model_parameters = "hormetic_parameters_reduced.tsv.gz",
 	drc_fits = "drc_fits_reduced.RDS"
 )
-
-# Full Model
-if (check_files_exist(file_names_full)) {
-	full_results <- read_results(file_names_full)
-} else {
-	total <- length(mismatches$data)
-	count <- 1
-	
-	BC.5_model <- mismatches %>%
-		mutate(fit = map2(data, response.max, ~{
-			result <- if (.y > 0) {
-				drm.try(
-					data = .x, 
-					LFC.adj ~ y_pred, 
-					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-					start = c(1, 0.5, 0),
-					fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
-			} else {
-				drm.try(
-					data = .x, 
-					LFC.adj ~ y_pred, 
-					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-					start = c(1, 0.5, 0),
-					fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
-			}
-			cat(sprintf("\r%d/%d (Full Model)", count, total))
-			count <<- count + 1
-			result
-		}))
-	cat("\n")
-}
-
-# Reduced Model
-if (check_files_exist(file_names_reduced)) {
-	reduced_results <- read_results(file_names_reduced)
-} else {
-	total <- length(mismatches$data)
-	count <- 1
-	
-	BC.5_reduced_model <- mismatches %>%
-		mutate(fit = map2(data, response.max, ~{
-			result <- if (.y > 0) {
-				drm.try(
-					data = .x, 
-					LFC.adj ~ y_pred, 
-					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-					start = c(1, 0.5),
-					fct = BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
-			} else {
-				drm.try(
-					data = .x, 
-					LFC.adj ~ y_pred, 
-					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-					start = c(1, 0.5),
-					fct = BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
-			}
-			cat(sprintf("\r%d/%d (Reduced Model)", count, total))
-			count <<- count + 1
-			result
-		}))
-	cat("\n")
-}
-
+message("File_names lists updated.\n")
 
 ##########################################################################################
 
-message("Beginning to process full model...")
+# Full Model
+message("Checking if full model results are in memory...\n")
+if (exists("full_results")) {
+	message("Full model results found in memory.\n")
+} else {
+	message("Checking if full model results files exist...\n")
+	if (check_files_exist(file_names_full)) {
+		message("Full model results files found. Loading results...\n")
+		full_results <- read_results(file_names_full)
+		message("Full model results loaded successfully.\n")
+	} else {
+		message("Full model results files not found. Proceeding with model fitting...\n")
+		total <- length(mismatches$data)
+		count <- 1
+		
+		BC.5_model <- mismatches %>%
+			mutate(fit = map2(data, response.max, ~{
+				message(sprintf("\rFitting full model: %d/%d", count, total))
+				result <- if (.y > 0) {
+					drm.try(
+						data = .x, 
+						LFC.adj ~ y_pred, 
+						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
+						lowerl = c(-50, 0, -20), upperl = c(50, 5, 20),
+						start = c(1, 0.5, 0),
+						fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
+				} else {
+					drm.try(
+						data = .x, 
+						LFC.adj ~ y_pred, 
+						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
+						lowerl = c(-50, 0, -20), upperl = c(50, 5, 20),
+						start = c(1, 0.5, 0),
+						fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
+				}
+				count <<- count + 1
+				result
+			}))
+		message("\nModel fitting complete.\n")
+	}
+}
 
-if (check_files_exist(file_names_full)) {
+# Reduced Model
+message("Checking if reduced model results are in memory...\n")
+if (exists("reduced_results")) {
+	message("Reduced model results found in memory.\n")
+} else {
+	message("Checking if reduced model results files exist...\n")
+	if (check_files_exist(file_names_reduced)) {
+		message("Reduced model results files found. Loading results...\n")
+		reduced_results <- read_results(file_names_reduced)
+		message("Reduced model results loaded successfully.\n")
+	} else {
+		message("Reduced model results files not found. Proceeding with model fitting...\n")
+		total <- length(mismatches$data)
+		count <- 1
+		
+		BC.5_reduced_model <- mismatches %>%
+			mutate(fit = map2(data, response.max, ~{
+				message(sprintf("\rFitting reduced model: %d/%d", count, total))
+				result <- if (.y > 0) {
+					drm.try(
+						data = .x, 
+						LFC.adj ~ y_pred, 
+						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
+						lowerl = c(-50, 0), upperl = c(50, 5),
+						start = c(1, 0.5),
+						fct = BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
+				} else {
+					drm.try(
+						data = .x, 
+						LFC.adj ~ y_pred, 
+						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
+						lowerl = c(-50, 0), upperl = c(50, 5),
+						start = c(1, 0.5),
+						fct = BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
+				}
+				count <<- count + 1
+				result
+			}))
+		message("\nModel fitting complete.\n")
+	}
+}
+
+						
+
+##########################################################################################
+message("Beginning to process full model...\n")
+
+if (exists("full_results")) {
+	message("Full model results already loaded in memory.\n")
+} else if (check_files_exist(file_names_full)) {
+	message("Loading full model results from disk...\n")
 	full_results <- read_results(file_names_full)
+	message("Full model results loaded successfully.\n")
 } else {
 	message("Processing BC.5_model...")
 	BC.5_model_processed <- process_mismatches(BC.5_model)
 	drc_fits <- BC.5_model_processed %>% select(unique_name, condition, fit)
 	
-	message("Computing results for full model...")
+	message("Computing results for full model...\n")
 	full_results <- list(
 		vuln.summary = compute_vuln_summary(BC.5_model_processed),
 		fit_predictions = compute_predictions(BC.5_model_processed),
@@ -171,17 +208,21 @@ if (check_files_exist(file_names_full)) {
 	save_results(full_results, file_names_full)
 }
 
-message("Full model processed.")
+message("Full model processed.\n")
 
-message("Beginning to process full model...")
-if (check_files_exist(file_names_reduced)) {
+message("Beginning to process reduced model...\n")
+if (exists("reduced_results")) {
+	message("Reduced model results already loaded in memory.\n")
+} else if (check_files_exist(file_names_reduced)) {
+	message("Loading reduced model results from disk...\n")
 	reduced_results <- read_results(file_names_reduced)
+	message("Reduced model results loaded successfully.\n")
 } else {
-	message("Processing BC.5_reduced_model...")
+	message("Processing BC.5_reduced_model...\n")
 	BC.5_reduced_processed <- process_mismatches(BC.5_reduced_model)
 	drc_fits <- BC.5_reduced_processed %>% select(unique_name, condition, fit)
 	
-	message("Computing results for reduced model...")
+	message("Computing results for reduced model...\n")
 	reduced_results <- list(
 		vuln.summary = compute_vuln_summary(BC.5_reduced_processed),
 		fit_predictions = compute_predictions(BC.5_reduced_processed),
@@ -193,22 +234,28 @@ if (check_files_exist(file_names_reduced)) {
 	save_results(reduced_results, file_names_reduced)
 }
 
-message("Reduced model processed.")
+message("Reduced model processed.\n")
 
 
 ################################################################################
-
 # Compare the models
-model_comparisons <- compare_models(
-	BC.5_model,
-	BC.5_reduced_model)
+model_comparisons_file_name <- "hormetic_model_comparisons.tsv"
+check_and_load_model_comparisons(model_comparisons_file_name)
 
-closeAllConnections()   # turn off sink FIX LATER
 
-model_comparisons <- inner_join(
-	full_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik = logLik),
-	reduced_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(reduced_logLik = logLik)
-) %>% inner_join(model_comparisons)
-
-fwrite(model_comparisons, "Results/hormetic_model_comparisons.tsv", sep = "\t")
-
+if (is.null(model_comparisons)) {
+	message("Calculating model comparisons...\n")
+	model_comparisons <- compare_models(
+		full_results$drc_fits,
+		reduced_results$drc_fits
+	)
+	
+	closeAllConnections()  # turn off sink FIX LATER
+	
+	model_comparisons <- inner_join(
+		full_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik = logLik),
+		reduced_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(reduced_logLik = logLik)
+	) %>% inner_join(model_comparisons)
+	
+	fwrite(model_comparisons, file.path("Results", model_comparisons_file_name), sep = "\t")
+}

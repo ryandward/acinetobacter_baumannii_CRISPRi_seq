@@ -121,14 +121,14 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 		geom_vline(
 			data = plot.parameters,
 			aes(xintercept = as.numeric(vuln.kd_50)),
-			linetype = "dashed", 
+			linetype = "dashed",
 			colour = "black",
 			linewidth = 0.25) +
 		geom_hline(
 			data = plot.parameters,
 			aes(yintercept = as.numeric(vuln.est)),
 			colour = "black",
-			linetype = "dashed", 
+			linetype = "dashed",
 			linewidth = 0.25) +
 		geom_line(
 			alpha = 0.50, 
@@ -246,7 +246,13 @@ plot_gene_dose_effect(
 
  plot_gene_dose_effect(
  	full_results,
- 	c("lysC", "glnS", "trpS", "tyrS"), 
- 	c("Meropenem_0.17_T2 - None_0_T0"), 
+ 	c("glnS", "lptB", "ispB", "rho"), 
+ 	c("Imipenem_0.09_T2 - None_0_T0"), 
+ 	gene_colors)
+ 
+ plot_gene_dose_effect(
+ 	full_results,
+ 	c("rpmF", "glnS", "trpS", "acpT"), 
+ 	c("None_0_T2 - None_0_T0"), 
  	gene_colors)
  
