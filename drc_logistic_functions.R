@@ -66,28 +66,16 @@ braincousens_logistic <- function(
 		parmMat[, 2] + (parmMat[, 3] + parmMat[, 5] * dose - parmMat[, 2]) / (1 + exp(parmMat[, 1] * (dose - parmMat[, 4])))
 	}
 	if (FALSE) {
-		ssfct <- function(dataFra) {
-			dose2 <- dataFra[, 1]
-			resp3 <- dataFra[, 2]
-			startVal <- rep(0, numParm)
-			startVal[3] <- max(resp3) + 0.001
-			startVal[2] <- min(resp3) - 0.001
-			startVal[5] <- 0
-			if (length(unique(dose2)) == 1) {
-				return((c(NA, NA, startVal[3], NA, NA))[notFixed])
-			}
-			indexT2 <- (dose2 > 0)
-			if (!any(indexT2)) {
-				return((rep(NA, numParm))[notFixed])
-			}
-			dose3 <- dose2[indexT2]
-			resp3 <- resp3[indexT2]
-			logitTrans <- log((startVal[3] - resp3) / (resp3 -
-																								 	startVal[2] + 0.001))
-			logitFit <- lm(logitTrans ~ log(dose3))
-			startVal[4] <- exp((-coef(logitFit)[1] / coef(logitFit)[2]))
-			startVal[1] <- coef(logitFit)[2]
-			return(startVal[notFixed])
+		ssfct <- function(dframe) {
+			dose <- dframe[, 1]
+			response <- dframe[, 2]
+			
+			b_initial <- 1
+			e_initial <- median(dose)
+			f_initial <- 0
+			
+			initval <- c(b_initial, e_initial, f_initial)
+			return(initval[notFixed])
 		}
 	}
 	if (!is.null(ssfct)) {
@@ -108,8 +96,7 @@ braincousens_logistic <- function(
 		t2 <- exp(parmMat[, 1] * (dose - parmMat[, 4]))
 		t3 <- 1 + t2
 		t4 <- (1 + t2) ^ (-2)
-		cbind(-t1 * t2 * t4, 1 - 1 / t3, 1 / t3, t1 * t2 * parmMat[, 1] * t4, dose /
-						t3)[, notFixed]
+		cbind(-t1 * t2 * t4, 1 - 1 / t3, 1 / t3, t1 * t2 * parmMat[, 1] * t4, dose / t3)[, notFixed]
 	}
 	deriv2 <- NULL
 	edfct <- function(
@@ -142,10 +129,8 @@ braincousens_logistic <- function(
 			c(
 				tempVal * tempVal1 * (log(EDdose) - log(parmVec[4])),
 				-parmVec[5] * EDdose / ((tempVal2) ^ 2),
-				parmVec[5] *
-					EDdose / ((tempVal2) ^ 2),
-				-tempVal * tempVal1 *
-					parmVec[1] / parmVec[4],
+				parmVec[5] * EDdose / ((tempVal2) ^ 2),
+				-tempVal * tempVal1 * parmVec[1] / parmVec[4],
 				-EDdose / tempVal2
 			)
 		derDose <- tempVal * tempVal1 * parmVec[1] / EDdose -
@@ -153,9 +138,7 @@ braincousens_logistic <- function(
 		EDder <- derParm / derDose
 		return(list(EDp, EDder[notFixed]))
 	}
-	maxfct <- function(parm,
-										 lower = 0.001,
-										 upper = 1000) {
+	maxfct <- function(parm, lower = 0.001, upper = 1000) {
 		parmVec[notFixed] <- parm
 		if (parmVec[1] < 1) {
 			stop("Brain-Cousens model with b<1 not meaningful")
@@ -167,13 +150,11 @@ braincousens_logistic <- function(
 			expTerm1 <- parmVec[5] * t
 			expTerm2 <- exp(parmVec[1] * (log(t) - log(parmVec[4])))
 			return(parmVec[5] * (1 + expTerm2) - (parmVec[3] -
-																							parmVec[2] + expTerm1) * expTerm2 * parmVec[1] /
-						 	t)
+																							parmVec[2] + expTerm1) * expTerm2 * parmVec[1] / t)
 		}
 		ED1 <- edfct(parm, 1, lower, upper)[[1]]
 		doseVec <- exp(seq(log(1e-06), log(ED1), length = 100))
-		maxDose <- uniroot(optfct, c((doseVec[optfct(doseVec) >
-																						0])[1], ED1))$root
+		maxDose <- uniroot(optfct, c((doseVec[optfct(doseVec) > 0])[1], ED1))$root
 		return(c(maxDose, fct(maxDose, matrix(
 			parm, 1, length(names)
 		))))
@@ -186,10 +167,8 @@ braincousens_logistic <- function(
 		deriv2 = deriv2,
 		edfct = edfct,
 		maxfct = maxfct,
-		name = ifelse(missing(fctName), as.character(match.call()[[1]]),
-									fctName),
-		text = ifelse(missing(fctText), "Brain-Cousens (hormesis)",
-									fctText),
+		name = ifelse(missing(fctName), as.character(match.call()[[1]]), fctName),
+		text = ifelse(missing(fctText), "Brain-Cousens (hormesis)", fctText),
 		noParm = sum(is.na(fixed))
 	)
 	class(returnList) <- "braincousens_logistic"

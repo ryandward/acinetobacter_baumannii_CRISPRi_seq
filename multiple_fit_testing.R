@@ -1,7 +1,9 @@
 # Load necessary packages
+source("drc_logistic_functions.R")
+
 require(conflicted)
 require(pacman)
-source("drc_logistic_functions.R")
+require(progress)
 
 # Load data
 aba_key <- fread("aba_key.tsv")
@@ -40,8 +42,14 @@ augment.try <- possibly(augment, otherwise = NA)
 glance.try <- possibly(glance, otherwise = NA)
 tidy.try <- possibly(tidy, otherwise = NA)
 
+# Test genes and parameters
+test.genes <- c("murA", "rpmB", "aroC", "GO593_00515", "glnS", "nuoB", "lpxC")
+L.4.parameters <- c("shape", "min_value", "max_value", "kd_50")
+BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
+
 # Estimate dose-response models
 mismatches <- melted_results %>%
+	# filter(unique_name %in% test.genes) %>%
 	filter(y_pred > 0) %>%
 	# mutate(y_pred = case_when(y_pred < 0 ~ 0, TRUE ~ y_pred)) %>%
 	filter(condition %in% interested.conditions) %>%
@@ -57,12 +65,6 @@ mismatches <- melted_results %>%
 			filter(abs(LFC.adj) == max(abs(LFC.adj))) %>%
 			rename(response.max = LFC.adj)) %>%
 	nest(data = c(-condition, -unique_name, -response.max))
-
-# Test genes and parameters
-test.genes <- c("murA", "rpmB", "aroC", "GO593_00515", "glnS", "nuoB", "lpxC")
-L.4.parameters <- c("shape", "min_value", "max_value", "kd_50")
-BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
-
 
 # Update file_names lists with the new DRC objects entry
 file_names_full <- list(
@@ -83,43 +85,68 @@ file_names_reduced <- list(
 	drc_fits = "drc_fits_reduced.RDS"
 )
 
-# Check if full model files exist
+# Full Model
 if (check_files_exist(file_names_full)) {
 	full_results <- read_results(file_names_full)
 } else {
-	# Define BC.5_model
+	total <- length(mismatches$data)
+	count <- 1
+	
 	BC.5_model <- mismatches %>%
-		mutate(fit = case_when(
-			response.max > 0 ~ map2(data, response.max, ~drm.try(
-				data = .x, 
-				LFC.adj ~ y_pred, 
-				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
-				fct = BC.5.logistic(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))),
-			response.max < 0 ~ map2(data, response.max, ~drm.try(
-				data = .x, 
-				LFC.adj ~ y_pred, 
-				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
-				fct = BC.5.logistic(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters)))))
+		mutate(fit = map2(data, response.max, ~{
+			result <- if (.y > 0) {
+				drm.try(
+					data = .x, 
+					LFC.adj ~ y_pred, 
+					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+					start = c(1, 0.5, 0),
+					fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
+			} else {
+				drm.try(
+					data = .x, 
+					LFC.adj ~ y_pred, 
+					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+					start = c(1, 0.5, 0),
+					fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
+			}
+			cat(sprintf("\r%d/%d (Full Model)", count, total))
+			count <<- count + 1
+			result
+		}))
+	cat("\n")
 }
 
-# Check if reduced model files exist
+# Reduced Model
 if (check_files_exist(file_names_reduced)) {
 	reduced_results <- read_results(file_names_reduced)
 } else {
-	# Define BC.5_reduced_model
+	total <- length(mismatches$data)
+	count <- 1
+	
 	BC.5_reduced_model <- mismatches %>%
-		mutate(fit = case_when(
-			response.max > 0 ~ map2(data, response.max, ~drm.try(
-				data = .x, 
-				LFC.adj ~ y_pred, 
-				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
-				fct = BC.5.logistic(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))),
-			response.max < 0 ~ map2(data, response.max, ~drm.try(
-				data = .x, 
-				LFC.adj ~ y_pred, 
-				control = drmc(method = "Nelder-Mead", noMessage = TRUE, maxIt = 50000), 
-				fct = BC.5.logistic(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters)))))
+		mutate(fit = map2(data, response.max, ~{
+			result <- if (.y > 0) {
+				drm.try(
+					data = .x, 
+					LFC.adj ~ y_pred, 
+					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+					start = c(1, 0.5),
+					fct = BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
+			} else {
+				drm.try(
+					data = .x, 
+					LFC.adj ~ y_pred, 
+					control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
+					start = c(1, 0.5),
+					fct = BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
+			}
+			cat(sprintf("\r%d/%d (Reduced Model)", count, total))
+			count <<- count + 1
+			result
+		}))
+	cat("\n")
 }
+
 
 ##########################################################################################
 
@@ -178,9 +205,10 @@ model_comparisons <- compare_models(
 
 closeAllConnections()   # turn off sink FIX LATER
 
+model_comparisons <- inner_join(
+	full_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik = logLik),
+	reduced_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(reduced_logLik = logLik)
+) %>% inner_join(model_comparisons)
+
 fwrite(model_comparisons, "Results/hormetic_model_comparisons.tsv", sep = "\t")
 
-model_comparisons <- inner_join(
-	full_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik=logLik),
-	reduced_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(reduced_logLik=logLik)
-) %>% inner_join(model_comparisons)

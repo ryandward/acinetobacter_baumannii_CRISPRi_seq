@@ -77,9 +77,9 @@ process_data <- function(data_list, data_name) {
 		)
 }
 
-plot.fit_predictions <- process_data(full_results, "fit_predictions")
-plot.fit_points <- process_data(full_results, "fit_points")
-plot.vulnerability <- full_results[['vuln.summary']]
+# plot.fit_predictions <- process_data(full_results, "fit_predictions")
+# plot.fit_points <- process_data(full_results, "fit_points")
+# plot.vulnerability <- full_results[['vuln.summary']]
 
 plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors) {
 	plot.fit_predictions <- process_data(results_data, "fit_predictions")
@@ -173,7 +173,8 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 		doc_theme +
 		theme(legend.position = "none") +
 	facet_wrap(~factor(Gene, levels = unique_names)) + 
-		guides(fill = guide_legend(nrow = 1, byrow = TRUE))
+		guides(fill = guide_legend(nrow = 1, byrow = TRUE)) +
+		ggtitle(conditions)
 	
 	print(plot.graphic)
 }
@@ -208,23 +209,44 @@ plot_gene_dose_effect(
 	c("Rifampicin_0.34_T2 - None_0_T0"), 
 	gene_colors)
 
-# beautiful
+#lrt p-value = 1.281345e-05
 plot_gene_dose_effect(
 	reduced_results,
+	c("nuoB"), 
+	c("None_0_T2 - None_0_T0"), 
+	gene_colors)
+
+
+
+# beautiful
+plot_gene_dose_effect(
+	full_results,
 	c("glnS"), 
-	c("Imipenem_0.09_T1 - None_0_T0"), 
+	c("Imipenem_0.06_T2 - None_0_T0"), 
 	gene_colors)
 
 
  plot_gene_dose_effect(
- 	full_results,
+ 	reduced_results,
  	c("lysC", "glnS", "trpS", "tyrS"), 
 	c("Imipenem_0.09_T2 - None_0_T0"), 
  	gene_colors)
  
  plot_gene_dose_effect(
+ 	full_results,
+ 	c("lysC", "glnS", "trpS", "tyrS"), 
+ 	c("Imipenem_0.09_T2 - None_0_T0"), 
+ 	gene_colors)
+ 
+ plot_gene_dose_effect(
+ 	reduced_results,
  	c("lysC", "glnS", "trpS", "tyrS"), 
  	c("Meropenem_0.17_T2 - None_0_T0"), 
  	gene_colors)
 
+ plot_gene_dose_effect(
+ 	full_results,
+ 	c("lysC", "glnS", "trpS", "tyrS"), 
+ 	c("Meropenem_0.17_T2 - None_0_T0"), 
+ 	gene_colors)
  
