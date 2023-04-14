@@ -228,16 +228,35 @@ check_file_exist <- function(file_path) {
 }
 
 
-check_and_load_model_comparisons <- function(file_name, directory = "Results") {
-	file_path <- file.path(directory, file_name)
-	if (exists("model_comparisons")) {
-		message("Model comparisons found in memory.")
+check_and_load_model_comparisons <- function(file_names, object_name, directory = "Results") {
+	file_path <- file.path(directory, file_names$drc_fits)
+	
+	if (exists(object_name)) {
+		message(paste(object_name, "found in memory."))
 	} else if (check_file_exist(file_path)) {
-		message("Model comparisons file found. Loading from disk...")
-		model_comparisons <<- fread(file_path, sep = "\t")
-		message("Model comparisons loaded successfully.")
+		message(paste(object_name, "file found. Loading from disk..."))
+		assign(object_name, fread(file_path, sep = "\t"), envir = .GlobalEnv)
+		message(paste(object_name, "loaded successfully."))
 	} else {
-		model_comparisons <<- NULL
+		message(paste(object_name, "not found in memory or on disk. Calculating..."))
+		calculate_model_comparisons(full_results, reduced_results, object_name)
 	}
 }
 
+
+calculate_model_comparisons <- function(full_results, reduced_results, object_name) {
+	model_comparisons <- compare_models(
+		full_results$drc_fits,
+		reduced_results$drc_fits
+	)
+	
+	closeAllConnections()  # turn off sink FIX LATER
+	
+	model_comparisons <- inner_join(
+		full_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik = logLik),
+		reduced_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(reduced_logLik = logLik)
+	) %>% inner_join(model_comparisons)
+	
+	assign(object_name, model_comparisons, envir = .GlobalEnv)
+	fwrite(model_comparisons, file_names$drc_fits, sep = "\t")
+}

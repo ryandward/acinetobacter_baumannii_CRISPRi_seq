@@ -117,7 +117,7 @@ if (exists("full_results")) {
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
 						lowerl = c(-50, 0, -20), upperl = c(50, 5, 20),
-						start = c(1, 0.5, 0),
+						start = c(0, 0.5, 0),
 						fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
 				} else {
 					drm.try(
@@ -126,7 +126,7 @@ if (exists("full_results")) {
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
 						lowerl = c(-50, 0, -20), upperl = c(50, 5, 20),
-						start = c(1, 0.5, 0),
+						start = c(0, 0.5, 0),
 						fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
 				}
 				count <<- count + 1
@@ -161,7 +161,7 @@ if (exists("reduced_results")) {
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
 						lowerl = c(-50, 0), upperl = c(50, 5),
-						start = c(1, 0.5),
+						start = c(0, 0.5),
 						fct = BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
 				} else {
 					drm.try(
@@ -170,7 +170,7 @@ if (exists("reduced_results")) {
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
 						lowerl = c(-50, 0), upperl = c(50, 5),
-						start = c(1, 0.5),
+						start = c(0, 0.5),
 						fct = BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
 				}
 				count <<- count + 1
@@ -238,24 +238,49 @@ message("Reduced model processed.\n")
 
 
 ################################################################################
+
 # Compare the models
-model_comparisons_file_name <- "hormetic_model_comparisons.tsv"
-check_and_load_model_comparisons(model_comparisons_file_name)
+file_names <- list(
+	drc_fits = "hormetic_model_comparisons.tsv"
+)
 
+object_name <- "model_comparisons"
+check_and_load_model_comparisons(file_names, object_name)
 
-if (is.null(model_comparisons)) {
-	message("Calculating model comparisons...\n")
-	model_comparisons <- compare_models(
-		full_results$drc_fits,
-		reduced_results$drc_fits
+#################################################################################
+
+# Create responses data frame
+response_data <- full_results$fit_predictions %>%
+	select(Gene, Condition, y_pred, .fitted) %>%
+	rename(unique_name = Gene, condition = Condition, fitted = .fitted) %>%
+	filter(y_pred != 0) %>%
+	group_by(unique_name, condition) %>%
+	summarize(
+		highest_fitted = max(fitted),
+		lowest_fitted = min(fitted),
+		highest_y_pred = y_pred[which.max(fitted)],
+		lowest_y_pred = y_pred[which.min(fitted)],
+		.groups = 'drop'
 	)
-	
-	closeAllConnections()  # turn off sink FIX LATER
-	
-	model_comparisons <- inner_join(
-		full_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik = logLik),
-		reduced_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(reduced_logLik = logLik)
-	) %>% inner_join(model_comparisons)
-	
-	fwrite(model_comparisons, file.path("Results", model_comparisons_file_name), sep = "\t")
-}
+
+# Create intermediate_phenotypes data frame
+intermediate_phenotypes <- response_data %>%
+	inner_join(mismatches %>% select(-data)) %>%
+	mutate(opposite_direction = sign(highest_fitted) != sign(response.max) | sign(lowest_fitted) != sign(response.max)) %>%
+	arrange(highest_y_pred)
+
+# Create filtered_data data frame
+filtered_results <- model_comparisons %>%
+	full_join(full_results$model_parameters %>% filter(term == "hormesis")) %>%
+	filter(p.value < 0.05 & lrt_p_value < 0.05 & anova_p_value < 0.05) %>%
+	inner_join(intermediate_phenotypes) %>%
+	filter(opposite_direction == TRUE)
+
+# Create full_estimates data frame
+full_estimates <- full_results$model_parameters %>% dcast(unique_name + condition ~ term, value.var = "estimate")
+
+# Create hormesis_with_parameters data frame
+hormesis_results <- filtered_results %>%
+	select(-term, -statistic, -std.error, -estimate) %>%
+	rename(hormesis_p_value = p.value) %>%
+	inner_join(full_estimates) %>% tibble
