@@ -116,7 +116,7 @@ if (exists("full_results")) {
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0, -20), upperl = c(50, 5, 20),
+						lowerl = c(-50, 0, -20), upperl = c(50, 2, 20),
 						start = c(0, 0.5, 0),
 						fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
 				} else {
@@ -125,7 +125,7 @@ if (exists("full_results")) {
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0, -20), upperl = c(50, 5, 20),
+						lowerl = c(-50, 0, -20), upperl = c(50, 2, 20),
 						start = c(0, 0.5, 0),
 						fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
 				}
@@ -160,7 +160,7 @@ if (exists("reduced_results")) {
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0), upperl = c(50, 5),
+						lowerl = c(-50, 0), upperl = c(50, 2),
 						start = c(0, 0.5),
 						fct = BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
 				} else {
@@ -169,7 +169,7 @@ if (exists("reduced_results")) {
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0), upperl = c(50, 5),
+						lowerl = c(-50, 0), upperl = c(50, 2),
 						start = c(0, 0.5),
 						fct = BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
 				}

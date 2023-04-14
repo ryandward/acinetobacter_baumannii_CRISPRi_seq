@@ -16,6 +16,7 @@ library(hrbrthemes)
 
 conflicted::conflicts_prefer(dplyr::filter)
 conflicted::conflicts_prefer(dplyr::select)
+conflicted::conflicts_prefer(dplyr::summarize)
 
 L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
