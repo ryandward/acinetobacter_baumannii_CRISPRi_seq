@@ -26,6 +26,8 @@ interested.conditions <- c( # List of conditions
 	"Imipenem_0.06_T2 - None_0_T0",
 	"Imipenem_0.09_T2 - None_0_T0") 
 
+max_y_pred <- aba_key %>% select(y_pred) %>% summarize(max(y_pred, na.rm = TRUE)) %>% as.numeric
+
 # Read results
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 median_melted_results <- fread("Results/median_melted_results.tsv.gz", sep = "\t")
@@ -116,18 +118,18 @@ if (exists("full_results")) {
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0, -20), upperl = c(50, 2, 20),
+						lowerl = c(-Inf, 0, -Inf), upperl = c(Inf, max_y_pred, Inf),
 						start = c(0, 0.5, 0),
-						fct = BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
+						fct = linear_BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
 				} else {
 					drm.try(
 						data = .x, 
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0, -20), upperl = c(50, 2, 20),
+						lowerl = c(-Inf, 0, -Inf), upperl = c(Inf, max_y_pred, Inf),
 						start = c(0, 0.5, 0),
-						fct = BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
+						fct = linear_BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
 				}
 				count <<- count + 1
 				result
@@ -160,18 +162,18 @@ if (exists("reduced_results")) {
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0), upperl = c(50, 2),
+						lowerl = c(-Inf, 0), upperl = c(Inf),
 						start = c(0, 0.5),
-						fct = BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
+						fct = linear_BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
 				} else {
 					drm.try(
 						data = .x, 
 						LFC.adj ~ y_pred, 
 						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
 						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-50, 0), upperl = c(50, 2),
+						lowerl = c(-Inf, 0), upperl = c(Inf, max_y_pred),
 						start = c(0, 0.5),
-						fct = BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
+						fct = linear_BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
 				}
 				count <<- count + 1
 				result
@@ -180,7 +182,7 @@ if (exists("reduced_results")) {
 	}
 }
 
-						
+
 
 ##########################################################################################
 message("Beginning to process full model...\n")
@@ -277,7 +279,7 @@ filtered_results <- model_comparisons %>%
 	filter(opposite_direction == TRUE)
 
 # Create full_estimates data frame
-full_estimates <- full_results$model_parameters %>% dcast(unique_name + condition ~ term, value.var = "estimate")
+full_estimates <- full_results$model_parameters %>% data.table %>% dcast(unique_name + condition ~ term, value.var = "estimate")
 
 # Create hormesis_with_parameters data frame
 hormesis_results <- filtered_results %>%
