@@ -5,7 +5,7 @@ require(conflicted)
 require(pacman)
 require(progress)
 
-# Load data
+# Load data in
 aba_key <- fread("aba_key.tsv")
 
 interested.genes <- fread("curated_names.tsv") %>% pull(unique_name)
