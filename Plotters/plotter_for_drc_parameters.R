@@ -1,4 +1,34 @@
-# Load several packages from CRAN and Bioconductor
+source("drc_logistic_functions.R")
+melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
+median_melted_results <- fread("Results/median_melted_results.tsv.gz", sep = "\t")
+
+doc_theme <- theme_ipsum(
+	base_family = "Arial", 
+	caption_margin = 12,
+	axis_title_size = 12,
+	axis_col = "black")
+
+# Update file_names lists with the new DRC objects entry
+message("Updating file_names lists...\n")
+file_names_full <- list(
+	vuln_summary = "hormetic_vulnerability_summary_full.tsv.gz",
+	fit_predictions = "hormetic_fit_predictions_full.tsv.gz",
+	fit_points = "hormetic_fit_points_full.tsv.gz",
+	model_performance = "hormetic_performance_full.tsv.gz",
+	model_parameters = "hormetic_parameters_full.tsv.gz",
+	drc_fits = "drc_fits_full.RDS"
+)
+
+file_names_reduced <- list(
+	vuln_summary = "hormetic_vulnerability_summary_reduced.tsv.gz",
+	fit_predictions = "hormetic_fit_predictions_reduced.tsv.gz",
+	fit_points = "hormetic_fit_points_reduced.tsv.gz",
+	model_performance = "hormetic_performance_reduced.tsv.gz",
+	model_parameters = "hormetic_parameters_reduced.tsv.gz",
+	drc_fits = "drc_fits_reduced.RDS"
+)
+message("File_names lists updated.\n")
+
 require('pacman')
 p_load(
 	data.table,
@@ -24,11 +54,6 @@ p_load(
 	"tidyverse",
 	"broom",
 	"modelr")
-
-p_load_current_gh(
-	"DoseResponse/drcData",
-	"ryandward/drc",
-	"hrbrmstr/hrbrthemes")
 
 conflicted::conflicts_prefer(
 	gtools::permute,
@@ -205,7 +230,7 @@ plot_gene_dose_effect(
 #lrt p-value = 1.281345e-05
 plot_gene_dose_effect(
 	full_results,
-	c("nuoB"), 
+	c("nuoB", "nuoK", "nuoD", "wzx"), 
 	c("Rifampicin_0.34_T2 - None_0_T0"), 
 	gene_colors)
 
@@ -251,8 +276,22 @@ plot_gene_dose_effect(
  	gene_colors)
  
  plot_gene_dose_effect(
- 	full_results,
+ 	reduced_results,
  	c("rpmF", "glnS", "trpS", "acpT"), 
  	c("None_0_T2 - None_0_T0"), 
  	gene_colors)
+ 
+ plot_gene_dose_effect(
+ 	full_results,
+ 	c("GO593_13220", "glnS", "lysC"), 
+ 	c("Meropenem_0.11_T2 - None_0_T0"), 
+ 	gene_colors)
+ 
+ 
+ plot_gene_dose_effect(
+ 	full_results,
+ 	c("glnS", "nuoB", "parB", "rho"), 
+ 	c("Imipenem_0.09_T2 - None_0_T0"), 
+ 	gene_colors)
+ 
  

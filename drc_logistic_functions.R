@@ -4,10 +4,10 @@
 
 require(pacman)
 
-pacman::p_load(lmtest, tidyverse, data.table)
+pacman::p_load(purrr, lmtest, tidyverse, data.table, data.table, tidyverse, broom, modelr, Hmisc, R.utils)
+p_load_current_gh("DoseResponse/drcData", "hrbrmstr/hrbrthemes")
+p_load_current_gh("ryandward/drc", "jokergoo/ComplexHeatmap")
 
-p_load(data.table, tidyverse, broom, modelr, Hmisc)
-p_load_current_gh("DoseResponse/drcData", "ryandward/drc", "hrbrmstr/hrbrthemes")
 
 # Load packages
 library(drcData)
@@ -18,25 +18,21 @@ conflicted::conflicts_prefer(dplyr::filter)
 conflicted::conflicts_prefer(dplyr::select)
 conflicted::conflicts_prefer(dplyr::summarize)
 
-L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
-BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
 ################################################################################
 # BC.5 Logistic function model using L.4.parameters and BC.5.parameters
 ###############################################################################
 
-linear_BC.5 <- function (fixed = c(NA, NA, NA, NA, NA), names = c("b", "c", "d", "e", "f")) 
-{
+linear_BC.5 <- function(
+		fixed = c(NA, NA, NA, NA, NA), 
+		names = c("b", "c", "d", "e", "f")){
 	return(linear_braincousens(fixed = fixed, names = names))
 }
 
-linear_braincousens <- function(
-		fixed = c(NA, NA, NA, NA, NA),
-		names = c("b", "c", "d", "e", "f"),
-		method = c("1", "2", "3", "4"),
-		ssfct = NULL,
-		fctName,
-		fctText) {
+linear_braincousens <- function (fixed = c(NA, NA, NA, NA, NA), names = c("b", "c", 
+																																					"d", "e", "f"), method = c("1", "2", "3", "4"), ssfct = NULL, 
+																 fctName, fctText) 
+{
 	numParm <- 5
 	if (!is.character(names) | !(length(names) == numParm)) {
 		stop("Not correct 'names' argument")
@@ -52,19 +48,33 @@ linear_braincousens <- function(
 	fct <- function(dose, parm) {
 		parmMat <- matrix(parmVec, nrow(parm), numParm, byrow = TRUE)
 		parmMat[, notFixed] <- parm
-		parmMat[, 2] + (parmMat[, 3] + parmMat[, 5] * dose - parmMat[, 2]) / (1 + exp(parmMat[, 1] * (dose - parmMat[, 4])))
+		parmMat[, 2] + (parmMat[, 3] + parmMat[, 5] * dose - 
+											parmMat[, 2])/(1 + exp(parmMat[, 1] * (dose - 
+																														 	parmMat[, 4])))
 	}
 	if (FALSE) {
-		ssfct <- function(dframe) {
-			dose <- dframe[, 1]
-			response <- dframe[, 2]
-			
-			b_initial <- 1
-			e_initial <- median(dose)
-			f_initial <- 0
-			
-			initval <- c(b_initial, e_initial, f_initial)
-			return(initval[notFixed])
+		ssfct <- function(dataFra) {
+			dose2 <- dataFra[, 1]
+			resp3 <- dataFra[, 2]
+			startVal <- rep(0, numParm)
+			startVal[3] <- max(resp3) + 0.001
+			startVal[2] <- min(resp3) - 0.001
+			startVal[5] <- 0
+			if (length(unique(dose2)) == 1) {
+				return((c(NA, NA, startVal[3], NA, NA))[notFixed])
+			}
+			indexT2 <- (dose2 > 0)
+			if (!any(indexT2)) {
+				return((rep(NA, numParm))[notFixed])
+			}
+			dose3 <- dose2[indexT2]
+			resp3 <- resp3[indexT2]
+			logitTrans <- log((startVal[3] - resp3)/(resp3 - 
+																							 	startVal[2] + 0.001))
+			logitFit <- lm(logitTrans ~ dose3)
+			startVal[4] <- (-coef(logitFit)[1]/coef(logitFit)[2])
+			startVal[1] <- coef(logitFit)[2]
+			return(startVal[notFixed])
 		}
 	}
 	if (!is.null(ssfct)) {
@@ -84,47 +94,37 @@ linear_braincousens <- function(
 		t1 <- parmMat[, 3] - parmMat[, 2] + parmMat[, 5] * dose
 		t2 <- exp(parmMat[, 1] * (dose - parmMat[, 4]))
 		t3 <- 1 + t2
-		t4 <- (1 + t2) ^ (-2)
-		cbind(-t1 * t2 * t4, 1 - 1 / t3, 1 / t3, t1 * t2 * parmMat[, 1] * t4, dose / t3)[, notFixed]
+		t4 <- (1 + t2)^(-2)
+		cbind(-t1 * t2 * t4, 1 - 1/t3, 1/t3, t1 * t2 * parmMat[, 1] * t4, dose/t3)[, notFixed]
 	}
 	deriv2 <- NULL
-	edfct <- function(
-		parm,
-		respl,
-		reference,
-		type,
-		lower = 0.001,
-		upper = 1000,
-		...) {
+	edfct <- function(parm, respl, reference, type, lower = 0.001, 
+										upper = 1000, ...) {
 		interval <- c(lower, upper)
 		parmVec[notFixed] <- parm
 		p <- EDhelper(parmVec, respl, reference, type)
-		tempVal <- (100 - p) / 100
+		tempVal <- (100 - p)/100
 		helpEqn <- function(dose) {
-			expVal <- exp(parmVec[1] * (log(dose) - log(parmVec[4])))
-			parmVec[5] * (1 + expVal * (1 - parmVec[1])) - 
-				(parmVec[3] - parmVec[2]) * expVal * parmVec[1] / dose
+			expVal <- exp(parmVec[1] * (dose - parmVec[4]))
+			parmVec[5] * (1 + expVal * (1 - parmVec[1])) - (parmVec[3] - 
+																												parmVec[2]) * expVal * parmVec[1]/dose
 		}
 		maxAt <- uniroot(helpEqn, interval)$root
 		eqn <- function(dose) {
-			tempVal * (1 + exp(parmVec[1] * (log(dose) - log(parmVec[4])))) -
-				(1 + parmVec[5] * dose / (parmVec[3] - parmVec[2]))
+			tempVal * (1 + exp(parmVec[1] * (dose - parmVec[4]))) - 
+				(1 + parmVec[5] * dose/(parmVec[3] - parmVec[2]))
 		}
 		EDp <- uniroot(eqn, lower = maxAt, upper = upper)$root
 		EDdose <- EDp
-		tempVal1 <- exp(parmVec[1] * (log(EDdose) - log(parmVec[4])))
+		tempVal1 <- exp(parmVec[1] * (EDdose - parmVec[4]))
 		tempVal2 <- parmVec[3] - parmVec[2]
-		derParm <-
-			c(
-				tempVal * tempVal1 * (log(EDdose) - log(parmVec[4])),
-				-parmVec[5] * EDdose / ((tempVal2) ^ 2),
-				parmVec[5] * EDdose / ((tempVal2) ^ 2),
-				-tempVal * tempVal1 * parmVec[1] / parmVec[4],
-				-EDdose / tempVal2
-			)
-		derDose <- tempVal * tempVal1 * parmVec[1] / EDdose -
-			parmVec[5] / tempVal2
-		EDder <- derParm / derDose
+		derParm <- c(tempVal * tempVal1 * (EDdose - parmVec[4]), 
+								 -parmVec[5] * EDdose/((tempVal2)^2), parmVec[5] * 
+								 	EDdose/((tempVal2)^2), -tempVal * tempVal1 * 
+								 	parmVec[1], -EDdose/tempVal2)
+		derDose <- tempVal * tempVal1 * parmVec[1] - 
+			parmVec[5]/tempVal2
+		EDder <- derParm/derDose
 		return(list(EDp, EDder[notFixed]))
 	}
 	maxfct <- function(parm, lower = 0.001, upper = 1000) {
@@ -137,32 +137,25 @@ linear_braincousens <- function(
 		}
 		optfct <- function(t) {
 			expTerm1 <- parmVec[5] * t
-			expTerm2 <- exp(parmVec[1] * (log(t) - log(parmVec[4])))
-			return(parmVec[5] * (1 + expTerm2) - (parmVec[3] -
-																							parmVec[2] + expTerm1) * expTerm2 * parmVec[1] / t)
+			expTerm2 <- exp(parmVec[1] * (t - parmVec[4]))
+			return(parmVec[5] * (1 + expTerm2) - (parmVec[3] - 
+																							parmVec[2] + expTerm1) * expTerm2 * parmVec[1]/t)
 		}
 		ED1 <- edfct(parm, 1, lower, upper)[[1]]
 		doseVec <- exp(seq(log(1e-06), log(ED1), length = 100))
-		maxDose <- uniroot(optfct, c((doseVec[optfct(doseVec) > 0])[1], ED1))$root
-		return(c(maxDose, fct(maxDose, matrix(
-			parm, 1, length(names)
-		))))
+		maxDose <- uniroot(optfct, c((doseVec[optfct(doseVec) > 
+																						0])[1], ED1))$root
+		return(c(maxDose, fct(maxDose, matrix(parm, 1, length(names)))))
 	}
-	returnList <- list(
-		fct = fct,
-		ssfct = ssfct,
-		names = names,
-		deriv1 = deriv1,
-		deriv2 = deriv2,
-		edfct = edfct,
-		maxfct = maxfct,
-		name = ifelse(missing(fctName), as.character(match.call()[[1]]), fctName),
-		text = ifelse(missing(fctText), "Brain-Cousens (hormesis)", fctText),
-		noParm = sum(is.na(fixed))
-	)
+	returnList <- list(fct = fct, ssfct = ssfct, names = names, 
+										 deriv1 = deriv1, deriv2 = deriv2, edfct = edfct, maxfct = maxfct, 
+										 name = ifelse(missing(fctName), as.character(match.call()[[1]]), 
+										 							fctName), text = ifelse(missing(fctText), "Brain-Cousens (hormesis)", 
+										 																			fctText), noParm = sum(is.na(fixed)))
 	class(returnList) <- "linear_braincousens"
 	invisible(returnList)
 }
+
 
 
 ################################################################################
@@ -187,30 +180,30 @@ process_mismatches <- function(mismatches) {
 }
 
 # Computes a summary of vulnerability results
-compute_vuln_summary <- function(mismatches) {
-	vuln.summary <- mismatches %>% select(unique_name, condition, vuln.est, vuln.kd_50, vuln.p)
-	vuln.summary <- mismatches %>% select(condition, unique_name, response.max) %>% inner_join(vuln.summary)
+compute_vuln_summary <- function(processed_results) {
+	vuln.summary <- processed_results %>% select(unique_name, condition, vuln.est, vuln.kd_50, vuln.p)
+	vuln.summary <- processed_results %>% select(condition, unique_name, response.max) %>% inner_join(vuln.summary)
 	vuln.summary
 }
 
 # Computes predictions for the fitted model
-compute_predictions <- function(mismatches) {
-	mismatches %>%
-		mutate(predictions = map2(fit, data, ~augment.try(.x, newdata = expand.grid(y_pred = seq(0, max(1, max(.y$y_pred)), length = 250)), conf.int = T, conf.level = 0.90))) %>%
+compute_predictions <- function(processed_results) {
+	processed_results %>%
+		mutate(predictions = map2(fit, data, ~augment.try(.x, newdata = expand.grid(y_pred = seq(0, max(1, max(.y$y_pred)), length = 100)), conf.int = T, conf.level = 0.90))) %>%
 		select(Gene, Condition, predictions) %>%
 		unnest(predictions)
 }
 
 # Extracts data points from the fitted model
-extract_fit_points <- function(mismatches) {
-	mismatches %>%
+extract_fit_points <- function(processed_results) {
+	processed_results %>%
 		select(Gene, Condition, data) %>%
 		unnest(data)
 }
 
 # Computes model performance metrics such as AIC, BIC, logLik, and df.residual
-compute_model_performance <- function(mismatches) {
-	mismatches %>%
+compute_model_performance <- function(processed_results) {
+	processed_results %>%
 		mutate(bayes = map(fit, glance),
 					 bayes = map(bayes, ~mutate(.x, logLik = c(logLik)))) %>%
 		unnest(bayes) %>%
@@ -218,11 +211,17 @@ compute_model_performance <- function(mismatches) {
 }
 
 # Computes model parameters and their statistics
-compute_model_parameters <- function(mismatches) {
-	mismatches %>%
+compute_model_parameters <- function(processed_results) {
+	processed_results %>%
 		mutate(perf = map(fit, tidy)) %>%
 		unnest(perf) %>%
-		select(unique_name, condition, term, estimate, std.error, statistic, p.value)
+		select(unique_name, condition, term, estimate, std.error, statistic, p.value) %>%
+		mutate(
+			estimate = round(estimate, 3),
+			std.error = round(std.error, 3),
+			statistic = round(statistic, 3),
+			p.value = round(p.value, 3)
+		)
 }
 
 ################################################################################
@@ -333,6 +332,19 @@ check_files_exist <- function(file_names, output_dir = "Results") {
 	return(all_files_exist)
 }
 
+
+# Function to check if all files in the list exist, excluding the last one (drc_fits)
+check_processed_files_exist <- function(file_names, output_dir = "Results") {
+	existing_files <- list()
+	for (i in 1:(length(file_names) - 1)) {
+		if (file.exists(file.path(output_dir, file_names[[i]]))) {
+			existing_files[[i]] <- file_names[[i]]
+		}
+	}
+	return(existing_files)
+}
+
+
 # Save results function including DRC objects
 save_results <- function(results, file_names, output_dir = "Results") {
 	if (!dir.exists(output_dir)) {dir.create(output_dir)}
@@ -342,11 +354,11 @@ save_results <- function(results, file_names, output_dir = "Results") {
 	fwrite(results$fit_points, file.path(output_dir, file_names$fit_points))
 	fwrite(results$model_performance, file.path(output_dir, file_names$model_performance), sep = "\t")
 	fwrite(results$model_parameters, file.path(output_dir, file_names$model_parameters), sep = "\t")
-	saveRDS(results$drc_fits, file.path(output_dir, file_names$drc_fits))
+	# saveRDS(results$drc_fits, file.path(output_dir, file_names$drc_fits))
 }
 
 # Read results from the saved files
-read_results <- function(file_names, output_dir = "Results") {
+read_results <- function(file_names, output_dir = "Results", exclude_drc_fits = FALSE) {
 	vuln.summary <- fread(file.path(output_dir, file_names$vuln_summary), sep = "\t")
 	fit_predictions <- fread(file.path(output_dir, file_names$fit_predictions))
 	fit_points <- fread(file.path(output_dir, file_names$fit_points))
@@ -354,7 +366,7 @@ read_results <- function(file_names, output_dir = "Results") {
 	model_parameters <- fread(file.path(output_dir, file_names$model_parameters), sep = "\t")
 	
 	drc_fits <- NULL
-	if (file.exists(file.path(output_dir, file_names$drc_fits))) {
+	if (!exclude_drc_fits && file.exists(file.path(output_dir, file_names$drc_fits))) {
 		drc_fits <- readRDS(file.path(output_dir, file_names$drc_fits))
 	}
 	
@@ -367,6 +379,7 @@ read_results <- function(file_names, output_dir = "Results") {
 		drc_fits = drc_fits
 	))
 }
+
 
 check_file_exist <- function(file_path) {
 	return(file.exists(file_path))

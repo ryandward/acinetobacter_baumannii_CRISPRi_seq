@@ -10,7 +10,8 @@ aba_key <- fread("aba_key.tsv")
 
 interested.genes <- fread("curated_names.tsv") %>% pull(unique_name)
 
-interested.conditions <- c( # List of conditions
+interested.conditions <- c( 
+	# List of conditions that make sense to analyze, i.e., all versus T0 without induction.
 	"None_0_T1 - None_0_T0",
 	"None_0_T2 - None_0_T0",
 	"Colistin_0.44_T1 - None_0_T0",
@@ -24,8 +25,9 @@ interested.conditions <- c( # List of conditions
 	"Imipenem_0.06_T1 - None_0_T0",
 	"Imipenem_0.09_T1 - None_0_T0",
 	"Imipenem_0.06_T2 - None_0_T0",
-	"Imipenem_0.09_T2 - None_0_T0") 
+	"Imipenem_0.09_T2 - None_0_T0")
 
+# The maximum knockdown dose provided by the system
 max_y_pred <- aba_key %>% select(y_pred) %>% summarize(max(y_pred, na.rm = TRUE)) %>% as.numeric
 
 # Read results
@@ -41,8 +43,9 @@ melted_results[aba_key, on = .(spacer), y_pred := y_pred]
 # Define error handling functions
 drm.try <- possibly(drm, otherwise = NA)
 augment.try <- possibly(augment, otherwise = NA)
-glance.try <- possibly(glance, otherwise = NA)
+glance.try <- possibly(glance, otherwise = tibble(logLik = NA_real_))
 tidy.try <- possibly(tidy, otherwise = NA)
+
 
 # Test genes and parameters
 test.genes <- c("murA", "rpmB", "aroC", "GO593_00515", "glnS", "nuoB", "lpxC")
@@ -94,95 +97,228 @@ message("File_names lists updated.\n")
 
 ##########################################################################################
 
-# Full Model
-message("Checking if full model results are in memory...\n")
-if (exists("full_results")) {
-	message("Full model results found in memory.\n")
-} else {
-	message("Checking if full model results files exist...\n")
-	if (check_files_exist(file_names_full)) {
-		message("Full model results files found. Loading results...\n")
-		full_results <- read_results(file_names_full)
-		message("Full model results loaded successfully.\n")
+# L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
+# Define the parameter names for the BC.5 model
+BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
+
+# This function creates constraints for the model parameters.
+# It takes four lists as input: fixed_params, lowerl_params, upperl_params, and start_params.
+# fixed_params: Parameters with fixed values.
+# lowerl_params: Parameters with lower limits.
+# upperl_params: Parameters with upper limits.
+# start_params: Parameters with starting values for optimization.
+create_constraints <- function(fixed_params, lowerl_params, upperl_params, start_params) {
+	param_names <- BC.5.parameters
+	
+	# Initialize the constraints and start values with default values
+	fixed_constraints <- setNames(rep(NA, length(param_names)), param_names)
+	lowerl_constraints <- setNames(rep(-Inf, length(param_names)), param_names)
+	upperl_constraints <- setNames(rep(Inf, length(param_names)), param_names)
+	start_values <- setNames(rep(NA, length(param_names)), param_names)
+	
+	# Update the constraints and start values with the input values
+	fixed_constraints[names(fixed_params)] <- fixed_params
+	lowerl_constraints[names(lowerl_params)] <- lowerl_params
+	upperl_constraints[names(upperl_params)] <- upperl_params
+	start_values[names(start_params)] <- start_params
+	
+	# Remove fixed parameters from the other constraint lists
+	non_fixed_names <- setdiff(param_names, names(fixed_params))
+	
+	# Return the final constraints and start values
+	return(list(fixed = unlist(fixed_constraints),
+							lowerl = unlist(lowerl_constraints[non_fixed_names]),
+							upperl = unlist(upperl_constraints[non_fixed_names]),
+							start = unlist(start_values[non_fixed_names])))
+}
+
+# This function returns the model constraints based on the model number and response_max.
+# model_number: An integer representing the model type (1, 2, 3, or 4).
+# response_max: The maximum response value for the data.
+get_model_constraints <- function(model_number, response_max) {
+	if (model_number == 1) {
+		# Model 1: Positive response with a lower limit of 0 for the response.
+		# min_value is fixed at 0, which implies that the response starts at 0 and increases.
+		fixed_params = list(min_value = 0)
+		lowerl_params = list(max_value = 0, kd_50 = 0)
+		upperl_params = list(shape = 0, max_value = response_max, kd_50 = max_y_pred)
+		start_params = list(shape = 0, max_value = response_max, kd_50 = 0.5, hormesis = 0)
+	} else if (model_number == 2) {
+		# Model 2: Negative response with an upper limit of 0 for the response.
+		# max_value is fixed at 0, which implies that the response starts at a high level and decreases.
+		fixed_params = list(max_value = 0)
+		lowerl_params = list(shape = 0, min_value = response_max, kd_50 = 0)
+		upperl_params = list(min_value = 0, kd_50 = max_y_pred)
+		start_params = list(shape = 0, min_value = response_max, kd_50 = 0.5, hormesis = 0)
+	} else if (model_number == 3) {
+		# Model 3: Positive response without hormesis.
+		# min_value and hormesis are fixed at 0, which implies that the response starts at 0 and increases,
+		# and there is no hormesis effect.
+		fixed_params = list(min_value = 0, hormesis = 0)
+		lowerl_params = list(max_value = 0, kd_50 = 0)
+		upperl_params = list(shape = 0, max_value = response_max, kd_50 = max_y_pred)
+		start_params = list(shape = 0, max_value = response_max, kd_50 = 0.5)
 	} else {
-		message("Full model results files not found. Proceeding with model fitting...\n")
-		total <- length(mismatches$data)
+		# Model 4: Negative response without hormesis.
+		# max_value and hormesis are fixed at 0, which implies that the response starts at a high level and decreases,
+		# and there is no hormesis effect.
+		fixed_params = list(max_value = 0, hormesis = 0)
+		lowerl_params = list(shape = 0, min_value = response_max, kd_50 = 0)
+		upperl_params = list(min_value = 0, kd_50 = max_y_pred)
+		start_params = list(shape = 0, min_value = response_max, kd_50 = 0.5)
+	}
+	return(create_constraints(fixed_params, lowerl_params, upperl_params, start_params))
+}
+
+# Check, load, or calculate the models
+
+message("Checking if BC.5_model results are in memory...\n")
+if (exists("BC.5_model")) {
+	message("BC.5_model results found in memory.\n")
+} else {
+	message("Checking if BC.5_model results files exist...\n")
+	if (check_files_exist(file_names_full)) {
+		message("BC.5_model results files found. Loading results...\n")
+		BC.5_model <- read_results(file_names_full)
+		message("BC.5_model results loaded successfully.\n")
+	} else {
+		message("BC.5_model results files not found. Proceeding with model fitting...\n")
+		total <- length(mismatches$data) * 2
 		count <- 1
 		
 		BC.5_model <- mismatches %>%
-			mutate(fit = map2(data, response.max, ~{
-				message(sprintf("\rFitting full model: %d/%d", count, total))
-				result <- if (.y > 0) {
-					drm.try(
-						data = .x, 
-						LFC.adj ~ y_pred, 
-						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-Inf, 0, -Inf), upperl = c(Inf, max_y_pred, Inf),
-						start = c(0, 0.5, 0),
-						fct = linear_BC.5(fixed = c(NA, 0, .y, NA, NA), names = BC.5.parameters))
-				} else {
-					drm.try(
-						data = .x, 
-						LFC.adj ~ y_pred, 
-						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-Inf, 0, -Inf), upperl = c(Inf, max_y_pred, Inf),
-						start = c(0, 0.5, 0),
-						fct = linear_BC.5(fixed = c(NA, .y, 0, NA, NA), names = BC.5.parameters))
-				}
-				count <<- count + 1
-				result
-			}))
-		message("\nModel fitting complete.\n")
+			mutate(
+				fit_model_1 = map2(data, response.max, ~{
+					cat(sprintf("\rFitting Model 1 and 2: %d/%d... ", count, total))
+					model_constraints_1 <- get_model_constraints(1, .y)
+					result <- drm.try(
+						data = .x,
+						LFC.adj ~ y_pred,
+						control = drmc(method = "L-BFGS-B", maxIt = 1e8, relTol = 1e-25),
+						lowerl = unlist(model_constraints_1$lowerl),
+						upperl = unlist(model_constraints_1$upperl),
+						start = unlist(model_constraints_1$start),
+						fct = BC.5(fixed = unlist(model_constraints_1$fixed), names = BC.5.parameters))
+					count <<- count + 1
+					result
+				}),
+				fit_model_2 = map2(data, response.max, ~{
+					cat(sprintf("\rFitting Model 1 and 2: %d/%d... ", count, total))
+					model_constraints_2 <- get_model_constraints(2, .y)
+					result <- drm.try(
+						data = .x,
+						LFC.adj ~ y_pred,
+						control = drmc(method = "L-BFGS-B", maxIt = 1e8, relTol = 1e-25),
+						lowerl = unlist(model_constraints_2$lowerl),
+						upperl = unlist(model_constraints_2$upperl),
+						start = unlist(model_constraints_2$start),
+						fct = BC.5(fixed = unlist(model_constraints_2$fixed), names = BC.5.parameters))
+					count <<- count + 1
+					result
+				})
+			)
+
+		
+		
+		BC.5_model_comparison <- BC.5_model %>%
+			mutate(
+				logLik_model_1 = map_dbl(fit_model_1, ~glance.try(.x)$logLik),
+				logLik_model_2 = map_dbl(fit_model_2, ~glance.try(.x)$logLik),
+				better_model = case_when(
+					is.na(logLik_model_1) & is.na(logLik_model_2) ~ NA_character_,
+					is.na(logLik_model_1) ~ "model_2",
+					is.na(logLik_model_2) ~ "model_1",
+					logLik_model_1 > logLik_model_2 ~ "model_1",
+					TRUE ~ "model_2"
+				)
+			) %>%
+			select(unique_name, condition, logLik_model_1, logLik_model_2, better_model)
+		
+		BC.5_model <- BC.5_model %>%
+			mutate(
+				fit = if_else(
+					BC.5_model_comparison$better_model == "model_1",
+					fit_model_1,
+					fit_model_2
+				)
+			) %>% select(-fit_model_1, -fit_model_2)
+		message("...Done!")
 	}
 }
 
-# Reduced Model
-message("Checking if reduced model results are in memory...\n")
-if (exists("reduced_results")) {
-	message("Reduced model results found in memory.\n")
+message("Checking if BC.5_reduced_model results are in memory...\n")
+if (exists("BC.5_reduced_model")) {
+	message("BC.5_reduced_model results found in memory.\n")
 } else {
-	message("Checking if reduced model results files exist...\n")
+	message("Checking if BC.5_reduced_model results files exist...\n")
 	if (check_files_exist(file_names_reduced)) {
-		message("Reduced model results files found. Loading results...\n")
-		reduced_results <- read_results(file_names_reduced)
-		message("Reduced model results loaded successfully.\n")
+		message("BC.5_reduced_model results files found. Loading results...\n")
+		BC.5_reduced_model <- read_results(file_names_reduced)
+		message("BC.5_reduced_model results loaded successfully.\n")
 	} else {
-		message("Reduced model results files not found. Proceeding with model fitting...\n")
-		total <- length(mismatches$data)
+		message("BC.5_reduced_model results files not found. Proceeding with model fitting...\n")
+		total <- length(mismatches$data) * 2
 		count <- 1
 		
 		BC.5_reduced_model <- mismatches %>%
-			mutate(fit = map2(data, response.max, ~{
-				message(sprintf("\rFitting reduced model: %d/%d", count, total))
-				result <- if (.y > 0) {
-					drm.try(
-						data = .x, 
-						LFC.adj ~ y_pred, 
-						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-Inf, 0), upperl = c(Inf),
-						start = c(0, 0.5),
-						fct = linear_BC.5(fixed = c(NA, 0, .y, NA, 0), names = BC.5.parameters))
-				} else {
-					drm.try(
-						data = .x, 
-						LFC.adj ~ y_pred, 
-						# control = drmc(method = "Nelder-Mead", maxIt = 1e7, relTol = 1e-25),
-						control = drmc(method = "L-BFGS-B", maxIt = 1e7, relTol = 1e-25),
-						lowerl = c(-Inf, 0), upperl = c(Inf, max_y_pred),
-						start = c(0, 0.5),
-						fct = linear_BC.5(fixed = c(NA, .y, 0, NA, 0), names = BC.5.parameters))
-				}
-				count <<- count + 1
-				result
-			}))
-		message("\nModel fitting complete.\n")
+			mutate(
+				fit_model_3 = map2(data, response.max, ~{
+					cat(sprintf("\rFitting Model 3 and 4: %d/%d... ", count, total))
+					model_constraints_3 <- get_model_constraints(3, .y)
+					result <- drm.try(
+						data = .x,
+						LFC.adj ~ y_pred,
+						control = drmc(method = "L-BFGS-B", maxIt = 1e8, relTol = 1e-25),
+						lowerl = unlist(model_constraints_3$lowerl),
+						upperl = unlist(model_constraints_3$upperl),
+						start = unlist(model_constraints_3$start),
+						fct = BC.5(fixed = unlist(model_constraints_3$fixed), names = BC.5.parameters))
+					count <<- count + 1
+					result
+				}),
+				fit_model_4 = map2(data, response.max, ~{
+					cat(sprintf("\rFitting Model 3 and 4: %d/%d... ", count, total))
+					model_constraints_4 <- get_model_constraints(4, .y)
+					result <- drm.try(
+						data = .x,
+						LFC.adj ~ y_pred,
+						control = drmc(method = "L-BFGS-B", maxIt = 1e8, relTol = 1e-25),
+						lowerl = unlist(model_constraints_4$lowerl),
+						upperl = unlist(model_constraints_4$upperl),
+						start = unlist(model_constraints_4$start),
+						fct = BC.5(fixed = unlist(model_constraints_4$fixed), names = BC.5.parameters))
+					count <<- count + 1
+					result
+				})
+			)
+		
+		BC.5_reduced_model_comparison <- BC.5_reduced_model %>%
+			mutate(
+				logLik_model_3 = map_dbl(fit_model_3, ~glance.try(.x)$logLik),
+				logLik_model_4 = map_dbl(fit_model_4, ~glance.try(.x)$logLik),
+				better_model = case_when(
+					is.na(logLik_model_3) & is.na(logLik_model_4) ~ NA_character_,
+					is.na(logLik_model_3) ~ "model_4",
+					is.na(logLik_model_4) ~ "model_3",
+					logLik_model_3 > logLik_model_4 ~ "model_3",
+					TRUE ~ "model_4"
+				)
+			) %>%
+			select(unique_name, condition, logLik_model_3, logLik_model_4, better_model)
+		
+		
+		BC.5_reduced_model <- BC.5_reduced_model %>%
+			mutate(
+				fit = if_else(
+					BC.5_reduced_model_comparison$better_model == "model_3",
+					fit_model_3,
+					fit_model_4
+				)
+			) %>% select(-fit_model_3, -fit_model_4)
+		message("...Done!")
+		
 	}
 }
-
-
 
 ##########################################################################################
 message("Beginning to process full model...\n")
@@ -249,6 +385,8 @@ file_names <- list(
 object_name <- "model_comparisons"
 check_and_load_model_comparisons(file_names, object_name)
 
+# 
+
 #################################################################################
 
 # Create responses data frame
@@ -274,7 +412,7 @@ intermediate_phenotypes <- response_data %>%
 # Create filtered_data data frame
 filtered_results <- model_comparisons %>%
 	full_join(full_results$model_parameters %>% filter(term == "hormesis")) %>%
-	filter(p.value < 0.05 & lrt_p_value < 0.05 & anova_p_value < 0.05) %>%
+	filter(p.value <= 0.05 & lrt_p_value <= 0.05) %>%
 	inner_join(intermediate_phenotypes) %>%
 	filter(opposite_direction == TRUE)
 
