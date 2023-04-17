@@ -1,9 +1,7 @@
 # Load necessary packages
+source("packages.R")
 source("drc_logistic_functions.R")
 
-require(conflicted)
-require(pacman)
-require(progress)
 
 # Load data in
 aba_key <- fread("aba_key.tsv")
@@ -217,7 +215,7 @@ if (exists("BC.5_model")) {
 					result
 				})
 			)
-
+		
 		
 		
 		BC.5_model_comparison <- BC.5_model %>%
@@ -385,8 +383,6 @@ file_names <- list(
 object_name <- "model_comparisons"
 check_and_load_model_comparisons(file_names, object_name)
 
-# 
-
 #################################################################################
 
 # Create responses data frame
@@ -424,3 +420,9 @@ hormesis_results <- filtered_results %>%
 	select(-term, -statistic, -std.error, -estimate) %>%
 	rename(hormesis_p_value = p.value) %>%
 	inner_join(full_estimates) %>% tibble
+
+##########################################################################################
+
+model_comparisons %>% fwrite("Results/model_comparisons.tsv", sep = "\t")
+hormesis_results %>% fwrite("Results/model_comparisons_hormesis.tsv", sep = "\t")
+

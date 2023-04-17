@@ -1,72 +1,7 @@
 source("drc_logistic_functions.R")
+
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 median_melted_results <- fread("Results/median_melted_results.tsv.gz", sep = "\t")
-
-doc_theme <- theme_ipsum(
-	base_family = "Arial", 
-	caption_margin = 12,
-	axis_title_size = 12,
-	axis_col = "black")
-
-# Update file_names lists with the new DRC objects entry
-message("Updating file_names lists...\n")
-file_names_full <- list(
-	vuln_summary = "hormetic_vulnerability_summary_full.tsv.gz",
-	fit_predictions = "hormetic_fit_predictions_full.tsv.gz",
-	fit_points = "hormetic_fit_points_full.tsv.gz",
-	model_performance = "hormetic_performance_full.tsv.gz",
-	model_parameters = "hormetic_parameters_full.tsv.gz",
-	drc_fits = "drc_fits_full.RDS"
-)
-
-file_names_reduced <- list(
-	vuln_summary = "hormetic_vulnerability_summary_reduced.tsv.gz",
-	fit_predictions = "hormetic_fit_predictions_reduced.tsv.gz",
-	fit_points = "hormetic_fit_points_reduced.tsv.gz",
-	model_performance = "hormetic_performance_reduced.tsv.gz",
-	model_parameters = "hormetic_parameters_reduced.tsv.gz",
-	drc_fits = "drc_fits_reduced.RDS"
-)
-message("File_names lists updated.\n")
-
-require('pacman')
-p_load(
-	data.table,
-	scales,
-	edgeR,
-	statmod,
-	poolr,
-	pheatmap,
-	svglite,
-	ggplot2,
-	ggrepel,
-	Rtsne,
-	pracma,
-	colourpicker,
-	RColorBrewer,
-	vegan,
-	tidyverse,
-	magrittr
-)
-
-p_load(
-	"data.table",
-	"tidyverse",
-	"broom",
-	"modelr")
-
-conflicted::conflicts_prefer(
-	gtools::permute,
-	dplyr::filter,
-	dplyr::select,
-	drc::gaussian)
-
-doc_theme <- theme_ipsum(
-	base_family = "Arial", 
-	caption_margin = 12,
-	axis_title_size = 12,
-	axis_col = "black")
-
 
 if (!exists("full_results")) {
 	if (exists("file_names_full")) {
@@ -83,7 +18,6 @@ if (!exists("reduced_results")) {
 		message("file_names_reduced not found.")
 	}
 }
-
 
 process_data <- function(data_list, data_name) {
 	data <- data_list[[data_name]]
@@ -106,7 +40,7 @@ process_data <- function(data_list, data_name) {
 # plot.fit_points <- process_data(full_results, "fit_points")
 # plot.vulnerability <- full_results[['vuln.summary']]
 
-plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors) {
+plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors, bands = FALSE, hormesis = NULL) {
 	plot.fit_predictions <- process_data(results_data, "fit_predictions")
 	plot.fit_points <- process_data(results_data, "fit_points")
 	plot.vulnerability <- results_data[['vuln.summary']]
@@ -125,84 +59,56 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 	plot.parameters <- plot.vulnerability %>%
 		filter(unique_name %in% plot.genes) %>% 
 		filter(condition %in% plot.conditions) %>%
-		filter(vuln.p <= 0.05) %>%
+		# filter(vuln.p <= 0.05) %>%
 		rename(Condition = condition, Gene = unique_name)
 	
-	plot.graphic <- plot.fit_predictions %>% 
-		filter(
-			Gene %in% plot.genes & Condition %in% plot.conditions) %>%
+	if (!is.null(hormesis) && nrow(hormesis) > 0) {
+		hormesis_lines <- hormesis %>%
+			filter(unique_name %in% unique_names & condition %in% conditions) %>%
+			mutate(
+				condition = factor(condition, levels = conditions),
+				max_response_fitted = ifelse(highest_fitted > response.max, highest_fitted, lowest_fitted),
+				max_dose_pred = ifelse(highest_fitted > response.max, highest_y_pred, lowest_y_pred)
+			)
+	} else {
+		hormesis_lines <- NULL
+	}
+	
+	
+	plot.graphic <- plot.fit_predictions %>%
+		filter(Gene %in% plot.genes & Condition %in% plot.conditions) %>%
 		mutate(label = gsub("", "", Condition)) %>%
 		ggplot() +
-		geom_hline(
-			yintercept = 0, 
-			linetype = "solid", 
-			color = "black", 
-			linewidth = 0.75) +
-		geom_vline(
-			xintercept = 0, 
-			linetype = "solid", 
-			color = "black", 
-			linewidth = 0.75) +
-		geom_vline(
-			data = plot.parameters,
-			aes(xintercept = as.numeric(vuln.kd_50)),
-			linetype = "dashed",
-			colour = "black",
-			linewidth = 0.25) +
-		geom_hline(
-			data = plot.parameters,
-			aes(yintercept = as.numeric(vuln.est)),
-			colour = "black",
-			linetype = "dashed",
-			linewidth = 0.25) +
-		geom_line(
-			alpha = 0.50, 
-			size = 3, 
-			aes(
-				x = y_pred, 
-				y = .fitted, 
-				color = Gene)) +
-		geom_point(
-			data = plot.fit_points %>%
-				filter(
-					
-					Gene %in% plot.genes &
-						Condition %in% plot.conditions) %>%
-				filter(
-					Gene %in% plot.genes & 
-						Condition %in% plot.conditions),
-			shape = 20, 
-			size = 3.5,
-			aes(
-				x = y_pred, 
-				y = LFC.adj, 
-				color = Gene)) + 
-		# geom_ribbon(
-		# 	data = plot.fit_predictions %>%
-		# 		filter(
-		# 			Gene %in% plot.genes &
-		# 				Condition %in% plot.conditions) %>%
-		# 		filter(
-		# 			Gene %in% plot.genes &
-		# 				Condition %in% plot.conditions),
-		# 	alpha = 0.25,
-		# aes(
-		# 	x = y_pred,
-		# 	y = .fitted,
-		# 	ymin = .lower,
-		# 	ymax = .upper,
-		# 	fill = Gene)) +
+		geom_hline(yintercept = 0, linetype = "solid", color = "black", linewidth = 0.75) +
+		geom_vline(xintercept = 0, linetype = "solid", color = "black", linewidth = 0.75) +
+		geom_vline(data = plot.parameters, aes(xintercept = as.numeric(vuln.kd_50)), linetype = "dashed", colour = "black", linewidth = 0.25) +
+		geom_hline(data = plot.parameters, aes(yintercept = as.numeric(vuln.est)), colour = "black", linetype = "dashed", linewidth = 0.25) +
+		geom_line(alpha = 0.50, size = 3, aes(x = y_pred, y = .fitted, color = Gene)) +
+		geom_point(data = plot.fit_points %>% filter(Gene %in% plot.genes & Condition %in% plot.conditions), shape = 20, size = 3.5, aes(x = y_pred, y = LFC.adj, color = Gene))
+	
+	if (bands) {
+		plot.graphic <- plot.graphic + geom_ribbon(data = plot.fit_predictions %>% filter(Gene %in% plot.genes & Condition %in% plot.conditions), alpha = 0.25, aes(x = y_pred, y = .fitted, ymin = .lower, ymax = .upper, fill = Gene))
+	}
+	
+	if (!is.null(hormesis_lines)) {
+		plot.graphic <- plot.graphic +
+			geom_hline(data = hormesis_lines, aes(yintercept = max_response_fitted), color = "red", linetype = "solid", size = 0.75, alpha = 0.5) 
+			#geom_vline(data = hormesis_lines, aes(xintercept = max_dose_pred), color = "blue", linetype = "dashed", size = 0.25)
+	}
+	
+	plot.graphic <- plot.graphic +
 		scale_fill_manual(values = colors) +
 		scale_color_manual(values = colors) +
 		ylab("Fitness (Log2)") +
 		doc_theme +
 		theme(legend.position = "none") +
-	facet_wrap(~factor(Gene, levels = unique_names)) + 
+		facet_wrap(~factor(Gene, levels = unique_names)) + 
 		guides(fill = guide_legend(nrow = 1, byrow = TRUE)) +
 		ggtitle(conditions)
 	
 	print(plot.graphic)
 }
+
 
 gene_colors <- c(
 	"nuoB" = "#6A3D9A",
@@ -227,20 +133,45 @@ plot_gene_dose_effect(
 
 
 
-#lrt p-value = 1.281345e-05
 plot_gene_dose_effect(
 	full_results,
-	c("nuoB", "nuoK", "nuoD", "wzx"), 
-	c("Rifampicin_0.34_T2 - None_0_T0"), 
-	gene_colors)
-
-#lrt p-value = 1.281345e-05
-plot_gene_dose_effect(
-	reduced_results,
 	c("nuoB"), 
-	c("None_0_T2 - None_0_T0"), 
-	gene_colors)
+	c("Rifampicin_0.34_T2 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE,
+	hormesis = hormesis_results)
 
+plot_gene_dose_effect(
+	full_results,
+	c("glnS"), 
+	c("Imipenem_0.09_T2 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE,
+	hormesis = hormesis_results)
+
+
+plot_gene_dose_effect(
+	full_results,
+	c("sdhD"), 
+	c("Rifampicin_0.34_T2 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE,
+	hormesis = hormesis_results)
+
+plot_gene_dose_effect(
+	full_results,
+	c("rplR"), 
+	c("Imipenem_0.09_T1 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE,
+	hormesis = hormesis_results)
+
+plot_gene_dose_effect(
+	full_results,
+	c("rplR"), 
+	c("Imipenem_0.09_T2 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE)
 
 
 # beautiful
