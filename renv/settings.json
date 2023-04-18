@@ -1,10 +1,7 @@
 {
-  "bioconductor.version": "3.16",
+  "bioconductor.version": null,
   "external.libraries": [],
-  "ignored.packages": [
-    "ggsankey",
-    "drcData"
-  ],
+  "ignored.packages": [],
   "package.dependency.fields": [
     "Imports",
     "Depends",

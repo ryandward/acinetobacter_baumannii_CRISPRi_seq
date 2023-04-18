@@ -15,6 +15,7 @@ p_load(
 	ggrepel,
 	gtools,
 	Hmisc,
+	hrbrthemes,
 	lmtest,
 	magrittr,
 	modelr,
@@ -33,12 +34,12 @@ p_load(
 )
 
 # Load packages from GitHub
-p_load_current_gh(
-	"DoseResponse/drcData",
-	"hrbrmstr/hrbrthemes",
-	"ryandward/drc",
-	"jokergoo/ComplexHeatmap"
-)
+# p_load_current_gh(
+# 	"DoseResponse/drcData",
+# 	"hrbrmstr/hrbrthemes",
+# 	"ryandward/drc",
+# 	"jokergoo/ComplexHeatmap"
+# )
 
 # Resolve conflicts using the conflicted package
 conflicted::conflicts_prefer(

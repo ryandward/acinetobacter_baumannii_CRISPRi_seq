@@ -5,8 +5,8 @@
 require(pacman)
 
 pacman::p_load(purrr, lmtest, tidyverse, data.table, data.table, tidyverse, broom, modelr, Hmisc, R.utils)
-p_load_current_gh("DoseResponse/drcData", "hrbrmstr/hrbrthemes")
-p_load_current_gh("ryandward/drc", "jokergoo/ComplexHeatmap")
+# p_load_current_gh("DoseResponse/drcData", "hrbrmstr/hrbrthemes")
+# p_load_current_gh("ryandward/drc", "jokergoo/ComplexHeatmap")
 
 
 # Load packages
