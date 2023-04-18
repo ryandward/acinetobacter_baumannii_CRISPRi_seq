@@ -1,4 +1,5 @@
 source("drc_logistic_functions.R")
+source("packages.R")
 
 melted_results <- fread("Results/melted_results.tsv.gz", sep = "\t")
 median_melted_results <- fread("Results/median_melted_results.tsv.gz", sep = "\t")

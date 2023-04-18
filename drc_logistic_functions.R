@@ -216,12 +216,7 @@ compute_model_parameters <- function(processed_results) {
 		mutate(perf = map(fit, tidy)) %>%
 		unnest(perf) %>%
 		select(unique_name, condition, term, estimate, std.error, statistic, p.value) %>%
-		mutate(
-			estimate = round(estimate, 3),
-			std.error = round(std.error, 3),
-			statistic = round(statistic, 3),
-			p.value = round(p.value, 3)
-		)
+		mutate_if(is.numeric, round, 3)
 }
 
 ################################################################################
@@ -247,27 +242,6 @@ calculate_lrt <- function(this.gene, this.condition, filtered_HA, filtered_H0) {
 	return(lrt.result$'Pr(>Chisq)'[2])
 }
 
-# Modify calculate_anova function to accept any two models
-calculate_anova <- function(this.gene, this.condition, filtered_HA, filtered_H0) {
-	
-	# Get the model fits for the given gene and condition
-	this.HA <- filtered_HA %>%
-		filter(unique_name == this.gene, condition == this.condition) %>%
-		pull(fit)
-	
-	this.H0 <- filtered_H0 %>%
-		filter(unique_name == this.gene, condition == this.condition) %>%
-		pull(fit)
-	
-	# Perform the likelihood ratio test and suppress the output
-	sink(tempfile())
-	anova.result <- anova(this.HA[[1]], this.H0[[1]])
-	sink()
-	
-	# Restore console output and return the ANOVA p-value
-	return(anova.result$'p value'[2])
-}
-
 # Compare between two DRC models
 compare_models <- function(HA_model, H0_model) {
 	
@@ -288,30 +262,28 @@ compare_models <- function(HA_model, H0_model) {
 	filtered_H0 <- H0_model %>% select(unique_name, condition, fit)
 	
 	# Initialize an empty data frame to store the results
-	results <- tibble(unique_name = character(), condition = character(), lrt_p_value = numeric(), anova_p_value = numeric())
+	results <- tibble(unique_name = character(), condition = character(), lrt_p_value = numeric())
 	
 	# Iterate through each common gene and condition combination
 	for (i in seq_along(common_gene_condition_combos$unique_name)) {
 		this.gene <- common_gene_condition_combos$unique_name[i]
 		this.condition <- common_gene_condition_combos$condition[i]
 		
-		# Calculate LRT and ANOVA p-values with error handling
+		# Calculate LRT p-values with error handling
 		lrt_p_value <- tryCatch({
 			calculate_lrt(this.gene, this.condition, filtered_HA, filtered_H0)
 		}, error = function(e) {
 			NA
 		})
 		
-		anova_p_value <- tryCatch({
-			calculate_anova(this.gene, this.condition, filtered_HA, filtered_H0)
-		}, error = function(e) {
-			NA
-		})
-		
+
 		# Store the p-values
 		results <- results %>%
-			add_row(unique_name = this.gene, condition = this.condition, lrt_p_value = lrt_p_value, anova_p_value = anova_p_value)
+		add_row(unique_name = this.gene, condition = this.condition, lrt_p_value = lrt_p_value)
+
 	}
+	
+	results <- results %>% mutate_if(is.numeric, round, 3)
 	
 	return(results)
 }
@@ -386,29 +358,29 @@ check_file_exist <- function(file_path) {
 }
 
 
-check_and_load_model_comparisons <- function(file_names, object_name, directory = "Results") {
-	file_path <- file.path(directory, file_names$drc_fits)
+check_and_load_model_comparisons <- function(HA, H0, file_name, directory = "Results") {
+	file_path <- file.path(directory, file_name)
 	
-	if (exists(object_name)) {
-		message(paste(object_name, "found in memory."))
-	} else if (check_file_exist(file_path)) {
-		message(paste(object_name, "file found. Loading from disk..."))
-		assign(object_name, fread(file_path, sep = "\t"), envir = .GlobalEnv)
-		message(paste(object_name, "loaded successfully."))
+	if (check_file_exist(file_path)) {
+		message(paste("File found. Loading from disk..."))
+		loaded_object <- fread(file_path, sep = "\t")
+		message("Loaded successfully.")
 	} else {
-		message(paste(object_name, "not found in memory or on disk. Calculating..."))
-		calculate_model_comparisons(full_results, reduced_results, object_name)
+		message("File not found on disk. Calculating...")
+		loaded_object <- calculate_model_comparisons(HA, H0, directory)
 	}
+	
+	return(loaded_object)
 }
 
 
-calculate_model_comparisons <- function(full_results, reduced_results, object_name) {
+calculate_model_comparisons <- function(full_results, reduced_results, object_name, directory = "Results") {
 	model_comparisons <- compare_models(
 		full_results$drc_fits,
 		reduced_results$drc_fits
 	)
 	
-	closeAllConnections()  # turn off sink FIX LATER
+	# closeAllConnections()  # turn off sink FIX LATER
 	
 	model_comparisons <- inner_join(
 		full_results$model_performance %>% select(unique_name, condition, logLik) %>% rename(hormetic_logLik = logLik),
@@ -416,5 +388,5 @@ calculate_model_comparisons <- function(full_results, reduced_results, object_na
 	) %>% inner_join(model_comparisons)
 	
 	assign(object_name, model_comparisons, envir = .GlobalEnv)
-	fwrite(model_comparisons, file_names$drc_fits, sep = "\t")
+	# fwrite(model_comparisons, paste0(directory, "/", file_names$drc_fits), sep = "\t")
 }

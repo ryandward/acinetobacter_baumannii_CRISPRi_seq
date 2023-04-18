@@ -375,13 +375,11 @@ message("Reduced model processed.\n")
 
 ################################################################################
 
-# Compare the models
-file_names <- list(
-	drc_fits = "hormetic_model_comparisons.tsv"
-)
 
-object_name <- "model_comparisons"
-check_and_load_model_comparisons(file_names, object_name)
+model_comparisons <- check_and_load_model_comparisons(
+	full_results, 
+	reduced_results, 
+	"model_comparisons.tsv")
 
 #################################################################################
 
@@ -419,7 +417,9 @@ full_estimates <- full_results$model_parameters %>% data.table %>% dcast(unique_
 hormesis_results <- filtered_results %>%
 	select(-term, -statistic, -std.error, -estimate) %>%
 	rename(hormesis_p_value = p.value) %>%
-	inner_join(full_estimates) %>% tibble
+	inner_join(full_estimates) %>% 
+	mutate_if(is.numeric, round, 3) %>% 
+	tibble
 
 ##########################################################################################
 
