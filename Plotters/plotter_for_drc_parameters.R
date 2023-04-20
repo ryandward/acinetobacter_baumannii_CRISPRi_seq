@@ -226,4 +226,11 @@ plot_gene_dose_effect(
  	c("Imipenem_0.09_T2 - None_0_T0"), 
  	gene_colors)
  
+ plot_gene_dose_effect(
+ 	full_results,
+ 	c("topA"), 
+ 	c("None_0_T2 - None_0_T0"), 
+ 	gene_colors,
+ 	bands = FALSE,
+ 	hormesis = hormesis_results)
  

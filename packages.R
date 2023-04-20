@@ -46,7 +46,8 @@ conflicted::conflicts_prefer(
 	gtools::permute,
 	dplyr::filter,
 	dplyr::select,
-	drc::gaussian
+	drc::gaussian,
+	tidyr::extract
 )
 
 # Add definitions
@@ -80,8 +81,8 @@ message("File_names lists updated.\n")
 
 safe_fread <- purrr::possibly(.f = fread, otherwise = data.frame())
 
-model_comparisons <- safe_fread("model_comparisons.tsv")
-hormesis_results <- safe_fread("model_comparisons_hormesis.tsv")
+model_comparisons <- safe_fread("Results/model_comparisons.tsv")
+hormesis_results <- safe_fread("Results/model_comparisons_hormesis.tsv")
 aba_key <- safe_fread("aba_key.tsv")
 interested.genes <- safe_fread("curated_names.tsv") %>% pull(unique_name)
 curated_names <- safe_fread("curated_names.tsv")
