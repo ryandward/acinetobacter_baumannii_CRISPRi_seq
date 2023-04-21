@@ -147,6 +147,14 @@ operon_details <- operon_details %>% inner_join(short_names) %>%
 
 operon_details %>% fwrite("operon_details.tsv", sep = "\t")
 
+curated_names_operons_pathways <- operon_conversion %>% 
+	inner_join(operon_pathways) %>% 
+	rename(AB19606 = locus_tag) %>% 
+	left_join(curated_names) %>% 
+	left_join(operon_details)
+
+curated_names_operons_pathways %>% fwrite("curated_names_operons_pathways.tsv", sep = "\t")
+
 operon_details <- fread("operon_details.tsv")
 
 operon_details <- operon_details %>%
