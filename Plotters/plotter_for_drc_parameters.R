@@ -222,9 +222,19 @@ plot_gene_dose_effect(
  
  plot_gene_dose_effect(
  	full_results,
- 	c("glnS", "nuoB", "parB", "rho"), 
+ 	c("glnS", "valS"), 
  	c("Imipenem_0.09_T2 - None_0_T0"), 
- 	gene_colors)
+ 	gene_colors,
+ 	bands = FALSE,
+ 	hormesis = hormesis_results)
+ 
+ plot_gene_dose_effect(
+ 	full_results,
+ 	c("glnS", "leuS"), 
+ 	c("Imipenem_0.09_T2 - None_0_T0"), 
+ 	gene_colors,
+ 	bands = FALSE,
+ 	hormesis = hormesis_results)
  
  plot_gene_dose_effect(
  	full_results,
