@@ -1,4 +1,4 @@
-source("meta_counter.R")
+# source("meta_counter.R")
 
 melted_results[
 	unique_name %like% "^sdh" | unique_name %like% "^atp" | unique_name %like% "^cyo" | unique_name %like% "^nuo",
@@ -150,8 +150,8 @@ operon_details %>% fwrite("operon_details.tsv", sep = "\t")
 curated_names_operons_pathways <- operon_conversion %>% 
 	inner_join(operon_pathways) %>% 
 	rename(AB19606 = locus_tag) %>% 
-	left_join(curated_names) %>% 
-	left_join(operon_details)
+	inner_join(curated_names) %>% 
+	inner_join(operon_details)
 
 curated_names_operons_pathways %>% fwrite("curated_names_operons_pathways.tsv", sep = "\t")
 
@@ -217,7 +217,9 @@ plot_operon <- function(
 			aes(x = operon_mLFC,
 					y = FDR,
 					fill = Pathways)) +
-		geom_point(aes(size = `Essentials in operon`, alpha = Significance), shape = 21) +
+		geom_point(data = . %>% filter(Significance == "Significant"), aes(size = `Essentials in operon`, fill = Pathways, color = Significance), alpha = .65, stroke = 0.5, shape = 21) +
+		geom_point(data = . %>% filter(Significance == "Not Significant"), aes(size = `Essentials in operon`, fill = Pathways, color = Significance), alpha = 0.35, stroke = 0, shape = 21) +
+		
 		geom_hline(yintercept = 0.05,
 							 linetype = "dashed",
 							 color = "#5A5A5A",
@@ -237,7 +239,7 @@ plot_operon <- function(
 		doc_theme +
 		scale_y_continuous(trans = scales::reverse_trans() %of% scales::log10_trans()) +
 		geom_label_repel(
-			fill = alpha(c("white"), 0.75),
+			fill = alpha(c("white"), 0.65),
 			max.iter = 1000000000,
 			data = . %>% filter(
 				FDR < 0.05 & 
@@ -258,23 +260,44 @@ plot_operon <- function(
 			values = c(
 				"Other" = "grey",
 				"Ribosome" = "#E31A1C",
-				"Ribosome+Other" = "#FB9A99",
+				"Ribosome+Other" = "#E31A1C",
 				"Ox Phos" = "#6A3D9A",
-				"Ox Phos+Other" = "#CAB2D6",
+				"Ox Phos+Other" = "#6A3D9A",
 				"LOS" = "#33A02C",
-				"LOS+Other" = "#B2DF8A",
+				"LOS+Other" = "#33A02C",
 				"Cell Wall/PG" = "#FF7F00",
-				"Cell Wall/PG+Other" = "#FDBF6F",
+				"Cell Wall/PG+Other" = "#FF7F00",
 				"tRNA Ligase" = "#1F78B4",
-				"tRNA Ligase+Other" = "#A6CEE3")) +
+				"tRNA Ligase+Other" = "#1F78B4")) +
+		# scale_fill_manual(
+		# 	values = c(
+		# 		"Other" = "grey",
+		# 		"Ribosome" = "#E31A1C",
+		# 		"Ribosome+Other" = "#FB9A99",
+		# 		"Ox Phos" = "#6A3D9A",
+		# 		"Ox Phos+Other" = "#CAB2D6",
+		# 		"LOS" = "#33A02C",
+		# 		"LOS+Other" = "#B2DF8A",
+		# 		"Cell Wall/PG" = "#FF7F00",
+		# 		"Cell Wall/PG+Other" = "#FDBF6F",
+		# 		"tRNA Ligase" = "#1F78B4",
+		# 		"tRNA Ligase+Other" = "#A6CEE3")) +
 		guides(fill = guide_legend(
 			override.aes = list(shape = 21, size = 5))) + 
 		guides(alpha = guide_legend(
 			override.aes = list(shape = 21, size = 5, fill = "black"))) +
 		scale_alpha_manual(
 			values = c(
-				"Significant" = 0.85,
-				"Not Significant" = 0.10)) +
+				"Significant" = 0.65,
+				"Not Significant" = 0.35)) +
+		scale_color_manual(
+			values = c(
+				"Significant" = "black",
+				"Not Significant" = alpha("white", 0))) +
+		scale_linewidth_manual(
+			values = c(
+				"Significant" = 1,
+				"Not Significant" = 0)) +
 		scale_size_area(breaks = c(1, 5, 10, 13))
 }
 
@@ -291,7 +314,7 @@ plot_operon(operon_median_results, c("Colistin_0.44_T1 - None_0_T1", "Colistin_0
 
 plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - None_0_T2", "Colistin_0.44_T2 - None_0_T2"), TRUE, 7, 7, 5, 1e-100)
 
-plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - Colistin_0.44_T2"), FALSE, 10, 10, 10, 1e-150)
+# plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - Colistin_0.44_T2"), FALSE, 10, 10, 10, 1e-150)
 
 plot_operon(operon_median_results, c("Meropenem_0.17_T2 - None_0_T2", "Imipenem_0.09_T2 - None_0_T2"), FALSE, 10, 10, 10, 1e-150)
 

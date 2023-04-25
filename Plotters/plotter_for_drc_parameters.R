@@ -121,7 +121,7 @@ gene_colors <- c(
 # beautiful 
 plot_gene_dose_effect(
 	reduced_results,
-	c("rpmB", "murA", "nuoB", "lpxC"), 
+	c("glnS", "murA", "nuoB", "lpxC"), 
 	c("None_0_T1 - None_0_T0"), 
 	gene_colors)
 
@@ -133,6 +133,19 @@ plot_gene_dose_effect(
 # 	gene_colors)
 
 
+plot_gene_dose_effect(
+	reduced_results,
+	consistent_genes %>% inner_join(curated_names_operons_pathways) %>% filter(Pathways %like% "tRNA") %>% pull(unique_name), 
+	c("None_0_T2 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE)
+
+plot_gene_dose_effect(
+	reduced_results,
+	consistent_genes %>% inner_join(curated_names_operons_pathways) %>% filter(Pathways %like% "tRNA") %>% pull(unique_name), 
+	c("Imipenem_0.09_T2 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE)
 
 plot_gene_dose_effect(
 	full_results,

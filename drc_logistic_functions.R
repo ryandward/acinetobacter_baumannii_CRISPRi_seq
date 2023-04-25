@@ -22,138 +22,79 @@ conflicted::conflicts_prefer(dplyr::summarize)
 ################################################################################
 # BC.5 Logistic function model using L.4.parameters and BC.5.parameters
 ###############################################################################
+##########################################################################################
 
-linear_BC.5 <- function(
-		fixed = c(NA, NA, NA, NA, NA), 
-		names = c("b", "c", "d", "e", "f")){
-	return(linear_braincousens(fixed = fixed, names = names))
+# L.4.parameters <- c("hill", "min_value", "max_value", "kd_50")
+# Define the parameter names for the BC.5 model
+BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
+
+# This function creates constraints for the model parameters.
+# It takes four lists as input: fixed_params, lowerl_params, upperl_params, and start_params.
+# fixed_params: Parameters with fixed values.
+# lowerl_params: Parameters with lower limits.
+# upperl_params: Parameters with upper limits.
+# start_params: Parameters with starting values for optimization.
+create_constraints <- function(fixed_params, lowerl_params, upperl_params, start_params) {
+	param_names <- BC.5.parameters
+	
+	# Initialize the constraints and start values with default values
+	fixed_constraints <- setNames(rep(NA, length(param_names)), param_names)
+	lowerl_constraints <- setNames(rep(-Inf, length(param_names)), param_names)
+	upperl_constraints <- setNames(rep(Inf, length(param_names)), param_names)
+	start_values <- setNames(rep(NA, length(param_names)), param_names)
+	
+	# Update the constraints and start values with the input values
+	fixed_constraints[names(fixed_params)] <- fixed_params
+	lowerl_constraints[names(lowerl_params)] <- lowerl_params
+	upperl_constraints[names(upperl_params)] <- upperl_params
+	start_values[names(start_params)] <- start_params
+	
+	# Remove fixed parameters from the other constraint lists
+	non_fixed_names <- setdiff(param_names, names(fixed_params))
+	
+	# Return the final constraints and start values
+	return(list(fixed = unlist(fixed_constraints),
+							lowerl = unlist(lowerl_constraints[non_fixed_names]),
+							upperl = unlist(upperl_constraints[non_fixed_names]),
+							start = unlist(start_values[non_fixed_names])))
 }
 
-linear_braincousens <- function (fixed = c(NA, NA, NA, NA, NA), names = c("b", "c", 
-																																					"d", "e", "f"), method = c("1", "2", "3", "4"), ssfct = NULL, 
-																 fctName, fctText) 
-{
-	numParm <- 5
-	if (!is.character(names) | !(length(names) == numParm)) {
-		stop("Not correct 'names' argument")
+# This function returns the model constraints based on the model number and response_max.
+# model_number: An integer representing the model type (1, 2, 3, or 4).
+# response_max: The maximum response value for the data.
+get_model_constraints <- function(model_number, response_max) {
+	if (model_number == 1) {
+		# Model 1: Positive response with a lower limit of 0 for the response.
+		# min_value is fixed at 0, which implies that the response starts at 0 and increases.
+		fixed_params = list(min_value = 0)
+		lowerl_params = list(max_value = 0, kd_50 = 0)
+		upperl_params = list(shape = 0, max_value = response_max, kd_50 = max_y_pred)
+		start_params = list(shape = 0, max_value = response_max, kd_50 = 0.5, hormesis = 0)
+	} else if (model_number == 2) {
+		# Model 2: Negative response with an upper limit of 0 for the response.
+		# max_value is fixed at 0, which implies that the response starts at a high level and decreases.
+		fixed_params = list(max_value = 0)
+		lowerl_params = list(shape = 0, min_value = response_max, kd_50 = 0)
+		upperl_params = list(min_value = 0, kd_50 = max_y_pred)
+		start_params = list(shape = 0, min_value = response_max, kd_50 = 0.5, hormesis = 0)
+	} else if (model_number == 3) {
+		# Model 3: Positive response without hormesis.
+		# min_value and hormesis are fixed at 0, which implies that the response starts at 0 and increases,
+		# and there is no hormesis effect.
+		fixed_params = list(min_value = 0, hormesis = 0)
+		lowerl_params = list(max_value = 0, kd_50 = 0)
+		upperl_params = list(shape = 0, max_value = response_max, kd_50 = max_y_pred)
+		start_params = list(shape = 0, max_value = response_max, kd_50 = 0.5)
+	} else {
+		# Model 4: Negative response without hormesis.
+		# max_value and hormesis are fixed at 0, which implies that the response starts at a high level and decreases,
+		# and there is no hormesis effect.
+		fixed_params = list(max_value = 0, hormesis = 0)
+		lowerl_params = list(shape = 0, min_value = response_max, kd_50 = 0)
+		upperl_params = list(min_value = 0, kd_50 = max_y_pred)
+		start_params = list(shape = 0, min_value = response_max, kd_50 = 0.5)
 	}
-	if (!(length(fixed) == numParm)) {
-		stop("Not correct 'fixed' argument")
-	}
-	notFixed <- is.na(fixed)
-	parmVec <- rep(0, numParm)
-	parmVec[!notFixed] <- fixed[!notFixed]
-	parmVec1 <- parmVec
-	parmVec2 <- parmVec
-	fct <- function(dose, parm) {
-		parmMat <- matrix(parmVec, nrow(parm), numParm, byrow = TRUE)
-		parmMat[, notFixed] <- parm
-		parmMat[, 2] + (parmMat[, 3] + parmMat[, 5] * dose - 
-											parmMat[, 2])/(1 + exp(parmMat[, 1] * (dose - 
-																														 	parmMat[, 4])))
-	}
-	if (FALSE) {
-		ssfct <- function(dataFra) {
-			dose2 <- dataFra[, 1]
-			resp3 <- dataFra[, 2]
-			startVal <- rep(0, numParm)
-			startVal[3] <- max(resp3) + 0.001
-			startVal[2] <- min(resp3) - 0.001
-			startVal[5] <- 0
-			if (length(unique(dose2)) == 1) {
-				return((c(NA, NA, startVal[3], NA, NA))[notFixed])
-			}
-			indexT2 <- (dose2 > 0)
-			if (!any(indexT2)) {
-				return((rep(NA, numParm))[notFixed])
-			}
-			dose3 <- dose2[indexT2]
-			resp3 <- resp3[indexT2]
-			logitTrans <- log((startVal[3] - resp3)/(resp3 - 
-																							 	startVal[2] + 0.001))
-			logitFit <- lm(logitTrans ~ dose3)
-			startVal[4] <- (-coef(logitFit)[1]/coef(logitFit)[2])
-			startVal[1] <- coef(logitFit)[2]
-			return(startVal[notFixed])
-		}
-	}
-	if (!is.null(ssfct)) {
-		ssfct <- ssfct
-	}
-	else {
-		ssfct <- function(dframe) {
-			initval <- llogistic()$ssfct(dframe)
-			initval[5] <- 0
-			return(initval[notFixed])
-		}
-	}
-	names <- names[notFixed]
-	deriv1 <- function(dose, parm) {
-		parmMat <- matrix(parmVec, nrow(parm), numParm, byrow = TRUE)
-		parmMat[, notFixed] <- parm
-		t1 <- parmMat[, 3] - parmMat[, 2] + parmMat[, 5] * dose
-		t2 <- exp(parmMat[, 1] * (dose - parmMat[, 4]))
-		t3 <- 1 + t2
-		t4 <- (1 + t2)^(-2)
-		cbind(-t1 * t2 * t4, 1 - 1/t3, 1/t3, t1 * t2 * parmMat[, 1] * t4, dose/t3)[, notFixed]
-	}
-	deriv2 <- NULL
-	edfct <- function(parm, respl, reference, type, lower = 0.001, 
-										upper = 1000, ...) {
-		interval <- c(lower, upper)
-		parmVec[notFixed] <- parm
-		p <- EDhelper(parmVec, respl, reference, type)
-		tempVal <- (100 - p)/100
-		helpEqn <- function(dose) {
-			expVal <- exp(parmVec[1] * (dose - parmVec[4]))
-			parmVec[5] * (1 + expVal * (1 - parmVec[1])) - (parmVec[3] - 
-																												parmVec[2]) * expVal * parmVec[1]/dose
-		}
-		maxAt <- uniroot(helpEqn, interval)$root
-		eqn <- function(dose) {
-			tempVal * (1 + exp(parmVec[1] * (dose - parmVec[4]))) - 
-				(1 + parmVec[5] * dose/(parmVec[3] - parmVec[2]))
-		}
-		EDp <- uniroot(eqn, lower = maxAt, upper = upper)$root
-		EDdose <- EDp
-		tempVal1 <- exp(parmVec[1] * (EDdose - parmVec[4]))
-		tempVal2 <- parmVec[3] - parmVec[2]
-		derParm <- c(tempVal * tempVal1 * (EDdose - parmVec[4]), 
-								 -parmVec[5] * EDdose/((tempVal2)^2), parmVec[5] * 
-								 	EDdose/((tempVal2)^2), -tempVal * tempVal1 * 
-								 	parmVec[1], -EDdose/tempVal2)
-		derDose <- tempVal * tempVal1 * parmVec[1] - 
-			parmVec[5]/tempVal2
-		EDder <- derParm/derDose
-		return(list(EDp, EDder[notFixed]))
-	}
-	maxfct <- function(parm, lower = 0.001, upper = 1000) {
-		parmVec[notFixed] <- parm
-		if (parmVec[1] < 1) {
-			stop("Brain-Cousens model with b<1 not meaningful")
-		}
-		if (parmVec[5] < 0) {
-			stop("Brain-Cousens model with f<0 not meaningful")
-		}
-		optfct <- function(t) {
-			expTerm1 <- parmVec[5] * t
-			expTerm2 <- exp(parmVec[1] * (t - parmVec[4]))
-			return(parmVec[5] * (1 + expTerm2) - (parmVec[3] - 
-																							parmVec[2] + expTerm1) * expTerm2 * parmVec[1]/t)
-		}
-		ED1 <- edfct(parm, 1, lower, upper)[[1]]
-		doseVec <- exp(seq(log(1e-06), log(ED1), length = 100))
-		maxDose <- uniroot(optfct, c((doseVec[optfct(doseVec) > 
-																						0])[1], ED1))$root
-		return(c(maxDose, fct(maxDose, matrix(parm, 1, length(names)))))
-	}
-	returnList <- list(fct = fct, ssfct = ssfct, names = names, 
-										 deriv1 = deriv1, deriv2 = deriv2, edfct = edfct, maxfct = maxfct, 
-										 name = ifelse(missing(fctName), as.character(match.call()[[1]]), 
-										 							fctName), text = ifelse(missing(fctText), "Brain-Cousens (hormesis)", 
-										 																			fctText), noParm = sum(is.na(fixed)))
-	class(returnList) <- "linear_braincousens"
-	invisible(returnList)
+	return(create_constraints(fixed_params, lowerl_params, upperl_params, start_params))
 }
 
 
