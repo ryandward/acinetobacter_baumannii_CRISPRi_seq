@@ -10,7 +10,7 @@ pacman::p_load(purrr, lmtest, tidyverse, data.table, data.table, tidyverse, broo
 
 
 # Load packages
-library(drcData)
+# library(drcData)
 library(drc)
 library(hrbrthemes)
 

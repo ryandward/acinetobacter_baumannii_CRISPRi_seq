@@ -58,9 +58,16 @@ rough_fits <- annotated_fit_predictions %>%
 rough_fits <- rough_fits %>%
 	nest(data = c(-Condition, -Pathway))
 
+
+
 rough_fits <- rough_fits %>% 
 	mutate(
-		fit = map(data, ~ drm.try(data = .x, binned_fit ~ binned_y_pred, fct = BC.5(names = c("hill", "min_value", "max_value", "kd_50")))))
+		fit = map(
+			data, 
+			~ drm.try(
+				data = .x, 
+				binned_fit ~ binned_y_pred, 
+				fct = BC.5(names = c("hill", "min_value", "max_value", "kd_50", "hormesis")))))
 
 rough_fits <- rough_fits %>% 
 	mutate(results = map(fit, glance)) %>%
