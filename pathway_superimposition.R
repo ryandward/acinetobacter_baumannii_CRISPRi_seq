@@ -104,7 +104,7 @@ annotated_fit_predictions %>%
 	doc_theme +
 	theme(legend.position = "none",
 				axis.text.x = element_text(angle = 45, hjust = 1)) +
-	scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+	scale_x_continuous(limits = c(0, 1.2), breaks = c(0, 0.5, 1)) +
 	geom_point(
 		data = (
 			annotated_vuln.summary %>%
