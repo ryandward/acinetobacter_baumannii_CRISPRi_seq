@@ -304,9 +304,15 @@ plot_operon <- function(
 ##########################################################################################
 plot_operon(
 	operon_median_results, 
-	c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"), 
+	c("None_0_T1 - None_0_T0"), 
 	use_condensed_name = TRUE, 
-	max_left = 5, max_right = 5, max_top = 10, min_sig = 1e-100)
+	max_left = 5, max_right = 5, max_top = 10, min_sig = 1e-150)
+
+plot_operon(
+	operon_median_results, 
+	c("None_0_T2 - None_0_T0"), 
+	use_condensed_name = TRUE, 
+	max_left = 5, max_right = 5, max_top = 10, min_sig = 1e-150)
 
 plot_operon(operon_median_results, c("None_0_T2 - None_0_T0"), 15, 5, 10)
 

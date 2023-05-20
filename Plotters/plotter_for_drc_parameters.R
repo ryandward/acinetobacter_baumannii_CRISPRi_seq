@@ -75,7 +75,6 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 		hormesis_lines <- NULL
 	}
 	
-	
 	plot.graphic <- plot.fit_predictions %>%
 		filter(Gene %in% plot.genes & Condition %in% plot.conditions) %>%
 		mutate(label = gsub("", "", Condition)) %>%
@@ -84,6 +83,7 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 		geom_vline(xintercept = 0, linetype = "solid", color = "black", linewidth = 0.75) +
 		geom_vline(data = plot.parameters, aes(xintercept = as.numeric(vuln.kd_50)), linetype = "dashed", colour = "black", linewidth = 0.25) +
 		geom_hline(data = plot.parameters, aes(yintercept = as.numeric(vuln.est)), colour = "black", linetype = "dashed", linewidth = 0.25) +
+		geom_point(data = plot.parameters, aes(x = as.numeric(vuln.kd_50), y = as.numeric(vuln.est), color = Gene), shape = 1, size = 6, stroke = 1.5) +
 		geom_line(alpha = 0.50, size = 3, aes(x = y_pred, y = .fitted, color = Gene)) +
 		geom_point(data = plot.fit_points %>% filter(Gene %in% plot.genes & Condition %in% plot.conditions), shape = 20, size = 3.5, aes(x = y_pred, y = LFC.adj, color = Gene))
 	
@@ -93,8 +93,8 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 	
 	if (!is.null(hormesis_lines)) {
 		plot.graphic <- plot.graphic +
-			geom_hline(data = hormesis_lines, aes(yintercept = max_response_fitted), color = "red", linetype = "solid", size = 0.75, alpha = 0.5) 
-			#geom_vline(data = hormesis_lines, aes(xintercept = max_dose_pred), color = "blue", linetype = "dashed", size = 0.25)
+			geom_hline(data = hormesis_lines, aes(yintercept = max_response_fitted), color = "red", linetype = "solid", size = 0.75, alpha = 0.5)
+		#geom_vline(data = hormesis_lines, aes(xintercept = max_dose_pred), color = "blue", linetype = "dashed", size = 0.25)
 	}
 	
 	plot.graphic <- plot.graphic +
@@ -103,17 +103,20 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 		ylab("Fitness (Log2)") +
 		doc_theme +
 		theme(legend.position = "none") +
-		facet_wrap(~factor(Gene, levels = unique_names)) + 
+		facet_grid(cols = vars(Condition), rows = vars(Gene)) +
 		guides(fill = guide_legend(nrow = 1, byrow = TRUE)) +
-		ggtitle(conditions)
+		ggtitle(paste(conditions, collapse = ", "))
 	
 	print(plot.graphic)
 }
+
+							 
 
 
 gene_colors <- c(
 	"nuoB" = "#6A3D9A",
 	"lpxC" = "#33A02C",
+	"lpxA" = "#33A02C",
 	"glnS" = "#1F78B4",
 	"murA" = "#FF7F00",
 	"rpmB" = "#E31A1C")
@@ -121,9 +124,29 @@ gene_colors <- c(
 # beautiful 
 plot_gene_dose_effect(
 	reduced_results,
-	c("glnS", "murA", "nuoB", "lpxC"), 
+	c("glnS", "murA", "nuoB", "lpxA"), 
+	c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"), 
+	gene_colors)
+
+plot_gene_dose_effect(
+	reduced_results,
+	c("glnS", "murA", "nuoB", "lpxA"), 
+	c("None_0_T2 - None_0_T0"), 
+	gene_colors)
+
+# beautiful 
+plot_gene_dose_effect(
+	reduced_results,
+	c("glnS", "murA", "nuoB", "lpxA"), 
 	c("None_0_T1 - None_0_T0"), 
 	gene_colors)
+
+plot_gene_dose_effect(
+	reduced_results,
+	c("murA", "nuoB", "lpxA"), 
+	c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"), 
+	gene_colors)
+
 
 # not justifiable use, check model comparison results
 # plot_gene_dose_effect(
@@ -162,6 +185,13 @@ plot_gene_dose_effect(
 	gene_colors,
 	bands = FALSE,
 	hormesis = hormesis_results)
+
+plot_gene_dose_effect(
+	reduced_results,
+	c("glnS"), 
+	c("Imipenem_0.09_T2 - None_0_T0"), 
+	gene_colors,
+	bands = FALSE)
 
 
 plot_gene_dose_effect(
@@ -256,4 +286,19 @@ plot_gene_dose_effect(
  	gene_colors,
  	bands = FALSE,
  	hormesis = hormesis_results)
+ 
+ plot_gene_dose_effect(
+ 	full_results,
+ 	c("nuoB"), 
+ 	c("Rifampicin_0.34_T2 - None_0_T0"), 
+ 	gene_colors,
+ 	bands = FALSE,
+ 	hormesis = hormesis_results)
+ 
+ plot_gene_dose_effect(
+ 	reduced_results,
+ 	c("nuoB"), 
+ 	c("Rifampicin_0.34_T2 - None_0_T0"), 
+ 	gene_colors,
+ 	bands = FALSE)
  
