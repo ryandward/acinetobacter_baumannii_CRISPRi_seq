@@ -7,7 +7,8 @@ This repository contains code, data, and processed data products used to generat
 ## Data pre-processing and counting 
 [General strategy to count CRISPRi](https://gist.github.com/ryandward/ed9bb3d3414f4eed17ad58fe6da1ed7a)
 ## Fitness Results
-|                     | Fitness                                                                                                                                | Confidence                                                                                                               |
-|---------------------|----------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| sgRNA-level results | [log<sub>2</sub> fold-changes](https://ryandward.github.io/acinetobacter_baumannii_CRISPRi_seq/Results/results_LFC.html)               | [false discovery rates](https://ryandward.github.io/acinetobacter_baumannii_CRISPRi_seq/Results/results_FDR.html)        |
-| gene-level results  | [median log<sub>2</sub> fold-changes](https://ryandward.github.io/acinetobacter_baumannii_CRISPRi_seq/Results/median_results_LFC.html) | [Stouffer's *p*-values](https://ryandward.github.io/acinetobacter_baumannii_CRISPRi_seq/Results/median_results_FDR.html) |
+[Guide Level](https://ryandward.github.io/acinetobacter_baumannii_CRISPRi_seq/Results/guide_level.html)
+
+[Gene Level](https://ryandward.github.io/acinetobacter_baumannii_CRISPRi_seq/Results/gene_level.html)
+
+[Transcription Unit Level](https://ryandward.github.io/acinetobacter_baumannii_CRISPRi_seq/Results/transcription_units.html)
