@@ -197,7 +197,8 @@ meropenem_subset %>%
 	ylim(-5.75, 3) +
 	theme(legend.position = "none") + 		
 	guides(colour = guide_legend(nrow = 3)) + 
-	doc_theme
+	doc_theme +
+	theme(legend.position = "none")
 
 ###################################################################
 ###################################################################

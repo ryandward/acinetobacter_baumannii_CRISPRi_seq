@@ -10,7 +10,7 @@ library(conflicted)
 conflict_prefer("rename", "dplyr")
 conflict_prefer("filter", "dplyr")
 
-growth_means_inhibition <- 0.1
+growth_means_inhibition <- 0.2
 colistin.max <- 3 * 2
 rifampicin.max <- 1.28 * 2
 
@@ -35,12 +35,12 @@ doc_theme <- theme_ipsum(
 growth.nt <- fread(
 	"Synergy/Triplicate_2/growth.nt.tsv",
 	header = T)
-# growth.lpxC <- fread(
-# 	"Synergy/Triplicate_2/growth.lpxC.tsv",
-# 	header = T)
-# growth.nuoH <- fread(
-# 	"Synergy/Triplicate_2/growth.nuoH.tsv",
-# 	header = T)
+growth.lpxC <- fread(
+	"Synergy/Triplicate_2/growth.lpxC.tsv",
+	header = T)
+growth.nuoH <- fread(
+	"Synergy/Triplicate_2/growth.nuoH.tsv",
+	header = T)
 
 colistin.dose <- data.table(
 	row = LETTERS[1:8], 
@@ -60,8 +60,7 @@ growth <- rbind(
 		mutate(gene = "lpxC"),
 	growth.nuoH %>% 
 		pivot_longer(cols = -`<>`, names_to = "col", values_to = "growth") %>% 
-		mutate(gene = "nuoH")
-	) %>%
+		mutate(gene = "nuoH")) %>%
 	rename(row = `<>`) %>%
 	group_by(gene) %>% 
 	mutate(
@@ -98,7 +97,7 @@ growth <- growth %>%
 		fic.rifampicin = rifampicin/mic.rifampicin)
 
 synergy <- growth %>% 
-	filter(fic.colistin + fic.rifampicin == 1) %>% 
+	filter(fic.colistin + fic.rifampicin == 0.5) %>% 
 	nest %>% 
 	mutate(fit = map(data, ~ glm(colistin ~ rifampicin, data = .))) %>% 
 	mutate(predictions = map2(
@@ -108,8 +107,8 @@ synergy <- growth %>%
 			.x, 
 			newdata = expand_grid(
 				rifampicin = seq(
-					min((.y %>% filter(fic.rifampicin <= 1) %>% select(rifampicin))), 
-					max((.y %>% filter(fic.rifampicin <= 1) %>% select(rifampicin))), 
+					min((.y %>% filter(fic.rifampicin <= 0.5) %>% select(rifampicin))), 
+					max((.y %>% filter(fic.rifampicin <= 0.5) %>% select(rifampicin))), 
 					length = 32))))) %>% 
 	unnest(predictions) %>% 
 	rename(colistin = .fitted) %>% 
@@ -159,7 +158,7 @@ growth <- growth %>%
 
 
 
-growth %>% filter(gene == "non-targeting") %>%
+growth %>% 
 	left_join(mic.rifampicin) %>% 
 	left_join(mic.colistin) %>%
 	mutate(
@@ -192,9 +191,8 @@ growth %>% filter(gene == "non-targeting") %>%
 	#   aes(alpha = Growth)) +
 	geom_line(
 		data = synergy %>% filter(
-			gene == "non-targeting" &
 			rifampicin >= min.rifampicin & colistin >= min.colistin) %>% 
-			rbind(growth %>% filter(fic.colistin + fic.rifampicin == 1 & gene == "non-targeting")),
+			rbind(growth %>% filter(fic.colistin + fic.rifampicin == 0.5)),
 		lwd = 1, lty = "twodash", 
 		colour = "red") + 
 	doc_theme +
@@ -239,19 +237,16 @@ growth %>% filter(gene == "non-targeting") %>%
 geom_richtext(
 	data = . %>% filter(colistin == mic.colistin & rifampicin == min.rifampicin/2),
 	aes(label = str_wrap(paste("MIC:",colistin), 12), y = colistin, hjust = 0),
-	angle = 45,
-	alpha = 0.75,
 	fill = "cornsilk",
 	size = 3) +
 	geom_richtext(
 		data = . %>% filter(rifampicin == mic.rifampicin & colistin == min.colistin/2),
 		aes(label = str_wrap(paste("MIC:",rifampicin), 12), x = rifampicin, hjust = 0), 
-		angle = 45,
-		alpha = 0.75,
+		angle = 90,
 		fill = "cornsilk",
 		size = 3) +
 	theme(
-		legend.position = 'none', legend.direction = "horizontal",
+		legend.position = 'bottom', legend.direction = "horizontal",
 		plot.background = element_blank(),
 		panel.grid.major = element_blank(),
 		panel.grid.minor = element_blank(),

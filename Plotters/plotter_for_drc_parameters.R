@@ -60,7 +60,7 @@ plot_gene_dose_effect <- function(results_data, unique_names, conditions, colors
 	plot.parameters <- plot.vulnerability %>%
 		filter(unique_name %in% plot.genes) %>% 
 		filter(condition %in% plot.conditions) %>%
-		# filter(vuln.p <= 0.05) %>%
+		filter(vuln.p <= 0.05) %>%
 		rename(Condition = condition, Gene = unique_name)
 	
 	if (!is.null(hormesis) && nrow(hormesis) > 0) {
@@ -124,8 +124,15 @@ gene_colors <- c(
 # beautiful 
 plot_gene_dose_effect(
 	reduced_results,
-	c("glnS", "murA", "nuoB", "lpxA"), 
+	c("glnS", "murA", "nuoB", "lpxA", "aroC", "rpmB", "GO593_00515"), 
 	c("None_0_T1 - None_0_T0", "None_0_T2 - None_0_T0"), 
+	gene_colors)
+
+# beautiful 
+plot_gene_dose_effect(
+	reduced_results,
+	c("accD"), 
+	c("Colistin_0.44_T2 - None_0_T0"), 
 	gene_colors)
 
 plot_gene_dose_effect(
@@ -202,13 +209,6 @@ plot_gene_dose_effect(
 	bands = FALSE,
 	hormesis = hormesis_results)
 
-plot_gene_dose_effect(
-	full_results,
-	c("rplR"), 
-	c("Imipenem_0.09_T1 - None_0_T0"), 
-	gene_colors,
-	bands = FALSE,
-	hormesis = hormesis_results)
 
 plot_gene_dose_effect(
 	full_results,
