@@ -316,6 +316,9 @@ plot_operon(
 
 plot_operon(operon_median_results, c("None_0_T2 - None_0_T0"), 15, 5, 10)
 
+plot_operon(operon_median_results, c("None_0_T2 - None_0_T1"), 15, 5, 10)
+
+
 plot_operon(operon_median_results, c("Colistin_0.44_T1 - None_0_T1", "Colistin_0.44_T2 - None_0_T2"))
 
 plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - None_0_T2", "Colistin_0.44_T2 - None_0_T2"), TRUE, 7, 7, 5, 1e-100)
@@ -334,5 +337,11 @@ plot_operon(operon_median_results, c("Meropenem_0.17_T1 - None_0_T1", "Meropenem
 
 plot_operon(operon_median_results, c("Imipenem_0.09_T1 - None_0_T1", "Imipenem_0.09_T2 - None_0_T2"))
 
+plot_operon(operon_median_results, c("Imipenem_0.09_T2 - Imipenem_0.06_T2"))
 
+plot_operon(operon_median_results, c("Meropenem_0.17_T2 - Meropenem_0.11_T2"))
+
+plot_operon(operon_median_results, c("Colistin_0.44_T2 - Colistin_0.44_T1"))
+
+plot_operon(operon_median_results, c("Rifampicin_0.34_T2 - Rifampicin_0.34_T1"))
 
