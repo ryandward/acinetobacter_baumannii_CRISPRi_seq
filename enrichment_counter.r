@@ -127,6 +127,7 @@ contrasts <- makeContrasts(
   T1_Rifampicin = T1_Rifampicin - T1_None,
   T1_Colistin = T1_Colistin - T1_None,
   T1_Col_Rif = T1_Colistin - T1_Rifampicin,
+  T1_Imipenem = T1_Imipenem - T1_None,
   T1_Rif_Imi = T1_Rifampicin - T1_Imipenem,
   levels = aba_permut
 )
@@ -277,7 +278,7 @@ all_sets <- lapply(colnames(contrasts), function(contrast_name) {
   #######################
 
 
-# all_sets <- all_sets %>% 
+all_sets <- all_sets %>% 
 #   inner_join(enrichments) %>% 
 #   inner_join(v_targets) %>%
 #   inner_join(term_stats) %>% 
@@ -288,9 +289,9 @@ all_sets <- lapply(colnames(contrasts), function(contrast_name) {
 #   arrange(FDR, missing_genes) %>% 
 #   slice(1) %>% 
 #   ungroup %>% 
-#   rename(guide_count = NGenes) %>%
+  rename(guide_count = NGenes) %>%
 #   select(term, guide_count, Direction, PValue, FDR, contrast, description, genes_targeted, gene_count)  %>% unique()  %>% 
-#   data.table()
+  data.table()
 
 create_plot <- function(full_data, targets, enrichments, sets) {
   set_name <- deparse(substitute(sets))
@@ -426,6 +427,7 @@ plot_results <- function(results, targets, enrichments, sets) {
 }
 
 plot_results(results, v_targets, enrichments, all_sets)
+
 
 
 
