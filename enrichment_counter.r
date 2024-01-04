@@ -136,8 +136,8 @@ contrasts <- makeContrasts(
   # T1_Rif_Mero = T1_Rifampicin - T1_Meropenem,
   # T2_Rif_Imi = T2_Rifampicin - T2_Imipenem,
   # T2_Rif_Mero = T2_Rifampicin - T2_Meropenem,
-  T1_Col_Rif = T1_Colistin - T1_Rifampicin,
-  T2_Col_Rif = T2_Colistin - T2_Rifampicin,
+  # T1_Col_Rif = T1_Colistin - T1_Rifampicin,
+  # T2_Col_Rif = T2_Colistin - T2_Rifampicin,
   levels = aba_permut
 )
 ##########################################################################################
@@ -302,6 +302,21 @@ best_sets <- all_sets %>%
   select(term, guide_count, Direction, PValue, FDR, contrast, description, genes_targeted, gene_count)  %>% unique()  %>% 
   data.table()
 
+all_sets <- all_sets %>% 
+  inner_join(enrichments) %>% 
+  inner_join(v_targets) %>%
+  inner_join(term_stats) %>% 
+  group_by(contrast, term, description) %>% 
+  nest(locus_tags = locus_tag) %>% 
+  group_by(locus_tags, contrast) %>% 
+  mutate(missing_genes = gene_count - genes_targeted) %>%
+  arrange(FDR, missing_genes) %>% 
+  # slice(1) %>% 
+  ungroup %>% 
+  rename(guide_count = NGenes) %>%
+  select(term, guide_count, Direction, PValue, FDR, contrast, description, genes_targeted, gene_count)  %>% unique()  %>% 
+  data.table()
+
 create_plot <- function(full_data, targets, enrichments, sets) {
   set_name <- deparse(substitute(sets))
 
@@ -329,8 +344,8 @@ create_plot <- function(full_data, targets, enrichments, sets) {
 
   ggplot(plot_data, aes(y = cpm, x = factor(timing), group = interaction(factor(drug_dose), factor(timing)))) +
     geom_tile(data = data.frame(timing= "T2"), aes(x = timing, y = 0), width = 1, height = Inf, fill = "grey50", alpha = 0.2, inherit.aes = FALSE) +
-    geom_sina(aes(weight = as.numeric(weight), color = factor(drug_dose), size = weight), alpha = 0.5, shape = 16, position = "dodge", scale = "width") +
-    geom_violin(aes(weight = as.numeric(weight)), alpha = 0.25, draw_quantiles = c(0.25, 0.5, 0.75), position = "dodge", scale = "width") +
+    geom_sina(aes(weight = as.numeric(weight), color = factor(drug_dose), size = weight), alpha = 0.5, shape = 16, position = "dodge", scale = "area") +
+    geom_violin(aes(weight = as.numeric(weight)), alpha = 0.25, draw_quantiles = c(0.25, 0.5, 0.75), position = "dodge", scale = "area") +
     facet_wrap(~facet_title, nrow = 3, scales = "free_y") +
     scale_size(range = c(0.25, 2.5)) +
     # use some nice colors for fill and color
@@ -354,10 +369,11 @@ create_plot <- function(full_data, targets, enrichments, sets) {
     )
 }
 
-create_plot(aba, v_targets, enrichments, best_sets[contrast == "T2_Col_Rif"])
+create_plot(aba, v_targets[mismatches == 0], enrichments, best_sets[contrast == "T2_Colistin"])
 
+create_plot(aba, v_targets[mismatches == 0], enrichments, all_sets[term == "CL:1032"])
 
-
+create_plot(aba, v_targets, enrichments, best_sets[term %in% c("CL:912", "CL:123", "KW-0444", "GO:0046501")])
 
 
 plot_results <- function(results, targets, enrichments, sets) {
