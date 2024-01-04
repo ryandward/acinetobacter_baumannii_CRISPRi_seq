@@ -241,7 +241,7 @@ locus_tags_list <- split(target_spacers_for_terms$spacer, target_spacers_for_ter
 gene_indices <- lapply(locus_tags_list, function(locus_tags) which(rownames(dge) %in% locus_tags))
 
 
-v <- voom(dge, aba_permut, plot = TRUE)
+v <- voomWithQualityWeights(dge, aba_permut, plot = TRUE)
 
 
 v_targets <- v$E %>%
