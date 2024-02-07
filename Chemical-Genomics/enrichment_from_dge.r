@@ -41,13 +41,11 @@ contrast_list$levels <- dge$design
 contrasts <- do.call(makeContrasts, contrast_list)
 
 
-
-
-all_string <- fread("STRG0060QIE.protein.enrichment.terms.v11.5.txt.gz") %>%
+all_string <- fread("../STRG0060QIE.protein.enrichment.terms.v11.5.txt.gz") %>%
   mutate(locus_tag = str_replace(`#string_protein_id`, ".*\\.", "")) %>%
   unique()
 
-targets <- fread("Ab_library.tsv", na.strings = "None")
+targets <- fread("../Ab_library.tsv", na.strings = "None")
 
 
 gene_groups <- all_string %>%
