@@ -21,11 +21,15 @@ p_load(
   ggforce
 )
 
-dge <- readRDS(file = "~/Chemical-Genomics/20240207_data_y_DGElist.rds")
+dge <- readRDS(file = "Chemical-Genomics/20240207_data_y_DGElist.rds")
+
 colnames(dge$design) <- gsub("[^[:alnum:]]", "_", colnames(dge$design))
 colnames(dge$design) <- gsub("___", " - ", colnames(dge$design))
 
-contrast_levels <- readRDS(file = "~/Chemical-Genomics/contrast_levels.rds")
+dge$samples$group <- gsub("[^[:alnum:]]", "_", dge$samples$group)
+dge$samples$group <- gsub("___", " - ", dge$samples$group)
+
+contrast_levels <- readRDS(file = "Chemical-Genomics/contrast_levels.rds")
 contrast_levels <- gsub("[^[:alnum:]]", "_", contrast_levels)
 contrast_levels <- gsub("___", " - ", contrast_levels)
 
@@ -38,11 +42,11 @@ contrast_list$levels <- dge$design
 contrasts <- do.call(makeContrasts, contrast_list)
 
 
-all_string <- fread("../STRG0060QIE.protein.enrichment.terms.v11.5.txt.gz") %>%
+all_string <- fread("STRG0060QIE.protein.enrichment.terms.v11.5.txt.gz") %>%
   mutate(locus_tag = str_replace(`#string_protein_id`, ".*\\.", "")) %>%
   unique()
 
-targets <- fread("../Ab_library.tsv", na.strings = "None")
+targets <- fread("Ab_library.tsv", na.strings = "None")
 
 
 gene_groups <- all_string %>%
@@ -110,7 +114,6 @@ target_spacers_for_terms <- term_stats %>%
   inner_join(targets, relationship = "many-to-many")
 
 
-
 #########################################################################################
 
 # Split the spacer column by term
@@ -119,9 +122,7 @@ sets_to_locus_tags <- split(target_spacers_for_terms$spacer, target_spacers_for_
 # Find the indices of each set of locus tags in rownames(dge)
 sets_to_locus_tags_indices <- lapply(sets_to_locus_tags, function(locus_tags) which(rownames(dge) %in% locus_tags))
 
-
 v <- voomWithQualityWeights(dge, dge$design, plot = TRUE)
-
 
 # filter out guides that do not have bona-fide targets, but keep non-targeting guides
 # i.e. guides that have no target, or guides that have a target in the same (wrong) direction
@@ -146,7 +147,7 @@ v_targets <- v$E %>%
       group_by(target)
   )
 
-
+# Assign the weight to the guides based on y_pred to be between 1 and 100
 v_targets[y_pred == "None", y_pred := NA_integer_]
 
 v_targets$y_pred <- as.numeric(v_targets$y_pred)
@@ -158,7 +159,6 @@ v_targets[spacer == target, weight := max(v_targets$y_pred, na.rm = TRUE)]
 v_targets[mismatches >= 1, weight := y_pred]
 
 v_targets$weight <- rescale(as.numeric(v_targets$weight), to = c(1, 100))
-
 
 # Perform the competitive gene set test for all gene sets
 all_sets <- lapply(colnames(contrasts), function(contrast_name) {
@@ -224,7 +224,13 @@ annotated_data <- dge$samples %>%
 
 ### you could create a function out of this
 
-this_contrast <- "imipenem_T2_3 - none_T2_3"
+this_term <- "GO:0046933"
+
+title <- term_stats %>%
+  filter(term == this_term) %>%
+  pull(description)
+
+title = paste(title, " (", this_term, ")", sep = "")
 
 enrichment_plot <- contrast_assignments %>%
   inner_join(
@@ -233,16 +239,19 @@ enrichment_plot <- contrast_assignments %>%
   ) %>%
   inner_join(
     all_sets %>%
-      filter(contrast == this_contrast) %>%
-      filter(FDR <= 0.05 & genes_targeted > 10) %>%
+      filter(term == this_term) %>%
       arrange(FDR) %>%
-      head(6)
+      head(24)
   ) %>%
+  arrange(FDR) %>%
+  filter(FDR <= 0.0005) %>%
+  mutate(label = paste(contrast, signif(FDR, 3), paste(Direction, paste("(", paste(genes_targeted,gene_count, sep = "/"), "genes in screen )")), sep = "\n")) %>%
+  mutate(label = factor(label, levels = unique(label))) %>%
   inner_join(enrichments) %>%
   inner_join(annotated_data %>% inner_join(v_targets)) %>%
   arrange(assignment) %>%
   mutate(group = factor(group, levels = unique(group))) %>%
-  ggplot(aes(x = group, y = cpm)) +
+  ggplot(aes(x = as.character(assignment), y = cpm)) +
   geom_sina(aes(weight = as.numeric(weight), size = weight, color = group)) +
   geom_violin(aes(weight = as.numeric(weight)), alpha = 0.25, draw_quantiles = c(0.25, 0.5, 0.75)) +
   scale_size(range = c(0.1, 3)) +
@@ -251,7 +260,7 @@ enrichment_plot <- contrast_assignments %>%
     breaks = c(10^(0:5)),
     labels = scales::label_number(scale_cut = scales::cut_short_scale())
   ) +
-  facet_wrap(~description, scales = "free_y") +
-  ggtitle(this_contrast)
+  facet_wrap(~label) +
+  ggtitle(title)
 
 plot(enrichment_plot)
