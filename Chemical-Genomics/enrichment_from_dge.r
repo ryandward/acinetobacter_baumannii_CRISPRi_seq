@@ -168,7 +168,7 @@ all_sets <- lapply(colnames(contrasts), function(contrast_name) {
     index = sets_to_locus_tags_indices,
     design = dge$design,
     weights = v_targets$weight,
-    # inter.gene.cor = 0.05,
+    inter.gene.cor = 0.05,
     contrast = contrast_column
   ) %>%
     data.table(keep.rownames = "term") %>%
