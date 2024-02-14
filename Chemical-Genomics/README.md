@@ -44,6 +44,17 @@ enrichment_plot <- contrast_assignments %>%
 
 plot(enrichment_plot)
 
+```
 
+Additionally, to create a table of binder scores highlighting Up/Down behavior simply
 
+```R
+all_sets %>%
+  mutate(score = case_when(
+    FDR <= 0.05 & Direction == "Down" ~ -1,
+    FDR <= 0.05 & Direction == "Up" ~ 1,
+    TRUE ~ 0  # This ensures all other cases, including FDR > 0.05, are filled with 0
+  )) %>%
+  dcast(term + description ~ contrast, value.var = "score") %>%
+  clipr::write_clip()
 ```
