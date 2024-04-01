@@ -5,6 +5,22 @@ library(dplyr)
 library(ggplot2)
 library(scales)
 
+score_set <- function(selected_contrast_pattern) {
+  all_sets |>
+    filter(contrast %like% selected_contrast_pattern) |>
+    select(Direction, term, description, FDR, genes_targeted, gene_count, contrast) |>
+    mutate(FDR = signif(FDR, 2)) |>
+    mutate(prop_targ = signif(genes_targeted / gene_count, 2)) |>
+    mutate(sign = ifelse(Direction == "Up", 1, -1)) |>
+    mutate(score = sign * -log10(FDR * prop_targ) * sqrt(genes_targeted)) |>
+    arrange(desc(abs(score)))
+}
+
+# to score everything you could do
+score_set("*") |>
+  mutate(score = signif(score, 2)) |>
+  dcast(term + description + genes_targeted + gene_count ~ contrast, value.var = "score")
+# then write to clipboard and paste into excel with clipr::write_clip()
 
 create_enrichment_plot <- function(selected_term, selected_contrast_pattern) {
   # Filter 'term_stats' using the 'selected_term' argument
@@ -62,3 +78,5 @@ create_enrichment_plot("CL:1517", "cycline")
 create_enrichment_plot("CL:1490", "cycline")
 create_enrichment_plot("GO:0015920", "cycline")
 create_enrichment_plot("GO:0045263", "cycline")
+create_enrichment_plot("GO:0140101", "polymyxin")
+create_enrichment_plot("CL:912", "cycline")
