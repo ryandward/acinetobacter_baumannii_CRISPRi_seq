@@ -59,12 +59,19 @@ create_enrichment_plot <- function(selected_term, selected_contrast_patterns) {
         inner_join(contrast_assignments) %>%
         mutate(contrast = factor(contrast, levels = unique(contrast))) %>%
     mutate(
-      label = paste(
+      label = case_when(
+        FDR <= 0.05 ~ paste(
+          contrast,
+          paste0(Direction, " (", signif(FDR, 2), ")"),
+          paste(paste(paste(genes_targeted, gene_count, sep = "/"), " genes present", sep = "")),
+          sep = "\n"
+      ), 
+      FDR > 0.05 ~ paste(
         contrast,
-        paste("FDR:", signif(FDR, 2)),
-        paste(Direction, paste(paste(genes_targeted, gene_count, sep = "/"), " genes present", sep = "")),
+        paste0("No change", " (", signif(FDR, 2), ")"),
+        paste(paste(paste(genes_targeted, gene_count, sep = "/"), " genes present", sep = "")),
         sep = "\n"
-      )
+      ))
     ) %>%
     mutate(label = factor(label, levels = unique(label))) %>%
     inner_join(enrichments) %>%
@@ -92,7 +99,8 @@ create_enrichment_plot <- function(selected_term, selected_contrast_patterns) {
     ggplot(aes(x = as.character(assignment), y = cpm)) +
     geom_tile(aes(alpha = factor(ifelse(FDR <= 0.05, "highlight", "no_highlight"))), width = Inf, height = Inf, fill = "light grey") +
     geom_sina(aes(weight = weight, size = `Predicted Efficacy`, color = group), shape = 20, alpha = 0.5) +
-    geom_violin(aes(weight = weight), alpha = 0.0, draw_quantiles = c(0.25, 0.5, 0.75), lwd = 1.25) +
+    # geom_violin(aes(weight = weight), alpha = 0.0, draw_quantiles = c(0.25, 0.5, 0.75), lwd = 1.25) +
+    geom_boxplot(aes(weight = weight), alpha = 0.0, lwd = 1.25) +
     scale_alpha_manual(values = c("highlight" = 0.00, "no_highlight" = 0.025), guide = FALSE) +
     scale_y_continuous(trans = scales::pseudo_log_trans(base = 10), breaks = c(10^(0:5)), labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
     facet_wrap(~label) +
@@ -118,3 +126,5 @@ create_enrichment_plot("GO:0140101", "polymyxin")
 create_enrichment_plot("CL:912", "cycline")
 
 create_enrichment_plot("CL:1517", c("amikacin", "tobr", "apramycin"))
+
+
