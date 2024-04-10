@@ -45,18 +45,12 @@ glance.try <- possibly(glance, otherwise = tibble(logLik = NA_real_))
 tidy.try <- possibly(tidy, otherwise = NA)
 
 
-# Test genes and parameters
-test.genes <- c("murA", "rpmB", "aroC", "GO593_00515", "glnS", "nuoB", "lpxC")
-test.genes <- c(test.genes, c("rpmF", "glnS", "trpS", "acpT"))
-
 L.4.parameters <- c("shape", "min_value", "max_value", "kd_50")
 BC.5.parameters <- c("shape", "min_value", "max_value", "kd_50", "hormesis")
 
 # Estimate dose-response models
 mismatches <- melted_results %>%
-	# filter(unique_name %in% test.genes) %>%
 	filter(y_pred > 0) %>%
-	# mutate(y_pred = case_when(y_pred < 0 ~ 0, TRUE ~ y_pred)) %>%
 	filter(condition %in% interested.conditions) %>%
 	filter(unique_name %in% interested.genes) %>%
 	filter(type == "mismatch") %>%

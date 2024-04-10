@@ -1,24 +1,24 @@
 # Load several packages from CRAN and Bioconductor
-require('pacman')
+require("pacman")
 p_load(
-data.table,
-scales,
-edgeR,
-statmod,
-poolr,
-pheatmap,
-svglite,
-ggplot2,
-ggrepel,
-Rtsne,
-pracma,
-colourpicker,
-RColorBrewer,
-vegan,
-tidyverse,
-magrittr,
-ggtext,
-ggforce
+  data.table,
+  scales,
+  edgeR,
+  statmod,
+  poolr,
+  pheatmap,
+  svglite,
+  ggplot2,
+  ggrepel,
+  Rtsne,
+  pracma,
+  colourpicker,
+  RColorBrewer,
+  vegan,
+  tidyverse,
+  magrittr,
+  ggtext,
+  ggforce
 )
 
 # Read in a file containing curated names
@@ -83,7 +83,7 @@ aba_design[, dose := factor(dose, levels = unique(dose))]
 
 
 # Create a design matrix for the groups
-aba_permut <- model.matrix(~ 0 + timing : drug, data = aba_design) %>%
+aba_permut <- model.matrix(~ 0 + timing:drug, data = aba_design) %>%
   set_rownames(aba_design$condition)
 
 aba_permut <- aba_permut[, colSums(aba_permut != 0) > 0]
@@ -105,7 +105,7 @@ aba_grid <-
   )
 
 # Convert the data to a matrix, with spacer names as row names
-aba_grid_matrix <- data.matrix(aba_grid[,-c("spacer")]) %>%
+aba_grid_matrix <- data.matrix(aba_grid[, -c("spacer")]) %>%
   set_rownames(aba_grid$spacer)
 
 # Create a DGEList object
@@ -122,8 +122,8 @@ voom_fit <- voomLmFit(dge, aba_permut)
 
 
 contrasts <- makeContrasts(
-  # T1 = T1_None - T0_None,
-  # T2 = T2_None - T0_None,
+  T1 = T1_None - T0_None,
+  T2 = T2_None - T0_None,
   T1_Rifampicin = T1_Rifampicin - T1_None,
   T2_Rifampicin = T2_Rifampicin - T2_None,
   T1_Colistin = T1_Colistin - T1_None,
@@ -166,60 +166,60 @@ all_string <- fread("STRG0060QIE.protein.enrichment.terms.v11.5.txt.gz") %>%
 
 
 gene_groups <- all_string %>%
-      # filter(term %in% (all_string %>% group_by(term) %>% tally() %>% pull(unique(term)))) %>%
-      group_by(category, term, description) %>%
-      summarise(gene_count = n(), locus_tag = list(sort(unique(locus_tag)))) %>%
-      mutate(locus_tag_group = vapply(locus_tag, paste, collapse = ",", FUN.VALUE = character(1)))
+  # filter(term %in% (all_string %>% group_by(term) %>% tally() %>% pull(unique(term)))) %>%
+  group_by(category, term, description) %>%
+  summarise(gene_count = n(), locus_tag = list(sort(unique(locus_tag)))) %>%
+  mutate(locus_tag_group = vapply(locus_tag, paste, collapse = ",", FUN.VALUE = character(1)))
 
 
-term_stats <- gene_groups %>% 
-  unnest(locus_tag) %>% 
-  inner_join(targets %>% 
-  select(locus_tag) %>% unique()) %>% 
-  group_by(term, gene_count, description) %>% 
-  summarize(genes_targeted = n()) 
+term_stats <- gene_groups %>%
+  unnest(locus_tag) %>%
+  inner_join(targets %>%
+    select(locus_tag) %>% unique()) %>%
+  group_by(term, gene_count, description) %>%
+  summarize(genes_targeted = n())
 
-complete_terms <- term_stats %>% 
+complete_terms <- term_stats %>%
   filter(gene_count == genes_targeted)
 
 # only perform enrichments where all genes are available
 # gene_groups <- complete_terms %>% inner_join(gene_groups)
 
-repeated_gene_groups <- gene_groups %>% 
-  group_by(locus_tag) %>% 
-  mutate(times_listed = n()) %>% 
-  arrange(locus_tag) %>% 
-  ungroup ()
+repeated_gene_groups <- gene_groups %>%
+  group_by(locus_tag) %>%
+  mutate(times_listed = n()) %>%
+  arrange(locus_tag) %>%
+  ungroup()
 
 
 # pick the best annotation for each locus_tag_group, i.e., highest in term, and the lowest in the category_rank
 ranked_annotations <- repeated_gene_groups %>%
-      group_by(locus_tag_group, category) %>%
-      arrange(versionsort::ver_sort(term)) %>%
-      slice(n()) %>%
-      ungroup() %>%
-      mutate(category_rank = case_when(
-        category == "Biological Process (Gene Ontology)" ~ 1,
-        category == "Molecular Function (Gene Ontology)" ~ 2,
-        category == "Cellular Component (Gene Ontology)" ~ 3,
-        category == "Protein Domains and Features (InterPro)" ~ 4,
-        category == "Protein Domains (SMART)" ~ 5,
-        category == "Protein Domains (Pfam)" ~ 6,
-        category == "Annotated Keywords (UniProt)" ~ 7,
-        category == "Reactome Pathways" ~ 8,
-        category == "Subcellular localization (COMPARTMENTS)" ~ 9,
-        category == "Local Network Cluster (STRING)" ~ 10,
-        TRUE ~ NA_integer_
-      )) %>%
-      group_by(locus_tag_group) %>%
-      filter(category_rank == min(category_rank))
+  group_by(locus_tag_group, category) %>%
+  arrange(versionsort::ver_sort(term)) %>%
+  slice(n()) %>%
+  ungroup() %>%
+  mutate(category_rank = case_when(
+    category == "Biological Process (Gene Ontology)" ~ 1,
+    category == "Molecular Function (Gene Ontology)" ~ 2,
+    category == "Cellular Component (Gene Ontology)" ~ 3,
+    category == "Protein Domains and Features (InterPro)" ~ 4,
+    category == "Protein Domains (SMART)" ~ 5,
+    category == "Protein Domains (Pfam)" ~ 6,
+    category == "Annotated Keywords (UniProt)" ~ 7,
+    category == "Reactome Pathways" ~ 8,
+    category == "Subcellular localization (COMPARTMENTS)" ~ 9,
+    category == "Local Network Cluster (STRING)" ~ 10,
+    TRUE ~ NA_integer_
+  )) %>%
+  group_by(locus_tag_group) %>%
+  filter(category_rank == min(category_rank))
 
 enrichments <- ranked_annotations %>%
   ungroup() %>%
   distinct(locus_tag_group, .keep_all = TRUE) %>%
   select(-locus_tag_group) %>%
   unnest(locus_tag) %>%
-  inner_join(term_stats) 
+  inner_join(term_stats)
 
 
 # Get the unique terms
@@ -235,10 +235,10 @@ target_spacers_for_terms <- term_stats %>%
 #########################################################################################
 
 # Split the spacer column by term
-locus_tags_list <- split(target_spacers_for_terms$spacer, target_spacers_for_terms$term)
+sets_to_locus_tags <- split(target_spacers_for_terms$spacer, target_spacers_for_terms$term)
 
 # Find the indices of each set of locus tags in rownames(dge)
-gene_indices <- lapply(locus_tags_list, function(locus_tags) which(rownames(dge) %in% locus_tags))
+sets_to_locus_tags_indices <- lapply(sets_to_locus_tags, function(locus_tags) which(rownames(dge) %in% locus_tags))
 
 
 v <- voomWithQualityWeights(dge, aba_permut, plot = TRUE)
@@ -264,7 +264,7 @@ v_targets[is.na(target) | target == "None", weight := min(v_targets$y_pred, na.r
 
 v_targets[spacer == target, weight := max(v_targets$y_pred, na.rm = TRUE)]
 
-v_targets[mismatches >=1, weight := y_pred]
+v_targets[mismatches >= 1, weight := y_pred]
 
 v_targets$weight <- rescale(as.numeric(v_targets$weight), to = c(1, 100))
 
@@ -273,9 +273,9 @@ all_sets <- lapply(colnames(contrasts), function(contrast_name) {
   contrast_column <- contrasts[, contrast_name]
   result <- camera(
     v,
-    index = gene_indices, design = aba_permut,
+    index = sets_to_locus_tags_indices, design = aba_permut,
     weights = v_targets$weight,
-    inter.gene.cor = 0.05,
+    # inter.gene.cor = 0.05,
     contrast = contrast_column
   ) %>%
     data.table(keep.rownames = "term") %>%
@@ -284,37 +284,39 @@ all_sets <- lapply(colnames(contrasts), function(contrast_name) {
 }) %>%
   do.call(rbind, .)
 
-  #######################
+#######################
 
 
-best_sets <- all_sets %>% 
-  inner_join(enrichments) %>% 
+best_sets <- all_sets %>%
+  inner_join(enrichments) %>%
   inner_join(v_targets) %>%
-  inner_join(term_stats) %>% 
-  group_by(contrast, term, description) %>% 
-  nest(locus_tags = locus_tag) %>% 
-  group_by(locus_tags, contrast) %>% 
+  inner_join(term_stats) %>%
+  group_by(contrast, term, description) %>%
+  nest(locus_tags = locus_tag) %>%
+  group_by(locus_tags, contrast) %>%
   mutate(missing_genes = gene_count - genes_targeted) %>%
-  arrange(FDR, missing_genes) %>% 
-  slice(1) %>% 
-  ungroup %>% 
+  arrange(FDR, missing_genes) %>%
+  slice(1) %>%
+  ungroup() %>%
   rename(guide_count = NGenes) %>%
-  select(term, guide_count, Direction, PValue, FDR, contrast, description, genes_targeted, gene_count)  %>% unique()  %>% 
+  select(term, guide_count, Direction, PValue, FDR, contrast, description, genes_targeted, gene_count) %>%
+  unique() %>%
   data.table()
 
-all_sets <- all_sets %>% 
-  inner_join(enrichments) %>% 
+all_sets <- all_sets %>%
+  inner_join(enrichments) %>%
   inner_join(v_targets) %>%
-  inner_join(term_stats) %>% 
-  group_by(contrast, term, description) %>% 
-  nest(locus_tags = locus_tag) %>% 
-  group_by(locus_tags, contrast) %>% 
+  inner_join(term_stats) %>%
+  group_by(contrast, term, description) %>%
+  nest(locus_tags = locus_tag) %>%
+  group_by(locus_tags, contrast) %>%
   mutate(missing_genes = gene_count - genes_targeted) %>%
-  arrange(FDR, missing_genes) %>% 
-  # slice(1) %>% 
-  ungroup %>% 
+  arrange(FDR, missing_genes) %>%
+  # slice(1) %>%
+  ungroup() %>%
   rename(guide_count = NGenes) %>%
-  select(term, guide_count, Direction, PValue, FDR, contrast, description, genes_targeted, gene_count)  %>% unique()  %>% 
+  select(term, guide_count, Direction, PValue, FDR, contrast, description, genes_targeted, gene_count) %>%
+  unique() %>%
   data.table()
 
 create_plot <- function(full_data, targets, enrichments, sets) {
@@ -343,7 +345,8 @@ create_plot <- function(full_data, targets, enrichments, sets) {
     mutate(facet_title = factor(facet_title, levels = facet_title %>% unique()))
 
   ggplot(plot_data, aes(y = cpm, x = factor(timing), group = interaction(factor(drug_dose), factor(timing)))) +
-    geom_tile(data = data.frame(timing= "T2"), aes(x = timing, y = 0), width = 1, height = Inf, fill = "grey50", alpha = 0.2, inherit.aes = FALSE) +
+    geom_tile(data = data.frame(timing = "T1"), aes(x = timing, y = 0), width = 1, height = Inf, fill = "grey75", alpha = 0.2, inherit.aes = FALSE) +
+    geom_tile(data = data.frame(timing = "T2"), aes(x = timing, y = 0), width = 1, height = Inf, fill = "grey50", alpha = 0.2, inherit.aes = FALSE) +
     geom_sina(aes(weight = as.numeric(weight), color = factor(drug_dose), size = weight), alpha = 0.5, shape = 16, position = "dodge", scale = "area") +
     geom_violin(aes(weight = as.numeric(weight)), alpha = 0.25, draw_quantiles = c(0.25, 0.5, 0.75), position = "dodge", scale = "area") +
     facet_wrap(~facet_title, nrow = 3, scales = "free_y") +
@@ -369,11 +372,14 @@ create_plot <- function(full_data, targets, enrichments, sets) {
     )
 }
 
-create_plot(aba, v_targets[mismatches == 0], enrichments, best_sets[contrast == "T2_Colistin"])
-
+create_plot(aba, v_targets, enrichments, best_sets[contrast == "T2_Rifampicin"])
+create_plot(aba, v_targets, enrichments, best_sets[contrast == "T2_Colistin"])
+create_plot(aba, v_targets, enrichments, best_sets[contrast == "T2"])
+create_plot(aba, v_targets, enrichments, best_sets[contrast == "T1"])
 create_plot(aba, v_targets[mismatches == 0], enrichments, all_sets[term == "CL:1032"])
-
 create_plot(aba, v_targets, enrichments, best_sets[term %in% c("CL:912", "CL:123", "KW-0444", "GO:0046501")])
+create_plot(aba, v_targets, enrichments, all_sets[term %in% c("CL:6627")])
+create_plot(aba, v_targets, enrichments, all_sets[term %in% c("KW-0819")])
 
 
 plot_results <- function(results, targets, enrichments, sets) {
@@ -381,7 +387,7 @@ plot_results <- function(results, targets, enrichments, sets) {
 
   # Find the terms with the lowest FDR
   lowest_FDR_terms <- sets %>%
-  filter(!contrast %in% c("T1", "T2")) %>%
+    filter(!contrast %in% c("T1", "T2")) %>%
     arrange(FDR) %>%
     pull(term) %>%
     unique() %>%
@@ -390,27 +396,29 @@ plot_results <- function(results, targets, enrichments, sets) {
   # Filter the rows that have those terms
   filtered_sets <- sets %>%
     filter(term %in% lowest_FDR_terms) %>%
-    arrange(FDR) %>% rename(winning_contrast = contrast) %>% unique() %>%
+    arrange(FDR) %>%
+    rename(winning_contrast = contrast) %>%
+    unique() %>%
     group_by(term) %>%
-    arrange(FDR) %>% 
+    arrange(FDR) %>%
     slice(1)
 
   plot_data <- results %>%
     filter(!contrast %in% c("T1", "T2")) %>%
-      inner_join(targets, relationship = "many-to-many") %>%
-      inner_join(enrichments, relationship = "many-to-many") %>%
-      inner_join(
-        rbind(filtered_sets)  
-      ) %>%
-      # filter(FDR <= 0.05) %>%
-      # group_by(factor(drug_dose), factor(induced), term) %>%
-      ungroup() %>%
-      arrange(FDR) %>%
-      mutate(description = stringr::str_wrap(description, width = 30)) %>%
-      mutate(facet_title = paste0("**", term, "**", " — ", Direction, "<br>", description)) %>%
-      mutate(facet_title = gsub("\n", "<br>", facet_title)) %>%
-      mutate(facet_title = paste(facet_title, paste0("**FDR** = ", signif(FDR, 2), ", *n* = ", guide_count), winning_contrast, sep = "<br>")) %>%
-      mutate(facet_title = factor(facet_title, levels = facet_title %>% unique()))
+    inner_join(targets, relationship = "many-to-many") %>%
+    inner_join(enrichments, relationship = "many-to-many") %>%
+    inner_join(
+      rbind(filtered_sets)
+    ) %>%
+    # filter(FDR <= 0.05) %>%
+    # group_by(factor(drug_dose), factor(induced), term) %>%
+    ungroup() %>%
+    arrange(FDR) %>%
+    mutate(description = stringr::str_wrap(description, width = 30)) %>%
+    mutate(facet_title = paste0("**", term, "**", " — ", Direction, "<br>", description)) %>%
+    mutate(facet_title = gsub("\n", "<br>", facet_title)) %>%
+    mutate(facet_title = paste(facet_title, paste0("**FDR** = ", signif(FDR, 2), ", *n* = ", guide_count), winning_contrast, sep = "<br>")) %>%
+    mutate(facet_title = factor(facet_title, levels = facet_title %>% unique()))
 
   ggplot(plot_data, aes(y = logFC, x = factor(contrast))) +
     # geom_tile(data = data.frame(timing= "T2"), aes(x = timing, y = 0), width = 1, height = Inf, fill = "grey50", alpha = 0.2, inherit.aes = FALSE) +
@@ -435,10 +443,5 @@ plot_results <- function(results, targets, enrichments, sets) {
     )
 }
 
-plot_results(results, v_targets, enrichments, best_sets[contrast == "T2_Col_Rif"])
-
-
-
-
-
-
+plot_results(results, v_targets, enrichments, best_sets[contrast == "T2_Colistin"])
+plot_results(results, v_targets, enrichments, best_sets[contrast == "T2_Rifampicin"])

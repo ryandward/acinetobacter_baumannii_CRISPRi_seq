@@ -1,5 +1,3 @@
-
-
 # Split the spacer column by term
 locus_tag_lists <- split(targets$spacer, targets$locus_tag)
 
@@ -10,7 +8,8 @@ locus_tag_indices <- lapply(locus_tag_lists, function(locus_tags) which(rownames
 locus_tag_confidence <- lapply(colnames(contrasts), function(contrast_name) {
   contrast_column <- contrasts[, contrast_name]
   result <- camera(
-    v, index = locus_tag_indices, design = aba_permut,
+    v,
+    index = locus_tag_indices, design = aba_permut,
     # geneid = v_targets$locus_tag,
     # allow.neg.cor = TRUE,
     weights = v_targets$weight,
@@ -20,18 +19,19 @@ locus_tag_confidence <- lapply(colnames(contrasts), function(contrast_name) {
     # use.ranks = TRUE,
     contrast = contrast_column
   ) %>%
-  data.table(keep.rownames = "locus_tag") %>% 
-  mutate(contrast = factor(contrast_name))
+    data.table(keep.rownames = "locus_tag") %>%
+    mutate(contrast = factor(contrast_name))
   result
-}) %>% 
-do.call(rbind, .)
+}) %>%
+  do.call(rbind, .)
 
 
-locus_tag_confidence <- v_targets %>% 
-  select(locus_tag, weight, spacer) %>% unique() %>% 
-  group_by(locus_tag) %>% 
-  summarise(weights = sum(weight)) %>% 
-  inner_join(locus_tag_confidence) %>% 
+locus_tag_confidence <- v_targets %>%
+  select(locus_tag, weight, spacer) %>%
+  unique() %>%
+  group_by(locus_tag) %>%
+  summarise(weights = sum(weight)) %>%
+  inner_join(locus_tag_confidence) %>%
   rename(NGuides = NGenes) %>%
   data.table()
 
@@ -41,22 +41,22 @@ locus_tag_confidence <- v_targets %>%
 
 # Function to create a graph for a given contrast
 create_graph <- function(current_contrast) {
-  edges <- (all_sets[current_contrast == contrast] %>% 
-    rename(FDR.term = FDR, PValue.term = PValue, Direction.term = Direction)) %>% 
+  edges <- (all_sets[current_contrast == contrast] %>%
+    rename(FDR.term = FDR, PValue.term = PValue, Direction.term = Direction)) %>%
     inner_join(enrichments %>% select(term, description, category, locus_tag) %>% unique()) %>%
-    inner_join(locus_tag_confidence[current_contrast == contrast] %>% 
-    rename(FDR.gene= FDR, PValue.gene = PValue, Direction.gene = Direction)) %>% 
+    inner_join(locus_tag_confidence[current_contrast == contrast] %>%
+      rename(FDR.gene = FDR, PValue.gene = PValue, Direction.gene = Direction)) %>%
     filter(FDR.term <= 0.05 & FDR.gene <= 0.05) %>%
-    inner_join(v_targets %>% select(locus_tag, gene) %>% 
-    unique()) %>%
-    filter(Direction.term == Direction.gene) 
+    inner_join(v_targets %>% select(locus_tag, gene) %>%
+      unique()) %>%
+    filter(Direction.term == Direction.gene)
 
   # Create an edge list from your data
   edge_list <- edges %>% select(term, locus_tag, weights)
 
   # Create the graph
   g <- graph_from_data_frame(edge_list, directed = FALSE)
-  
+
   # Add contrast as a graph attribute
   g$contrast <- current_contrast
 
@@ -111,7 +111,7 @@ calculate_centrality_and_extract_attributes <- function(g) {
   vertex_attr_dt <- rbindlist(lapply(1:length(subgraphs), function(i) {
     dt <- as.data.table(vertex_attr(subgraphs[[i]]))
     dt[, graph := i]
-    dt[, contrast := g$contrast]  # Add the contrast column
+    dt[, contrast := g$contrast] # Add the contrast column
     return(dt)
   }), fill = TRUE)
 
@@ -139,7 +139,7 @@ create_adjacency_graphs <- function(g) {
 
   # Ensure that genes are in the first column and terms are in the second column
   edges_ordered <- edges
-  if(unique(edges$V1_type) == "term") {
+  if (unique(edges$V1_type) == "term") {
     edges_ordered <- edges[, c("V2", "V1", "V2_type", "V1_type")]
     names(edges_ordered) <- c("V1", "V2", "V1_type", "V2_type")
   }
@@ -236,15 +236,19 @@ combined_term_adj_verts <- rbindlist(term_adj_verts_list, fill = TRUE)
 combined_gene_adj_verts <- rbindlist(gene_adj_verts_list, fill = TRUE)
 
 
-gene_centrality <- combined_gene_adj_verts %>% 
-  inner_join(curated_names %>% rename(name = AB19606)) %>% 
-  rename(locus_tag = name) %>% select(contrast, locus_tag, unique_name, graph, degree, closeness, betweenness, eigen_centrality)
+gene_centrality <- combined_gene_adj_verts %>%
+  inner_join(curated_names %>% rename(name = AB19606)) %>%
+  rename(locus_tag = name) %>%
+  select(contrast, locus_tag, unique_name, graph, degree, closeness, betweenness, eigen_centrality)
 
-term_centrality <- combined_term_adj_verts %>% 
-  rename(term = name) %>% 
-  inner_join(term_stats) %>% 
-  mutate(missing_genes = gene_count - genes_targeted) %>% 
+term_centrality <- combined_term_adj_verts %>%
+  rename(term = name) %>%
+  inner_join(term_stats) %>%
+  mutate(missing_genes = gene_count - genes_targeted) %>%
   arrange(missing_genes, desc(genes_targeted), desc(betweenness)) %>%
   inner_join(all_sets %>% select(term, contrast, FDR, Direction))
 
-term_centrality %>% select(description, Direction, FDR, contrast, eigen_centrality, betweenness, graph) %>% as_tibble() %>% print(n=25)
+term_centrality %>%
+  select(description, Direction, FDR, contrast, eigen_centrality, betweenness, graph) %>%
+  as_tibble() %>%
+  print(n = 25)

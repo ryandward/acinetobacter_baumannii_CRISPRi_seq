@@ -199,7 +199,11 @@ contrast_assignments <- contrasts %>%
     variable.name = "contrast",
     value.name = "assignment"
   ) %>%
-  filter(assignment != 0)
+  filter(assignment != 0) %>%
+  mutate(assignment = case_when(
+    assignment == 1 ~ "Treatment",
+    assignment == -1 ~ "Control"
+  ))
 
 group_assignments <- dge$design %>%
   data.table(keep.rownames = "sample") %>%
@@ -224,7 +228,7 @@ annotated_data <- dge$samples %>%
 
 ### you could create a function out of this
 
-this_term <- "GO:0046933"
+this_term <- "CL:912"
 
 title <- term_stats %>%
   filter(term == this_term) %>%
@@ -244,7 +248,7 @@ enrichment_plot <- contrast_assignments %>%
       head(24)
   ) %>%
   arrange(FDR) %>%
-  filter(FDR <= 0.0005) %>%
+  filter(FDR <= 0.05) %>%
   mutate(label = paste(contrast, signif(FDR, 3), paste(Direction, paste("(", paste(genes_targeted,gene_count, sep = "/"), "genes in screen )")), sep = "\n")) %>%
   mutate(label = factor(label, levels = unique(label))) %>%
   inner_join(enrichments) %>%
@@ -264,3 +268,5 @@ enrichment_plot <- contrast_assignments %>%
   ggtitle(title)
 
 plot(enrichment_plot)
+
+

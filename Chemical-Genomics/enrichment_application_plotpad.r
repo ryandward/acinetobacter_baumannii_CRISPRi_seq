@@ -1,9 +1,10 @@
-source("enrichment_application.r")
+source("Chemical-Genomics/enrichment_application.r")
 
 
 library(dplyr)
 library(ggplot2)
 library(scales)
+library(Hmisc)
 
 score_set <- function(selected_contrast_pattern, pattern = TRUE) {
 
@@ -48,7 +49,7 @@ create_enrichment_plot <- function(selected_term, selected_contrast_patterns) {
   }
   
   # Construct the plot with dynamic filtering based on 'selected_term' and 'selected_contrast_patterns'
-  enrichment_plot <- contrast_assignments %>%
+  enrichment_data <- contrast_assignments %>%
     inner_join(group_assignments) %>%
     inner_join(
       all_sets %>%
@@ -76,18 +77,32 @@ create_enrichment_plot <- function(selected_term, selected_contrast_patterns) {
       assignment == -1 ~ "Control"
     )) %>%
     mutate(group = factor(group, levels = unique(group))) %>%
+    mutate(`Predicted Efficacy` = rescale(as.numeric(weight), to = c(1, 100)))
+
+  quantiles <- enrichment_data %>% 
+    group_by(contrast, assignment, label) %>% 
+    summarise(cpm = wtd.quantile(cpm, weights = weight, probs = 0.5))
+  
+  print(quantiles)
+
+
+
+
+  enrichment_plot <- enrichment_data %>%
     ggplot(aes(x = as.character(assignment), y = cpm)) +
     geom_tile(aes(alpha = factor(ifelse(FDR <= 0.05, "highlight", "no_highlight"))), width = Inf, height = Inf, fill = "light grey") +
-    geom_sina(aes(weight = weight, size = y_pred), shape = 21, color = "darkgrey", lwd = 0.1) +
-    geom_violin(aes(weight = weight), alpha = 0.0, draw_quantiles = c(0.25, 0.5, 0.75), lwd = 0.75) +
+    geom_sina(aes(weight = weight, size = `Predicted Efficacy`, color = group), shape = 20, alpha = 0.5) +
+    geom_violin(aes(weight = weight), alpha = 0.0, draw_quantiles = c(0.25, 0.5, 0.75), lwd = 1.25) +
     scale_alpha_manual(values = c("highlight" = 0.00, "no_highlight" = 0.025), guide = FALSE) +
-    scale_size(range = c(0.1, 3)) +
     scale_y_continuous(trans = scales::pseudo_log_trans(base = 10), breaks = c(10^(0:5)), labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
     facet_wrap(~label) +
     labs(x = NULL, y = "Counts per Million") +
     ggtitle(title) +
     scale_fill_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0) +
-    scale_size_continuous(range = c(1, 5), limits = c(0, 1)) +
+    scale_size_continuous(range = c(0.5, 5), limits = c(0, 100)) +
+    geom_label(data = quantiles, aes(label = round(cpm, 0)), alpha = 0.75) + # Add labels
+    geom_label(data = quantiles, aes(label = round(cpm, 0)), fill = NA) + # Add labels
+
     theme_minimal()
 
   print(enrichment_plot)
@@ -98,23 +113,8 @@ create_enrichment_plot("CL:1517", "cycline") # heme copper terminal oxidase
 create_enrichment_plot("CL:1490", "cycline")
 create_enrichment_plot("GO:0015920", "cycline")
 create_enrichment_plot("GO:0045263", "cycline")
-create_enrichment_plot("GO:0008137", "cycline")
-create_enrichment_plot("CL:1490", "cycline")
+create_enrichment_plot("GO:0140101", "polymyxin")
 
-create_enrichment_plot("GO:0140101", c("colistin", "polymyxin"))
+create_enrichment_plot("CL:912", "cycline")
 
-
-create_enrichment_plot("GO:0071554", "penem") #direct target
-create_enrichment_plot("CL:2527", "chlorhexidine" ) #direct target. minor differences in efficacy
-create_enrichment_plot("GO:0003887", "floxacin" ) #direct target, different mechanism of action, different class of drug
-
-create_enrichment_plot("CL:332", c("carvacrol", "thymol")) #NADH
-create_enrichment_plot("GO:0042886", c("carvacrol", "thymol")) #potential target
-
-create_enrichment_plot("CL:1490", c("fosfo", "indole"))
-create_enrichment_plot("GO:0005216", "trimethoprim")
-
-create_enrichment_plot("CL:535", "DMSO")
-
-create_enrichment_plot("CL:2556", c("EDTA", "TPEN"))
-create_enrichment_plot("CL:1265", c("EDTA", "TPEN"))
+create_enrichment_plot("CL:1517", c("amikacin", "tobr", "apramycin"))
